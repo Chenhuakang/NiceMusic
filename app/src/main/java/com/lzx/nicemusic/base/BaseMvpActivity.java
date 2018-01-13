@@ -2,11 +2,13 @@ package com.lzx.nicemusic.base;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.lzx.nicemusic.R;
@@ -15,6 +17,7 @@ import com.lzx.nicemusic.base.mvp.BaseMvpProxy;
 import com.lzx.nicemusic.base.mvp.factory.PresenterMvpFactory;
 import com.lzx.nicemusic.base.mvp.factory.PresenterMvpFactoryImpl;
 import com.lzx.nicemusic.base.mvp.factory.PresenterProxyInterface;
+import com.lzx.nicemusic.utils.SystemBarHelper;
 
 
 /**
@@ -31,6 +34,8 @@ public abstract class BaseMvpActivity<V extends BaseContract.BaseView, P extends
      * 创建被代理对象,传入默认Presenter的工厂
      */
     private BaseMvpProxy<V, P> mProxy;
+
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,7 +63,22 @@ public abstract class BaseMvpActivity<V extends BaseContract.BaseView, P extends
      * 初始化StatusBar
      */
     protected void initStatusBar() {
-
+        mToolbar = findViewById(R.id.toolbar);
+        if (mToolbar != null) {
+            SystemBarHelper.immersiveStatusBar(this, 0);
+            SystemBarHelper.setHeightAndPadding(this, mToolbar);
+            setSupportActionBar(mToolbar);
+            getSupportActionBar().setTitle("");
+            mToolbar.setTitleMarginStart(0);
+            mToolbar.setContentInsetStartWithNavigation(0);
+            mToolbar.setNavigationOnClickListener(v -> {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    finish();
+                } else {
+                    supportFinishAfterTransition();
+                }
+            });
+        }
     }
 
     /**
@@ -127,7 +147,6 @@ public abstract class BaseMvpActivity<V extends BaseContract.BaseView, P extends
         mProxy.onDestroy();
         super.onDestroy();
     }
-
 
 
     /**
@@ -219,7 +238,6 @@ public abstract class BaseMvpActivity<V extends BaseContract.BaseView, P extends
     protected View $(@IdRes int id) {
         return this.findViewById(id);
     }
-
 
 
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 圆形头像控件-->
+    <declare-styleable name="OuterLayerImageView">
+        <attr name="outerLayerColor" format="color"/>
+    </declare-styleable>
+
+</resources>
