@@ -10,7 +10,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
  * Created by xian on 2018/1/13.
  */
 
-public class GildeUtil {
+public class GlideUtil {
 
     public static void loadImageByUrl(Context context, String url, ImageView imageView) {
         Glide.with(context).load(url).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);

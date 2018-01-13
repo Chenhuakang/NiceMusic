@@ -17,6 +17,7 @@ import com.lzx.nicemusic.base.mvp.BaseMvpProxy;
 import com.lzx.nicemusic.base.mvp.factory.PresenterMvpFactory;
 import com.lzx.nicemusic.base.mvp.factory.PresenterMvpFactoryImpl;
 import com.lzx.nicemusic.base.mvp.factory.PresenterProxyInterface;
+import com.trello.rxlifecycle2.components.support.RxFragment;
 
 /**
  * 基础fragment
@@ -25,7 +26,7 @@ import com.lzx.nicemusic.base.mvp.factory.PresenterProxyInterface;
  * @date 2017/12/5
  */
 
-public abstract class BaseMvpFragment<V extends BaseContract.BaseView, P extends BaseContract.BasePresenter<V>> extends Fragment implements PresenterProxyInterface<V, P>, BaseContract.BaseView {
+public abstract class BaseMvpFragment<V extends BaseContract.BaseView, P extends BaseContract.BasePresenter<V>> extends RxFragment implements PresenterProxyInterface<V, P>, BaseContract.BaseView {
 
     protected View mRootView;
     protected LayoutInflater inflater;

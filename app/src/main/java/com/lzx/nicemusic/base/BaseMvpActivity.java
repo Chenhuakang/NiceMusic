@@ -18,6 +18,7 @@ import com.lzx.nicemusic.base.mvp.factory.PresenterMvpFactory;
 import com.lzx.nicemusic.base.mvp.factory.PresenterMvpFactoryImpl;
 import com.lzx.nicemusic.base.mvp.factory.PresenterProxyInterface;
 import com.lzx.nicemusic.utils.SystemBarHelper;
+import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
 
 /**
@@ -26,7 +27,7 @@ import com.lzx.nicemusic.utils.SystemBarHelper;
  * @author lzx
  * @date 2017/12/5
  */
-public abstract class BaseMvpActivity<V extends BaseContract.BaseView, P extends BaseContract.BasePresenter<V>> extends AppCompatActivity implements PresenterProxyInterface<V, P>, BaseContract.BaseView {
+public abstract class BaseMvpActivity<V extends BaseContract.BaseView, P extends BaseContract.BasePresenter<V>> extends RxAppCompatActivity implements PresenterProxyInterface<V, P>, BaseContract.BaseView {
     protected Context mContext;
     private static final String PRESENTER_SAVE_KEY = "presenter_save_key";
 
