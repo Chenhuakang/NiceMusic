@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <com.lzx.nicemusic.widget.OuterLayerImageView
-        android:id="@+id/item_banner"
+    <com.lzx.nicemusic.widget.banner.BannerView
+        android:id="@+id/banner_view"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:scaleType="centerCrop" />
-</android.support.constraint.ConstraintLayout>
+        android:layout_height="200dp" />
+
+    <include layout="@layout/item_top_layout" />
+</LinearLayout>

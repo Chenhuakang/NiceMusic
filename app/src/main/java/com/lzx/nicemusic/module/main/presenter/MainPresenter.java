@@ -50,7 +50,10 @@ public class MainPresenter extends BasePresenter<MainContract.View> implements M
                         }.getType()))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(homeInfos -> mView.requestMainDataSuccess(homeInfos),
+                .subscribe(homeInfos -> {
+                            mView.requestMainDataSuccess(homeInfos);
+                            updateCache();
+                        },
                         throwable -> LogUtil.i("-->" + throwable.getMessage()));
     }
 

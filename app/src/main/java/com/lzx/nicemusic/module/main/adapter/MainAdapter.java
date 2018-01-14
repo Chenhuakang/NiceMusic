@@ -2,7 +2,6 @@ package com.lzx.nicemusic.module.main.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +13,8 @@ import android.widget.TextView;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.bean.BannerInfo;
 import com.lzx.nicemusic.bean.HomeInfo;
-import com.lzx.nicemusic.module.main.sectioned.BannerSection;
 import com.lzx.nicemusic.utils.FormatUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
-import com.lzx.nicemusic.utils.LogUtil;
 import com.lzx.nicemusic.widget.OuterLayerImageView;
 import com.lzx.nicemusic.widget.RectangleImageView;
 import com.lzx.nicemusic.widget.SquareImageView;
@@ -79,25 +76,25 @@ public class MainAdapter extends RecyclerView.Adapter {
         View view;
         switch (viewType) {
             case HomeInfo.TYPE_ITEM_BANNER:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.section_banner_view, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_banner_view, parent, false);
                 return new BannerHolder(view);
             case HomeInfo.TYPE_ITEM_TITLE:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.section_header_title, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_header_title, parent, false);
                 return new TitleHolder(view);
             case HomeInfo.TYPE_ITEM_ONE:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.section_item_one, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_type_one, parent, false);
                 return new OneHolder(view);
             case HomeInfo.TYPE_ITEM_LONGLEGS:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.section_item_longlegs, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_item_longlegs, parent, false);
                 return new LongLegsHolder(view);
             case HomeInfo.TYPE_ITEM_TWO:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.section_item_two, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_type_two, parent, false);
                 return new TwoHolder(view);
             case HomeInfo.TYPE_ITEM_THREE:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.section_item_music, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_item_music, parent, false);
                 return new ItemViewHolder(view);
             case HomeInfo.TYPE_ITEM_ARTS:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.section_item_arts, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_item_arts, parent, false);
                 return new ArtsHolder(view);
             default:
                 return null;
@@ -117,7 +114,7 @@ public class MainAdapter extends RecyclerView.Adapter {
 
                         @Override
                         public View createHolderView(BannerInfo bannerInfo) {
-                            View bannerView = View.inflate(mContext, R.layout.item_banner_view, null);
+                            View bannerView = View.inflate(mContext, R.layout.layout_banner_view, null);
                             OuterLayerImageView mImageBanner = bannerView.findViewById(R.id.item_banner);
                             GlideUtil.loadImageByUrl(mContext, bannerInfo.getThumb(), mImageBanner);
                             return bannerView;
@@ -140,7 +137,7 @@ public class MainAdapter extends RecyclerView.Adapter {
 
                         @Override
                         public View createHolderView(BannerInfo bannerInfo) {
-                            View bannerView = View.inflate(mContext, R.layout.item_banner_longlegs, null);
+                            View bannerView = View.inflate(mContext, R.layout.layout_banner_longlegs, null);
                             OuterLayerImageView mImageBanner = bannerView.findViewById(R.id.item_banner);
                             TextView mBannerTitle = bannerView.findViewById(R.id.banner_title);
                             mBannerTitle.setText(bannerInfo.getTitle());

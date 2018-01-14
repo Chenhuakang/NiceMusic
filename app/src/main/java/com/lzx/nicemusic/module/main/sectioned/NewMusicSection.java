@@ -24,8 +24,8 @@ public class NewMusicSection extends StatelessSection {
     private List<MusicInfo> mMusicInfos;
 
     public NewMusicSection(Context context, List<MusicInfo> newMusics) {
-        super(new SectionParameters.Builder(R.layout.section_item_music)
-                .headerResourceId(R.layout.section_header_title).build());
+        super(new SectionParameters.Builder(R.layout.item_item_music)
+                .headerResourceId(R.layout.item_header_title).build());
         mContext = context;
         mMusicInfos = newMusics;
     }

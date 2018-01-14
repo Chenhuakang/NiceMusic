@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.bean.BannerInfo;
@@ -28,7 +27,7 @@ public class BannerSection extends StatelessSection {
     private List<BannerInfo> mBannerInfos;
 
     public BannerSection(Context context, List<BannerInfo> bannerInfos) {
-        super(new SectionParameters.Builder(R.layout.section_banner_view).build());
+        super(new SectionParameters.Builder(R.layout.layout_banner_view).build());
         mContext = context;
         mBannerInfos = bannerInfos;
     }
@@ -54,7 +53,7 @@ public class BannerSection extends StatelessSection {
 
                     @Override
                     public View createHolderView(BannerInfo bannerInfo) {
-                        View bannerView = View.inflate(mContext, R.layout.item_banner_view, null);
+                        View bannerView = View.inflate(mContext, R.layout.layout_banner_view, null);
                         OuterLayerImageView mImageBanner = bannerView.findViewById(R.id.item_banner);
                         GlideUtil.loadImageByUrl(mContext, bannerInfo.getThumb(), mImageBanner);
                         return bannerView;

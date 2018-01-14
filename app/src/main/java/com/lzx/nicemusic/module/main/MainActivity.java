@@ -1,5 +1,6 @@
 package com.lzx.nicemusic.module.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
@@ -16,6 +17,7 @@ import com.lzx.nicemusic.callback.BaseDiffUtilCallBack;
 import com.lzx.nicemusic.module.main.adapter.MainAdapter;
 import com.lzx.nicemusic.module.main.presenter.MainContract;
 import com.lzx.nicemusic.module.main.presenter.MainPresenter;
+import com.lzx.nicemusic.module.search.SearchActivity;
 import com.lzx.nicemusic.utils.DisplayUtil;
 import com.lzx.nicemusic.utils.LogUtil;
 
@@ -25,7 +27,7 @@ import org.json.JSONObject;
 import java.util.List;
 
 @CreatePresenter(MainPresenter.class)
-public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresenter> implements MainContract.View {
+public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresenter> implements MainContract.View, View.OnClickListener {
 
     private RecyclerView mRecyclerView;
     private TextView mEdSearch;
@@ -86,6 +88,10 @@ public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresent
             }
         });
         getPresenter().requestMusicList();
+
+
+        //搜索
+        mEdSearch.setOnClickListener(this);
     }
 
     @Override
@@ -95,6 +101,16 @@ public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresent
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callBack, true);
         mMainAdapter.setHomeInfos(dataList);
         diffResult.dispatchUpdatesTo(mMainAdapter);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.ed_search:
+                Intent intent = new Intent(this, SearchActivity.class);
+                startActivity(intent);
+                break;
+        }
     }
 }
 

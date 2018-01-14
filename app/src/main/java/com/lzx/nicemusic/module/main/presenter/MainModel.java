@@ -79,7 +79,6 @@ public class MainModel {
                     homeInfos.add(homeInfo);
 
                     String cacheJson = new Gson().toJson(homeInfos);
-
                     CacheManager.getImpl().saveCache(CacheManager.KEY_HOME_LIST_DATA, cacheJson);
 
                     return homeInfos;
