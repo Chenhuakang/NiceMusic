@@ -42,6 +42,7 @@ public class SearchActivity extends BaseMvpActivity<SearchContract.View, SearchP
     private SearchResultSection mSearchResultSection;
     private String SearchHistorySectionTag = "SearchHistorySectionTag";
     private String SearchResultSectionTag = "SearchResultSectionTag";
+    private int deletePosition = -1;
 
     @Override
     protected int getLayoutId() {
@@ -81,8 +82,6 @@ public class SearchActivity extends BaseMvpActivity<SearchContract.View, SearchP
 
         getPresenter().requestDefaultSearchData();
     }
-
-    private int deletePosition = -1;
 
     @Override
     public void onClick(View view) {
@@ -134,6 +133,4 @@ public class SearchActivity extends BaseMvpActivity<SearchContract.View, SearchP
         mSectionedRecyclerViewAdapter.addSection(SearchResultSectionTag, mSearchResultSection);
         mSectionedRecyclerViewAdapter.notifyDataSetChanged();
     }
-
-
 }

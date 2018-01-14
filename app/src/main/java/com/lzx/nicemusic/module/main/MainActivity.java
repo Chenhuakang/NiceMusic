@@ -14,6 +14,7 @@ import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
 import com.lzx.nicemusic.bean.HomeInfo;
 import com.lzx.nicemusic.callback.BaseDiffUtilCallBack;
+import com.lzx.nicemusic.module.area.AreaActivity;
 import com.lzx.nicemusic.module.main.adapter.MainAdapter;
 import com.lzx.nicemusic.module.main.presenter.MainContract;
 import com.lzx.nicemusic.module.main.presenter.MainPresenter;
@@ -33,7 +34,7 @@ public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresent
     private TextView mEdSearch;
     private View mBgSearch;
     private MainAdapter mMainAdapter;
-
+    private Intent intent;
     private float mDistanceY = 0;
 
     @Override
@@ -89,7 +90,6 @@ public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresent
         });
         getPresenter().requestMusicList();
 
-
         //搜索
         mEdSearch.setOnClickListener(this);
     }
@@ -101,13 +101,24 @@ public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresent
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callBack, true);
         mMainAdapter.setHomeInfos(dataList);
         diffResult.dispatchUpdatesTo(mMainAdapter);
+        mMainAdapter.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ed_search:
-                Intent intent = new Intent(this, SearchActivity.class);
+                intent = new Intent(this, SearchActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.btn_me:
+                break;
+            case R.id.btn_music:
+                break;
+            case R.id.btn_other:
+                break;
+            case R.id.btn_area:
+                intent = new Intent(this, AreaActivity.class);
                 startActivity(intent);
                 break;
         }

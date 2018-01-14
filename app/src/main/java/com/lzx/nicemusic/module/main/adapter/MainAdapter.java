@@ -30,8 +30,8 @@ import java.util.List;
 public class MainAdapter extends RecyclerView.Adapter {
 
     private Context mContext;
-
     private List<HomeInfo> mHomeInfos = new ArrayList<>();
+    private View.OnClickListener mOnClickListener;
 
     public MainAdapter(Context context) {
         mContext = context;
@@ -117,6 +117,12 @@ public class MainAdapter extends RecyclerView.Adapter {
                             return bannerView;
                         }
                     });
+            if (mOnClickListener!=null){
+                holder.mBtnMe.setOnClickListener(mOnClickListener);
+                holder.mBtnArea.setOnClickListener(mOnClickListener);
+                holder.mBtnMusic.setOnClickListener(mOnClickListener);
+                holder.mBtnOther.setOnClickListener(mOnClickListener);
+            }
         } else if (viewHolder instanceof TitleHolder) {
             TitleHolder holder = (TitleHolder) viewHolder;
             holder.tvTitle.setText(info.getItemTitle());
@@ -156,8 +162,11 @@ public class MainAdapter extends RecyclerView.Adapter {
         } else if (viewHolder instanceof ArtsHolder) {
             ArtsHolder holder = (ArtsHolder) viewHolder;
             GlideUtil.loadImageByUrl(mContext, info.getArtGirl().getThumb(), holder.mArts);
-
         }
+    }
+
+    public void setOnClickListener(View.OnClickListener onClickListener) {
+        mOnClickListener = onClickListener;
     }
 
     @Override
@@ -168,7 +177,7 @@ public class MainAdapter extends RecyclerView.Adapter {
     class BannerHolder extends RecyclerView.ViewHolder {
 
         BannerView mBannerView;
-        RelativeLayout mBtnMe, mBtnMusic, mBtnOther;
+        RelativeLayout mBtnMe, mBtnArea, mBtnMusic, mBtnOther;
 
         BannerHolder(View view) {
             super(view);
@@ -176,6 +185,7 @@ public class MainAdapter extends RecyclerView.Adapter {
             mBtnMe = view.findViewById(R.id.btn_me);
             mBtnMusic = view.findViewById(R.id.btn_music);
             mBtnOther = view.findViewById(R.id.btn_other);
+            mBtnArea = view.findViewById(R.id.btn_area);
         }
     }
 
