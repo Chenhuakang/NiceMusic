@@ -41,7 +41,7 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(strings -> {
                     List<String> hotSearch = new ArrayList<>();
-                    hotSearch.add("告别气球");
+                    hotSearch.add("告白气球");
                     hotSearch.add("空空如也");
                     hotSearch.add("我们不一样");
                     hotSearch.add("追光者");
@@ -78,7 +78,7 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aBoolean -> {
-                    LogUtil.i("-->删除搜索历史成功");
+                    mView.deleteHistorySuccess();
                 }, throwable -> {
                     LogUtil.i("-->" + throwable.getMessage());
                 });

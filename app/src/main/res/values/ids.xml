@@ -3,4 +3,7 @@
     <item name="statusbar_view" type="id"/>
     <item name="translucent_view" type="id"/>
     <item name="toolbar" type="id"/>
+
+    <item name="key_search_title" type="id"/>
+    <item name="key_search_position" type="id"/>
 </resources>

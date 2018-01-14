@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lzx.nicemusic.R;
+import com.lzx.nicemusic.module.search.presenter.SearchPresenter;
 import com.zhy.view.flowlayout.FlowLayout;
 import com.zhy.view.flowlayout.TagAdapter;
 import com.zhy.view.flowlayout.TagFlowLayout;
@@ -27,16 +28,20 @@ public class SearchHistorySection extends StatelessSection {
     private Context mContext;
     private List<String> hotSearchs = new ArrayList<>();
     private List<String> historys = new ArrayList<>();
+    private TagFlowLayout.OnTagClickListener mOnTagClickListener;
     private View.OnClickListener mOnClickListener;
 
     public SearchHistorySection(Context context, List<String> hotSearchs,
-                                List<String> historys, View.OnClickListener onClickListener) {
+                                List<String> historys) {
         super(new SectionParameters.Builder(R.layout.section_search_item)
                 .headerResourceId(R.layout.section_search_header).build());
         mContext = context;
         this.hotSearchs = hotSearchs;
         this.historys = historys;
-        mOnClickListener = onClickListener;
+    }
+
+    public void removeHistory(int position) {
+        historys.remove(position);
     }
 
     @Override
@@ -60,6 +65,11 @@ public class SearchHistorySection extends StatelessSection {
                 return tv;
             }
         });
+        holder.mFlowLayout.setOnTagClickListener(mOnTagClickListener);
+    }
+
+    public void setOnTagClickListener(TagFlowLayout.OnTagClickListener onTagClickListener) {
+        mOnTagClickListener = onTagClickListener;
     }
 
     @Override
@@ -70,9 +80,17 @@ public class SearchHistorySection extends StatelessSection {
     @Override
     public void onBindItemViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         HistoryHolder holder = (HistoryHolder) viewHolder;
-        holder.mSearchTitle.setText(hotSearchs.get(position));
-        holder.mBtnDelete.setOnClickListener(mOnClickListener);
+        String history = historys.get(position);
+        holder.mSearchTitle.setText(history);
+        holder.mSearchTitle.setTag(history);
+        holder.mBtnDelete.setTag(R.id.key_search_title, history);
+        holder.mBtnDelete.setTag(R.id.key_search_position, position);
         holder.mSearchTitle.setOnClickListener(mOnClickListener);
+        holder.mBtnDelete.setOnClickListener(mOnClickListener);
+    }
+
+    public void setOnClickListener(View.OnClickListener onClickListener) {
+        mOnClickListener = onClickListener;
     }
 
     class HeaderHolder extends RecyclerView.ViewHolder {

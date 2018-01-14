@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.bean.MusicInfo;
+import com.lzx.nicemusic.module.search.presenter.SearchPresenter;
 import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.SquareImageView;
 
@@ -24,12 +25,14 @@ public class SearchResultSection extends StatelessSection {
 
     private Context mContext;
     private List<MusicInfo> mMusicInfos = new ArrayList<>();
+    private SearchPresenter mSearchPresenter;
 
-    public SearchResultSection(Context context, List<MusicInfo> infoList) {
+    public SearchResultSection(Context context, List<MusicInfo> infoList,SearchPresenter presenter) {
         super(new SectionParameters.Builder(R.layout.section_search_result)
                 .headerResourceId(R.layout.section_search_result_header).build());
         mContext = context;
         mMusicInfos = infoList;
+        mSearchPresenter = presenter;
     }
 
     @Override

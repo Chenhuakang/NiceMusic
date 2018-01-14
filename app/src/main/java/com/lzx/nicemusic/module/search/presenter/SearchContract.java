@@ -15,6 +15,8 @@ public interface SearchContract {
         void loadDefaultSearchDataSuccess(List<String> hotSearch, List<String> historys);
 
         void searchSuccess(List<MusicInfo> infoList);
+
+        void deleteHistorySuccess();
     }
 
     interface Presenter<T> extends BaseContract.BasePresenter<T> {

@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.lzx.nicemusic.R;
@@ -18,6 +19,8 @@ import com.lzx.nicemusic.module.search.presenter.SearchPresenter;
 import com.lzx.nicemusic.module.search.sectioned.SearchHistorySection;
 import com.lzx.nicemusic.module.search.sectioned.SearchResultSection;
 import com.lzx.nicemusic.utils.LogUtil;
+import com.zhy.view.flowlayout.FlowLayout;
+import com.zhy.view.flowlayout.TagFlowLayout;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -68,7 +71,7 @@ public class SearchActivity extends BaseMvpActivity<SearchContract.View, SearchP
                             mSectionedRecyclerViewAdapter.removeSection(SearchResultSectionTag);
                         }
                         if (mSearchHistorySection != null) {
-                            mSectionedRecyclerViewAdapter.addSection(SearchHistorySectionTag, mSearchHistorySection);
+                            getPresenter().requestDefaultSearchData();
                         }
                         mSectionedRecyclerViewAdapter.notifyDataSetChanged();
                     }
@@ -79,32 +82,58 @@ public class SearchActivity extends BaseMvpActivity<SearchContract.View, SearchP
         getPresenter().requestDefaultSearchData();
     }
 
+    private int deletePosition = -1;
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_back:
                 finish();
                 break;
+            case R.id.btn_delete:
+                deletePosition = (int) view.getTag(R.id.key_search_position);
+                getPresenter().deleteHistory(String.valueOf(view.getTag(R.id.key_search_title)));
+                break;
+            case R.id.search_title:
+                String tag = (String) view.getTag();
+                mEdSearch.setText(tag);
+                mEdSearch.setSelection(tag.length());
+                getPresenter().searchMusic(tag);
+                break;
         }
     }
 
     @Override
     public void loadDefaultSearchDataSuccess(List<String> hotSearch, List<String> historys) {
-        mSearchHistorySection = new SearchHistorySection(this, hotSearch, historys, new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
+        mSearchHistorySection = new SearchHistorySection(this, hotSearch, historys);
+        mSearchHistorySection.setOnTagClickListener((view, position, parent) -> {
+            String tag = hotSearch.get(position);
+            mEdSearch.setText(tag);
+            mEdSearch.setSelection(tag.length());
+            getPresenter().searchMusic(tag);
+            getPresenter().addHistory(tag);
+            return true;
         });
+        mSearchHistorySection.setOnClickListener(this);
         mSectionedRecyclerViewAdapter.addSection(SearchHistorySectionTag, mSearchHistorySection);
         mSectionedRecyclerViewAdapter.notifyDataSetChanged();
     }
 
     @Override
+    public void deleteHistorySuccess() {
+        if (deletePosition != -1) {
+            mSectionedRecyclerViewAdapter.notifyItemRemovedFromSection(SearchHistorySectionTag, deletePosition);
+            mSearchHistorySection.removeHistory(deletePosition);
+        }
+    }
+
+    @Override
     public void searchSuccess(List<MusicInfo> infoList) {
         mSectionedRecyclerViewAdapter.removeSection(SearchHistorySectionTag);
-        mSearchResultSection = new SearchResultSection(this, infoList);
+        mSearchResultSection = new SearchResultSection(this, infoList, getPresenter());
         mSectionedRecyclerViewAdapter.addSection(SearchResultSectionTag, mSearchResultSection);
         mSectionedRecyclerViewAdapter.notifyDataSetChanged();
     }
+
+
 }
