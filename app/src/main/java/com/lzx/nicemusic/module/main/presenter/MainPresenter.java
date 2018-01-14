@@ -22,6 +22,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -41,7 +42,7 @@ public class MainPresenter extends BasePresenter<MainContract.View> implements M
 
     @Override
     public void requestMusicList() {
-        Observable.create((ObservableOnSubscribe<String>) emitter -> {
+        Disposable subscriber = Observable.create((ObservableOnSubscribe<String>) emitter -> {
             String json = CacheManager.getImpl().findCache(CacheManager.KEY_HOME_LIST_DATA);
             emitter.onNext(json);
         })
@@ -55,14 +56,16 @@ public class MainPresenter extends BasePresenter<MainContract.View> implements M
                             updateCache();
                         },
                         throwable -> LogUtil.i("-->" + throwable.getMessage()));
+        addSubscribe(subscriber);
     }
 
     @Override
     public void updateCache() {
-        mMainModel.loadMainData().subscribeOn(Schedulers.newThread())
+        Disposable subscriber = mMainModel.loadMainData().subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(homeInfos -> mView.requestMainDataSuccess(homeInfos),
                         throwable -> LogUtil.i("-->" + throwable.getMessage()));
+        addSubscribe(subscriber);
     }
 
 

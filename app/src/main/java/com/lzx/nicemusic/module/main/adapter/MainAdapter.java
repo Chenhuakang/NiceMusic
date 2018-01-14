@@ -30,9 +30,6 @@ import java.util.List;
 public class MainAdapter extends RecyclerView.Adapter {
 
     private Context mContext;
-    public static final int TYPE_ONE = 0;
-    public static final int TYPE_TWO = 1;
-    public static final int TYPE_THREE = 2;
 
     private List<HomeInfo> mHomeInfos = new ArrayList<>();
 
@@ -76,7 +73,7 @@ public class MainAdapter extends RecyclerView.Adapter {
         View view;
         switch (viewType) {
             case HomeInfo.TYPE_ITEM_BANNER:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_banner_view, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_banner_view, parent, false);
                 return new BannerHolder(view);
             case HomeInfo.TYPE_ITEM_TITLE:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_header_title, parent, false);

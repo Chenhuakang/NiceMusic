@@ -22,7 +22,7 @@ public class CacheManager {
     private DbHelper helper;
 
     public CacheManager(Context context) {
-        helper = DbHelper.getIntance(context);
+        helper = DbHelper.getInstance(context);
     }
 
     private final static class HolderClass {
@@ -44,7 +44,6 @@ public class CacheManager {
     public void insertCache(String key, String value) {
         SQLiteDatabase db = helper.getReadableDatabase();
         if (db.isOpen()) {
-            db.delete(niceMusicCache, null, null);
             ContentValues contentValues = new ContentValues();
             contentValues.put(niceMusicKey, key);
             contentValues.put(niceMusicValue, value);
@@ -56,7 +55,7 @@ public class CacheManager {
         SQLiteDatabase db = helper.getWritableDatabase();
         if (db.isOpen()) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(key, value);
+            contentValues.put(niceMusicValue, value);
             db.update(niceMusicCache, contentValues, niceMusicKey + " = ?", new String[]{key});
         }
     }

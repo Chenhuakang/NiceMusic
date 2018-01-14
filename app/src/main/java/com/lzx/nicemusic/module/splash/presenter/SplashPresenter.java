@@ -22,6 +22,7 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
@@ -41,7 +42,7 @@ public class SplashPresenter extends BasePresenter<SplashContract.View> implemen
 
     @Override
     public void requestMusicList() {
-        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+        Disposable subscriber = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             boolean hasCache = CacheManager.getImpl().hasCache(CacheManager.KEY_HOME_LIST_DATA);
             emitter.onNext(hasCache);
         }).filter(aBoolean -> {
@@ -56,5 +57,7 @@ public class SplashPresenter extends BasePresenter<SplashContract.View> implemen
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(mainDataList1 -> mView.requestMainDataSuccess(false),
                         throwable -> LogUtil.i("-->" + throwable.getMessage()));
+
+        addSubscribe(subscriber);
     }
 }

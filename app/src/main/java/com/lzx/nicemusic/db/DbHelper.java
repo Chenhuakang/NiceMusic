@@ -17,14 +17,19 @@ public class DbHelper extends SQLiteOpenHelper {
         super(context, name, null, version);
     }
 
-    private final String DATACACHE = "create table "
+    private final String TABLE_CACHE = "create table "
             + CacheManager.niceMusicCache + " ( "
             + CacheManager.niceMusicKey + " text not null primary key, "
             + CacheManager.niceMusicValue + " text);";
 
+    private final String TABLE_SEARCH_HISTORY = "create table "
+            + SearchManager.searchHistory + " ( "
+            + SearchManager.searchTitle + " text);";
+
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(DATACACHE);
+        db.execSQL(TABLE_CACHE);
+        db.execSQL(TABLE_SEARCH_HISTORY);
     }
 
     @Override
@@ -32,7 +37,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     }
 
-    public static DbHelper getIntance(Context context) {
+    public static DbHelper getInstance(Context context) {
         if (instance == null) {
             synchronized (DbHelper.class) {
                 if (instance == null) {

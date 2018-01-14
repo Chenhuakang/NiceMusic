@@ -20,7 +20,7 @@ public class MusicInfo {
     private String url;
     private String singername;
     private String albumid;
-
+    private String m4a;
 
     public String getSongname() {
         return songname;
@@ -108,5 +108,13 @@ public class MusicInfo {
 
     public void setAlbumid(String albumid) {
         this.albumid = albumid;
+    }
+
+    public String getM4a() {
+        return m4a;
+    }
+
+    public void setM4a(String m4a) {
+        this.m4a = m4a;
     }
 }
