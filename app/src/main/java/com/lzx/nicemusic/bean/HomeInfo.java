@@ -1,6 +1,7 @@
 package com.lzx.nicemusic.bean;
 
 import com.google.gson.annotations.SerializedName;
+import com.lzx.nicemusic.utils.MD5Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,6 @@ public class HomeInfo {
     private List<BannerInfo> bannerList = new ArrayList<>();
     private List<BannerInfo> longLegs = new ArrayList<>();
     private BannerInfo artGirl = new BannerInfo();
-
 
     private String itemTitle;
     private int itemType;
@@ -54,7 +54,6 @@ public class HomeInfo {
     private String createTime;
     private String image3;
 
-
     public static final int TYPE_ITEM_BANNER = 0;
     public static final int TYPE_ITEM_TITLE = 1;
     public static final int TYPE_ITEM_ONE = 2;
@@ -69,6 +68,20 @@ public class HomeInfo {
     }
 
     public HomeInfo() {
+    }
+
+    public String getFlag() {
+        StringBuilder result = new StringBuilder();
+        for (BannerInfo info : bannerList) {
+            result.append(info.getTitle());
+        }
+        for (BannerInfo info : longLegs) {
+            result.append(info.getTitle());
+        }
+        result.append(artGirl.getTitle());
+        result.append(songid);
+        result.append(id);
+        return MD5Util.md5(result.toString());
     }
 
     public List<BannerInfo> getBannerList() {

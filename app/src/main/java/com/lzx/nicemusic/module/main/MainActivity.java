@@ -1,36 +1,28 @@
 package com.lzx.nicemusic.module.main;
 
 import android.os.Bundle;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.load.model.GlideUrl;
+import com.google.gson.Gson;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
-import com.lzx.nicemusic.bean.BannerInfo;
 import com.lzx.nicemusic.bean.HomeInfo;
-import com.lzx.nicemusic.bean.MainDataList;
+import com.lzx.nicemusic.callback.BaseDiffUtilCallBack;
 import com.lzx.nicemusic.module.main.adapter.MainAdapter;
 import com.lzx.nicemusic.module.main.presenter.MainContract;
 import com.lzx.nicemusic.module.main.presenter.MainPresenter;
-import com.lzx.nicemusic.module.main.sectioned.BannerSection;
-import com.lzx.nicemusic.module.main.sectioned.NewMusicSection;
 import com.lzx.nicemusic.utils.DisplayUtil;
-import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.utils.LogUtil;
-import com.lzx.nicemusic.widget.OuterLayerImageView;
-import com.lzx.nicemusic.widget.banner.BannerView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
-
-import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
 @CreatePresenter(MainPresenter.class)
 public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresenter> implements MainContract.View {
@@ -98,7 +90,11 @@ public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresent
 
     @Override
     public void requestMainDataSuccess(List<HomeInfo> dataList) {
+        BaseDiffUtilCallBack<HomeInfo> callBack = new BaseDiffUtilCallBack<>(mMainAdapter.getHomeInfos(), dataList);
+        callBack.setOnAreItemsTheSameListener((oldData, newData) -> oldData.getFlag().equals(newData.getFlag()));
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callBack, true);
         mMainAdapter.setHomeInfos(dataList);
+        diffResult.dispatchUpdatesTo(mMainAdapter);
     }
 }
 

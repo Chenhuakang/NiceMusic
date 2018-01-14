@@ -45,7 +45,10 @@ public class MainAdapter extends RecyclerView.Adapter {
 
     public void setHomeInfos(List<HomeInfo> homeInfos) {
         mHomeInfos = homeInfos;
-        notifyDataSetChanged();
+    }
+
+    public List<HomeInfo> getHomeInfos() {
+        return mHomeInfos;
     }
 
     @Override

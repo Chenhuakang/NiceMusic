@@ -11,5 +11,37 @@
         android:layout_marginBottom="12dp"
         android:layout_marginTop="12dp"
         android:adjustViewBounds="true"
+        android:background="#000000"
         android:scaleType="centerCrop" />
+
+    <View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/music_cover"
+        android:layout_marginTop="20dp"
+        android:background="#EFEFF0" />
+
+    <TextView
+        android:id="@+id/btn_search"
+        android:layout_width="120dp"
+        android:layout_height="25dp"
+        android:layout_below="@+id/line"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/shape_frame_red_corners"
+        android:gravity="center"
+        android:text="搜索更多内容"
+        android:textColor="#ff2828"
+        android:textSize="13sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_search"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="50dp"
+        android:layout_marginTop="15dp"
+        android:text="去发现更多有趣内容 >"
+        android:textSize="13sp" />
 </RelativeLayout>

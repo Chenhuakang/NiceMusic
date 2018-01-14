@@ -50,4 +50,6 @@ public class BannerInfo {
     public void setItemType(int itemType) {
         this.itemType = itemType;
     }
+
+
 }
