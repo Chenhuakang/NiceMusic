@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="1px">
+
+    <com.lzx.nicemusic.widget.RectangleImageView
+        android:id="@+id/music_cover"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/like_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_margin="5dp"
+        android:drawableLeft="@drawable/ic_love"
+        android:drawablePadding="5dp"
+        android:textColor="@color/white"
+        android:gravity="center_vertical"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/music_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_below="@+id/music_cover"
+        android:gravity="center_vertical"
+        android:lines="1"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:textColor="@color/font_color"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/music_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/music_text"
+        android:layout_marginBottom="20dp"
+        android:lines="1"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:textColor="#797A7B"
+        android:textSize="12sp" />
+</RelativeLayout>

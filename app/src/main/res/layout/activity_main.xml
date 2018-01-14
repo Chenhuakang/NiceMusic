@@ -3,29 +3,35 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.lzx.nicemusic.module.MainActivity">
+    android:layout_height="match_parent">
 
-    <com.lzx.nicemusic.widget.banner.BannerView
-        android:id="@+id/banner_view"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycle_view"
         android:layout_width="match_parent"
-        android:layout_height="200dp"/>
+        android:layout_height="match_parent" />
+
+    <View
+        android:id="@+id/bg_search"
+        android:alpha="0"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="#d43030" />
 
     <TextView
         android:id="@+id/ed_search"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="36dp"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
         android:layout_marginTop="30dp"
         android:background="@drawable/bg_corners_write"
         android:drawableLeft="@drawable/ic_search"
         android:drawablePadding="12dp"
+        android:gravity="center_vertical"
         android:lines="1"
         android:paddingLeft="12dp"
-        android:gravity="center_vertical"
-        android:text="搜索你想要的......"
         android:paddingRight="12dp"
+        android:text="搜索你想要的......"
         android:textColor="#d0333333"
         android:textSize="14sp" />
 

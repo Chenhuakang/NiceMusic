@@ -43,13 +43,18 @@ public class RetrofitHelper {
     }
 
     public static MusicApi getMusicApi() {
-        String url = "";
+        String url = "http://route.showapi.com/";
         return createApi(MusicApi.class, url);
     }
 
     public static NewsApi getNewsApi() {
         String url = "http://route.showapi.com/";
         return createApi(NewsApi.class, url);
+    }
+
+    public static BaiSiBuDeJieApi getBaiSiBuDeJieApi(){
+        String url = "http://route.showapi.com/";
+        return createApi(BaiSiBuDeJieApi.class, url);
     }
 
     /**

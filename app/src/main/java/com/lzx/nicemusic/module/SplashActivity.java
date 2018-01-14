@@ -6,6 +6,7 @@ import android.widget.ImageView;
 
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
+import com.lzx.nicemusic.module.main.MainActivity;
 import com.lzx.nicemusic.utils.SystemBarHelper;
 
 import java.util.concurrent.TimeUnit;

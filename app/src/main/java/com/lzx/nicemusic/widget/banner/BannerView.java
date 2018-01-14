@@ -47,6 +47,7 @@ public class BannerView<T> extends RelativeLayout
     //点击事件
     private ViewPagerOnItemClickListener mViewPagerOnItemClickListener;
     private onPageChangeListener mPageChangeListener;
+    private boolean isHidePoints = false;
 
     private LinearLayout.LayoutParams paramsNormal, paramsSelect;
 
@@ -162,6 +163,11 @@ public class BannerView<T> extends RelativeLayout
         return this;
     }
 
+    public BannerView isHidePoints(boolean isHidePoints) {
+        this.isHidePoints = isHidePoints;
+        return this;
+    }
+
     /**
      * 图片轮播需要传入参数
      */
@@ -184,18 +190,19 @@ public class BannerView<T> extends RelativeLayout
         //判断是否清空 指示器点
         points.removeAllViews();
 
-        //初始化与个数相同的指示器点
-        for (int i = 0; i < pointSize; i++) {
-            View dot = new View(getContext());
-            dot.setBackgroundResource(unSelectRes);
-            dot.setLayoutParams(paramsNormal);
-            dot.setEnabled(false);
-            points.addView(dot);
+        if (!isHidePoints) {
+            //初始化与个数相同的指示器点
+            for (int i = 0; i < pointSize; i++) {
+                View dot = new View(getContext());
+                dot.setBackgroundResource(unSelectRes);
+                dot.setLayoutParams(paramsNormal);
+                dot.setEnabled(false);
+                points.addView(dot);
+            }
+
+            points.getChildAt(0).setBackgroundResource(selectRes);
+            points.getChildAt(0).setLayoutParams(paramsSelect);
         }
-
-        points.getChildAt(0).setBackgroundResource(selectRes);
-        points.getChildAt(0).setLayoutParams(paramsSelect);
-
         for (int i = 0; i < bannerList.size(); i++) {
             View view = creator.createHolderView(bannerList.get(i));
             if (view == null) {
@@ -211,12 +218,14 @@ public class BannerView<T> extends RelativeLayout
             public void onPageSelected(int pos) {
                 pos = pos % pointSize;
                 currentPos = pos;
-                for (int i = 0; i < points.getChildCount(); i++) {
-                    points.getChildAt(i).setBackgroundResource(unSelectRes);
-                    points.getChildAt(i).setLayoutParams(paramsNormal);
+                if (!isHidePoints) {
+                    for (int i = 0; i < points.getChildCount(); i++) {
+                        points.getChildAt(i).setBackgroundResource(unSelectRes);
+                        points.getChildAt(i).setLayoutParams(paramsNormal);
+                    }
+                    points.getChildAt(pos).setBackgroundResource(selectRes);
+                    points.getChildAt(pos).setLayoutParams(paramsSelect);
                 }
-                points.getChildAt(pos).setBackgroundResource(selectRes);
-                points.getChildAt(pos).setLayoutParams(paramsSelect);
                 if (mPageChangeListener != null) {
                     mPageChangeListener.onPageChange(currentPos);
                 }

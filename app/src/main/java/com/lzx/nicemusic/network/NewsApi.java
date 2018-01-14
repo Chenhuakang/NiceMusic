@@ -14,7 +14,9 @@ import retrofit2.http.Query;
 
 public interface NewsApi {
 
-    @GET("819-1?showapi_appid=22640&showapi_sign=0676cf5617eb46f1a6da7bcf7853f423&type=35&num=5")
+    @GET("819-1?showapi_appid=22640&showapi_sign=0676cf5617eb46f1a6da7bcf7853f423&type=34&num=5")
     Observable<ResponseBody> requestBanner();
 
+    @GET("819-1?showapi_appid=22640&showapi_sign=0676cf5617eb46f1a6da7bcf7853f423")
+    Observable<ResponseBody> requestWelfare(@Query("type") int type, @Query("num") int num);
 }

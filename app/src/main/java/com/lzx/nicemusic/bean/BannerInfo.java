@@ -8,7 +8,8 @@ public class BannerInfo {
     private String title;
     private String thumb;
     private String url;
-
+    private String itemTitle;
+    private int itemType;
 
     public String getTitle() {
         return title;
@@ -32,5 +33,21 @@ public class BannerInfo {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getItemTitle() {
+        return itemTitle;
+    }
+
+    public void setItemTitle(String itemTitle) {
+        this.itemTitle = itemTitle;
+    }
+
+    public int getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(int itemType) {
+        this.itemType = itemType;
     }
 }
