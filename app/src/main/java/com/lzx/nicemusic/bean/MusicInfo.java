@@ -21,6 +21,7 @@ public class MusicInfo {
     private String singername;
     private String albumid;
     private String m4a;
+    private String albumname;
 
     public String getSongname() {
         return songname;
@@ -116,5 +117,13 @@ public class MusicInfo {
 
     public void setM4a(String m4a) {
         this.m4a = m4a;
+    }
+
+    public String getAlbumname() {
+        return albumname;
+    }
+
+    public void setAlbumname(String albumname) {
+        this.albumname = albumname;
     }
 }

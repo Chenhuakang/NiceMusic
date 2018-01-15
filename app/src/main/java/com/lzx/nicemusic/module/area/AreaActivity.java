@@ -1,5 +1,6 @@
 package com.lzx.nicemusic.module.area;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -46,11 +47,11 @@ public class AreaActivity extends BaseMvpActivity {
                 R.drawable.image_japan
         };
         int[] mColorArray = new int[]{
+                android.R.color.holo_orange_light,
                 android.R.color.holo_blue_light,
+                android.R.color.holo_green_light,
                 android.R.color.holo_red_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_green_light};
+                android.R.color.holo_purple};
         mCoordinatorTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
         mCoordinatorTabLayout.setImageArray(mImageArray, mColorArray);
         mCoordinatorTabLayout.setTitle("地区")
@@ -59,17 +60,19 @@ public class AreaActivity extends BaseMvpActivity {
     }
 
     private void initFragments() {
-        titles.add("欧美");
+        titles.add("韩国");
         titles.add("内地");
         titles.add("港台");
-        titles.add("韩国");
+        titles.add("欧美");
         titles.add("日本");
-        for (String title : titles) {
-            mFragments.add(AreaFragment.getInstance());
+        String[] topicArray = new String[]{"16", "5", "6", "3", "17"};
+        for (String topic : topicArray) {
+            mFragments.add(AreaFragment.getInstance(topic));
         }
     }
 
     private void initViewPager() {
+        mViewPager.setOffscreenPageLimit(titles.size());
         mViewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager(), mFragments, titles));
     }
 }

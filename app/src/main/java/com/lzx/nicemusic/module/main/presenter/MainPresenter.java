@@ -8,6 +8,7 @@ import com.lzx.nicemusic.bean.HomeInfo;
 import com.lzx.nicemusic.db.CacheManager;
 import com.lzx.nicemusic.network.RetrofitHelper;
 import com.lzx.nicemusic.utils.LogUtil;
+import com.lzx.nicemusic.utils.SpUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,11 +62,15 @@ public class MainPresenter extends BasePresenter<MainContract.View> implements M
 
     @Override
     public void updateCache() {
-        Disposable subscriber = mMainModel.loadMainData().subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(homeInfos -> mView.requestMainDataSuccess(homeInfos),
-                        throwable -> LogUtil.i("-->" + throwable.getMessage()));
-        addSubscribe(subscriber);
+        long currTime = SpUtil.getInstance().getLong("cache_main_data", System.currentTimeMillis());
+        if (System.currentTimeMillis() - currTime > 24 * 60 * 60 * 1000) {
+            SpUtil.getInstance().putLong("cache_main_data", System.currentTimeMillis());
+            Disposable subscriber = mMainModel.loadMainData().subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(homeInfos -> mView.requestMainDataSuccess(homeInfos),
+                            throwable -> LogUtil.i("-->" + throwable.getMessage()));
+            addSubscribe(subscriber);
+        }
     }
 
 
