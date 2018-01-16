@@ -43,21 +43,21 @@ import static com.lzx.nicemusic.lib.utils.MediaIDHelper.MEDIA_ID_ROOT;
 
 public class MusicService extends MediaBrowserServiceCompat implements PlaybackManager.PlaybackServiceCallback {
 
-    // Extra on MediaSession that contains the Cast device name currently connected to
+    // MediaSession中包含当前连接的Cast设备名称
     public static final String EXTRA_CONNECTED_CAST = "com.lzx.nicemusic.CAST_NAME";
-    // The action of the incoming Intent indicating that it contains a command
-    // to be executed (see {@link #onStartCommand})
-    public static final String ACTION_CMD = "com.example.android.uamp.ACTION_CMD";
-    // The key in the extras of the incoming Intent indicating the command that
-    // should be executed (see {@link #onStartCommand})
+    // 传入Intent的动作表明它包含一个命令
+    // 被执行 (see {@link #onStartCommand})
+    public static final String ACTION_CMD = "com.lzx.nicemusic.ACTION_CMD";
+    // 传入Intent的附加项中的关键字表示该命令
+    // 应该执行 (see {@link #onStartCommand})
     public static final String CMD_NAME = "CMD_NAME";
-    // A value of a CMD_NAME key in the extras of the incoming Intent that
-    // indicates that the music playback should be paused (see {@link #onStartCommand})
+    // 在传入意向的额外的CMD_NAME键的值
+    // 表示音乐播放应该暂停 (see {@link #onStartCommand})
     public static final String CMD_PAUSE = "CMD_PAUSE";
-    // A value of a CMD_NAME key that indicates that the music playback should switch
-    // to local playback from cast playback.
+    // 指示音乐播放应切换的CMD_NAME键的值
+    // 从本地播放播放。
     public static final String CMD_STOP_CASTING = "CMD_STOP_CASTING";
-    // Delay stopSelf by using a handler.
+    // 使用处理程序延迟stopSelf。
     private static final int STOP_DELAY = 30000;
 
     private MusicProvider mMusicProvider;
@@ -77,44 +77,41 @@ public class MusicService extends MediaBrowserServiceCompat implements PlaybackM
         super.onCreate();
         mMusicProvider = new MusicProvider();
         //模拟获取音乐信息
-        mMusicProvider.retrieveMediaAsync(null /* Callback */);
-
+        mMusicProvider.retrieveMediaAsync(null);
+        //验证调用包是否有权浏览MediaBrowserService
         mPackageValidator = new PackageValidator(this);
+        //音乐队列管理状态回调
+        QueueManager queueManager = new QueueManager(mMusicProvider, getResources(), new QueueManager.MetadataUpdateListener() {
+            @Override
+            public void onMetadataChanged(MediaMetadataCompat metadata) {
+                mSession.setMetadata(metadata);
+            }
 
-        QueueManager queueManager = new QueueManager(mMusicProvider, getResources(),
-                new QueueManager.MetadataUpdateListener() {
-                    @Override
-                    public void onMetadataChanged(MediaMetadataCompat metadata) {
-                        mSession.setMetadata(metadata);
-                    }
+            @Override
+            public void onMetadataRetrieveError() {
+                mPlaybackManager.updatePlaybackState(getString(R.string.error_no_metadata));
+            }
 
-                    @Override
-                    public void onMetadataRetrieveError() {
-                        mPlaybackManager.updatePlaybackState(
-                                getString(R.string.error_no_metadata));
-                    }
+            @Override
+            public void onCurrentQueueIndexUpdated(int queueIndex) {
+                mPlaybackManager.handlePlayRequest();
+            }
 
-                    @Override
-                    public void onCurrentQueueIndexUpdated(int queueIndex) {
-                        mPlaybackManager.handlePlayRequest();
-                    }
-
-                    @Override
-                    public void onQueueUpdated(String title,
-                                               List<MediaSessionCompat.QueueItem> newQueue) {
-                        mSession.setQueue(newQueue);
-                        mSession.setQueueTitle(title);
-                    }
-                });
+            @Override
+            public void onQueueUpdated(String title, List<MediaSessionCompat.QueueItem> newQueue) {
+                mSession.setQueue(newQueue);
+                mSession.setQueueTitle(title);
+            }
+        });
 
         LocalPlayback playback = new LocalPlayback(this, mMusicProvider);
         mPlaybackManager = new PlaybackManager(this, getResources(), mMusicProvider, queueManager, playback);
+
         // Start a new MediaSession
         mSession = new MediaSessionCompat(this, "MusicService");
         setSessionToken(mSession.getSessionToken());
         mSession.setCallback(mPlaybackManager.getMediaSessionCallback());
-        mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
 //        Context context = getApplicationContext();
 //        Intent intent = new Intent(context, NowPlayingActivity.class);
@@ -132,14 +129,11 @@ public class MusicService extends MediaBrowserServiceCompat implements PlaybackM
             throw new IllegalStateException("Could not create a MediaNotificationManager", e);
         }
 
-        int playServicesAvailable =
-                GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
-
-        if ( playServicesAvailable == ConnectionResult.SUCCESS) {
+        int playServicesAvailable = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
+        if (playServicesAvailable == ConnectionResult.SUCCESS) {
             mCastSessionManager = CastContext.getSharedInstance(this).getSessionManager();
             mCastSessionManagerListener = new CastSessionManagerListener();
-            mCastSessionManager.addSessionManagerListener(mCastSessionManagerListener,
-                    CastSession.class);
+            mCastSessionManager.addSessionManagerListener(mCastSessionManagerListener, CastSession.class);
         }
 
         mMediaRouter = MediaRouter.getInstance(getApplicationContext());
@@ -254,7 +248,6 @@ public class MusicService extends MediaBrowserServiceCompat implements PlaybackM
     public void onPlaybackStateUpdated(PlaybackStateCompat newState) {
         mSession.setPlaybackState(newState);
     }
-
 
 
     /**

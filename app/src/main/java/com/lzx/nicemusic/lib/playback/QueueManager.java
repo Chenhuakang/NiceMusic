@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.text.TextUtils;
 
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.lib.AlbumArtCache;
@@ -103,13 +104,11 @@ public class QueueManager {
     }
 
     public void setRandomQueue() {
-        setCurrentQueue(mResources.getString(R.string.random_queue_title),
-                QueueHelper.getRandomQueue(mMusicProvider));
+        setCurrentQueue(mResources.getString(R.string.random_queue_title), QueueHelper.getRandomQueue(mMusicProvider));
         updateMetadata();
     }
 
     public void setQueueFromMusic(String mediaId) {
-
         // The mediaId used here is not the unique musicId. This one comes from the
         // MediaBrowser, and is actually a "hierarchy-aware mediaID": a concatenation of
         // the hierarchy in MediaBrowser and the actual unique musicID. This is necessary
@@ -157,14 +156,16 @@ public class QueueManager {
         mListener.onQueueUpdated(title, newQueue);
     }
 
+    /**
+     * 更新媒体信息
+     */
     public void updateMetadata() {
         MediaSessionCompat.QueueItem currentMusic = getCurrentMusic();
-        if (currentMusic == null) {
+        if (currentMusic == null || currentMusic.getDescription() == null || TextUtils.isEmpty(currentMusic.getDescription().getMediaId())) {
             mListener.onMetadataRetrieveError();
             return;
         }
-        final String musicId = MediaIDHelper.extractMusicIDFromMediaID(
-                currentMusic.getDescription().getMediaId());
+        final String musicId = MediaIDHelper.extractMusicIDFromMediaID(currentMusic.getDescription().getMediaId());
         MediaMetadataCompat metadata = mMusicProvider.getMusic(musicId);
         if (metadata == null) {
             throw new IllegalArgumentException("Invalid musicId " + musicId);
@@ -172,23 +173,24 @@ public class QueueManager {
 
         mListener.onMetadataChanged(metadata);
 
-        // Set the proper album artwork on the media session, so it can be shown in the
-        // locked screen and in other places.
-        if (metadata.getDescription().getIconBitmap() == null &&
-                metadata.getDescription().getIconUri() != null) {
+        //在媒体会话中设置适当的专辑封面，所以可以显示在
+        //锁定屏幕和其他地方。
+        if (metadata.getDescription().getIconBitmap() == null && metadata.getDescription().getIconUri() != null) {
             String albumUri = metadata.getDescription().getIconUri().toString();
             AlbumArtCache.getInstance().fetch(albumUri, new AlbumArtCache.FetchListener() {
                 @Override
                 public void onFetched(String artUrl, Bitmap bitmap, Bitmap icon) {
                     mMusicProvider.updateMusicArt(musicId, bitmap, icon);
-
                     // If we are still playing the same music, notify the listeners:
+                    //如果我们还在播放相同的音乐，请通知听众
                     MediaSessionCompat.QueueItem currentMusic = getCurrentMusic();
-                    if (currentMusic == null) {
+                    if (currentMusic == null || currentMusic.getDescription() == null || TextUtils.isEmpty(currentMusic.getDescription().getMediaId())) {
                         return;
                     }
-                    String currentPlayingId = MediaIDHelper.extractMusicIDFromMediaID(
-                            currentMusic.getDescription().getMediaId());
+                    String currentPlayingId = MediaIDHelper.extractMusicIDFromMediaID(currentMusic.getDescription().getMediaId());
+                    if (TextUtils.isEmpty(musicId) || TextUtils.isEmpty(currentPlayingId)) {
+                        return;
+                    }
                     if (musicId.equals(currentPlayingId)) {
                         mListener.onMetadataChanged(mMusicProvider.getMusic(currentPlayingId));
                     }
@@ -199,8 +201,11 @@ public class QueueManager {
 
     public interface MetadataUpdateListener {
         void onMetadataChanged(MediaMetadataCompat metadata);
+
         void onMetadataRetrieveError();
+
         void onCurrentQueueIndexUpdated(int queueIndex);
+
         void onQueueUpdated(String title, List<MediaSessionCompat.QueueItem> newQueue);
     }
 }

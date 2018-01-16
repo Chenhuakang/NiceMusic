@@ -242,10 +242,12 @@ public class PlaybackManager implements Playback.Callback {
     }
 
 
+    /**
+     * 媒体操作回调
+     */
     private class MediaSessionCallback extends MediaSessionCompat.Callback {
         @Override
         public void onPlay() {
-
             if (mQueueManager.getCurrentMusic() == null) {
                 mQueueManager.setRandomQueue();
             }

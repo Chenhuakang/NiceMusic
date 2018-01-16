@@ -41,6 +41,8 @@ import static com.google.android.exoplayer2.C.CONTENT_TYPE_MUSIC;
 import static com.google.android.exoplayer2.C.USAGE_MEDIA;
 
 /**
+ * 一个实现本地媒体播放的类
+ *
  * @author lzx
  * @date 2018/1/16
  */
@@ -48,17 +50,15 @@ import static com.google.android.exoplayer2.C.USAGE_MEDIA;
 public final class LocalPlayback implements Playback {
 
 
-    // The volume we set the media player to when we lose audio focus, but are
-    // allowed to reduce the volume instead of stopping playback.
+    //当我们失去音频焦点时，我们设置媒体播放器的音量，但是允许减小音量而不是停止播放（失去焦点时的音量大小）
     public static final float VOLUME_DUCK = 0.2f;
-    // The volume we set the media player when we have audio focus.
+    //当我们有音频焦点时，我们设置媒体播放器的音量（有焦点时的音量大小）
     public static final float VOLUME_NORMAL = 1.0f;
-
-    // we don't have audio focus, and can't duck (play at a low volume)
+    //我们没有音频的焦点，低音量播放
     private static final int AUDIO_NO_FOCUS_NO_DUCK = 0;
-    // we don't have focus, but can duck (play at a low volume)
+    // 我们没有焦点， 低音量播放
     private static final int AUDIO_NO_FOCUS_CAN_DUCK = 1;
-    // we have full audio focus
+    // 我们有完整的音频焦点
     private static final int AUDIO_FOCUSED = 2;
 
     private final Context mContext;
@@ -74,38 +74,33 @@ public final class LocalPlayback implements Playback {
     private SimpleExoPlayer mExoPlayer;
     private final ExoPlayerEventListener mEventListener = new ExoPlayerEventListener();
 
-    // Whether to return STATE_NONE or STATE_STOPPED when mExoPlayer is null;
+    // 当mExoPlayer为空时是否返回STATE_NONE或STATE_STOPPED;
     private boolean mExoPlayerNullIsStopped = false;
 
-    private final IntentFilter mAudioNoisyIntentFilter =
-            new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+    private final IntentFilter mAudioNoisyIntentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 
-    private final BroadcastReceiver mAudioNoisyReceiver =
-            new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
-                        if (isPlaying()) {
-                            Intent i = new Intent(context, MusicService.class);
-                            i.setAction(MusicService.ACTION_CMD);
-                            i.putExtra(MusicService.CMD_NAME, MusicService.CMD_PAUSE);
-                            mContext.startService(i);
-                        }
-                    }
+    private final BroadcastReceiver mAudioNoisyReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //监听耳机拔出
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+                if (isPlaying()) {
+                    Intent i = new Intent(context, MusicService.class);
+                    i.setAction(MusicService.ACTION_CMD);
+                    i.putExtra(MusicService.CMD_NAME, MusicService.CMD_PAUSE);
+                    mContext.startService(i);
                 }
-            };
+            }
+        }
+    };
 
     public LocalPlayback(Context context, MusicProvider musicProvider) {
         Context applicationContext = context.getApplicationContext();
         this.mContext = applicationContext;
         this.mMusicProvider = musicProvider;
-
-        this.mAudioManager =
-                (AudioManager) applicationContext.getSystemService(Context.AUDIO_SERVICE);
+        this.mAudioManager = (AudioManager) applicationContext.getSystemService(Context.AUDIO_SERVICE);
         // Create the Wifi lock (this does not acquire the lock, this just creates it)
-        this.mWifiLock =
-                ((WifiManager) applicationContext.getSystemService(Context.WIFI_SERVICE))
-                        .createWifiLock(WifiManager.WIFI_MODE_FULL, "uAmp_lock");
+        this.mWifiLock = ((WifiManager) applicationContext.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "uAmp_lock");
     }
 
     @Override
@@ -128,9 +123,7 @@ public final class LocalPlayback implements Playback {
     @Override
     public int getState() {
         if (mExoPlayer == null) {
-            return mExoPlayerNullIsStopped
-                    ? PlaybackStateCompat.STATE_STOPPED
-                    : PlaybackStateCompat.STATE_NONE;
+            return mExoPlayerNullIsStopped ? PlaybackStateCompat.STATE_STOPPED : PlaybackStateCompat.STATE_NONE;
         }
         switch (mExoPlayer.getPlaybackState()) {
             case Player.STATE_IDLE:
@@ -138,9 +131,7 @@ public final class LocalPlayback implements Playback {
             case Player.STATE_BUFFERING:
                 return PlaybackStateCompat.STATE_BUFFERING;
             case Player.STATE_READY:
-                return mExoPlayer.getPlayWhenReady()
-                        ? PlaybackStateCompat.STATE_PLAYING
-                        : PlaybackStateCompat.STATE_PAUSED;
+                return mExoPlayer.getPlayWhenReady() ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED;
             case Player.STATE_ENDED:
                 return PlaybackStateCompat.STATE_PAUSED;
             default:
@@ -284,10 +275,11 @@ public final class LocalPlayback implements Playback {
         }
     }
 
+    /**
+     * 设置当前状态为 没有音频的焦点
+     */
     private void giveUpAudioFocus() {
-
-        if (mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener)
-                == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+        if (mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             mCurrentAudioFocusState = AUDIO_NO_FOCUS_NO_DUCK;
         }
     }
