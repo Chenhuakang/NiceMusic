@@ -67,6 +67,7 @@ public interface Playback {
     interface Callback {
         /**
          * On current music completed.
+         * 当前音乐播放完成
          */
         void onCompletion();
 

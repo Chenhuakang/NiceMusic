@@ -176,8 +176,7 @@ public class MusicService extends MediaBrowserServiceCompat implements PlaybackM
         mMediaNotificationManager.stopNotification();
 
         if (mCastSessionManager != null) {
-            mCastSessionManager.removeSessionManagerListener(mCastSessionManagerListener,
-                    CastSession.class);
+            mCastSessionManager.removeSessionManagerListener(mCastSessionManagerListener, CastSession.class);
         }
 
         mDelayedStopHandler.removeCallbacksAndMessages(null);

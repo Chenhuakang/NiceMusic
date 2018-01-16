@@ -14,7 +14,6 @@ import android.text.TextUtils;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
@@ -170,26 +169,20 @@ public final class LocalPlayback implements Playback {
         if (mediaHasChanged) {
             mCurrentMediaId = mediaId;
         }
-
         if (mediaHasChanged || mExoPlayer == null) {
-            releaseResources(false); // release everything except the player
-            MediaMetadataCompat track =
-                    mMusicProvider.getMusic(
-                            MediaIDHelper.extractMusicIDFromMediaID(
-                                    item.getDescription().getMediaId()));
+            releaseResources(false); //除了player外释放所有资源
+            //当前音频
+            MediaMetadataCompat track = mMusicProvider.getMusic(MediaIDHelper.extractMusicIDFromMediaID(item.getDescription().getMediaId()));
 
             String source = track.getString(MusicProviderSource.CUSTOM_METADATA_TRACK_SOURCE);
             if (source != null) {
                 source = source.replaceAll(" ", "%20"); // Escape spaces for URLs
             }
-
+            //创建播放器
             if (mExoPlayer == null) {
-                mExoPlayer =
-                        ExoPlayerFactory.newSimpleInstance(
-                                mContext, new DefaultTrackSelector(), new DefaultLoadControl());
+                mExoPlayer = ExoPlayerFactory.newSimpleInstance(mContext, new DefaultTrackSelector(), new DefaultLoadControl());
                 mExoPlayer.addListener(mEventListener);
             }
-
             // Android "O" makes much greater use of AudioAttributes, especially
             // with regards to AudioFocus. All of UAMP's tracks are music, but
             // if your content includes spoken word such as audiobooks or podcasts
@@ -201,20 +194,15 @@ public final class LocalPlayback implements Playback {
                     .build();
             mExoPlayer.setAudioAttributes(audioAttributes);
 
-
-            // Produces DataSource instances through which media data is loaded.
-            DataSource.Factory dataSourceFactory =
-                    new DefaultDataSourceFactory(
-                            mContext, Util.getUserAgent(mContext, "uamp"), null);
+            // 通过其加载媒体数据生成DataSource实例。
+            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(mContext, Util.getUserAgent(mContext, "uamp"), null);
             // Produces Extractor instances for parsing the media data.
+            // 生成提取器实例以解析媒体数据。
             ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-            // The MediaSource represents the media to be played.
-            MediaSource mediaSource =
-                    new ExtractorMediaSource(
-                            Uri.parse(source), dataSourceFactory, extractorsFactory, null, null);
+            // MediaSource代表要播放的媒体。
+            MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(source), dataSourceFactory, extractorsFactory, null, null);
 
-            // Prepares media to play (happens on background thread) and triggers
-            // {@code onPlayerStateChanged} callback when the stream is ready to play.
+            //准备媒体播放（发生在后台线程）和触发器 当流准备播放时,回调 {@code onPlayerStateChanged} 回调。
             mExoPlayer.prepare(mediaSource);
 
             // If we are streaming from the internet, we want to hold a
@@ -261,8 +249,10 @@ public final class LocalPlayback implements Playback {
         return mCurrentMediaId;
     }
 
+    /**
+     * 获取音乐焦点
+     */
     private void tryToGetAudioFocus() {
-
         int result =
                 mAudioManager.requestAudioFocus(
                         mOnAudioFocusChangeListener,
@@ -285,6 +275,13 @@ public final class LocalPlayback implements Playback {
     }
 
     /**
+           *根据音频焦点设置重新配置播放器并启动/重新启动。 这种方法
+           *启动/重新启动ExoPlayer实例尊重当前的音频焦点状态。 所以，如果我们
+           *有焦点，会正常播放; 如果我们没有重点，它会离开玩家
+           *暂停或将其设置为低音量，具体取决于当前焦点允许的内容
+           *设置。
+          */
+    /**
      * Reconfigures the player according to audio focus settings and starts/restarts it. This method
      * starts/restarts the ExoPlayer instance respecting the current audio focus state. So if we
      * have focus, it will play normally; if we don't have focus, it will either leave the player
@@ -293,19 +290,21 @@ public final class LocalPlayback implements Playback {
      */
     private void configurePlayerState() {
         if (mCurrentAudioFocusState == AUDIO_NO_FOCUS_NO_DUCK) {
-            // We don't have audio focus and can't duck, so we have to pause
+            //没有焦点的时候，需要暂停
             pause();
         } else {
             registerAudioNoisyReceiver();
 
             if (mCurrentAudioFocusState == AUDIO_NO_FOCUS_CAN_DUCK) {
                 // We're permitted to play, but only if we 'duck', ie: play softly
+                //有焦点，但是不是全部，就低音播放,否则正常音量
                 mExoPlayer.setVolume(VOLUME_DUCK);
             } else {
                 mExoPlayer.setVolume(VOLUME_NORMAL);
             }
 
             // If we were playing when we lost focus, we need to resume playing.
+            // 播放
             if (mPlayOnFocusGain) {
                 mExoPlayer.setPlayWhenReady(true);
                 mPlayOnFocusGain = false;
@@ -313,6 +312,9 @@ public final class LocalPlayback implements Playback {
         }
     }
 
+    /**
+     * 焦点监听
+     */
     private final AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener =
             new AudioManager.OnAudioFocusChangeListener() {
                 @Override
@@ -341,20 +343,20 @@ public final class LocalPlayback implements Playback {
 
                     if (mExoPlayer != null) {
                         // Update the player state based on the change
+                        //更新焦点配置
                         configurePlayerState();
                     }
                 }
             };
 
     /**
+     * 释放资源
      * Releases resources used by the service for playback, which is mostly just the WiFi lock for
      * local playback. If requested, the ExoPlayer instance is also released.
      *
      * @param releasePlayer Indicates whether the player should also be released
      */
     private void releaseResources(boolean releasePlayer) {
-
-
         // Stops and releases player (if requested and available).
         if (releasePlayer && mExoPlayer != null) {
             mExoPlayer.release();
@@ -383,7 +385,10 @@ public final class LocalPlayback implements Playback {
         }
     }
 
-    private final class ExoPlayerEventListener implements ExoPlayer.EventListener {
+    /**
+     * 播放事件监听
+     */
+    private final class ExoPlayerEventListener implements Player.EventListener {
         @Override
         public void onTimelineChanged(Timeline timeline, Object manifest) {
             // Nothing to do.

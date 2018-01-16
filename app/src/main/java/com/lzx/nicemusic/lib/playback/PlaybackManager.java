@@ -13,6 +13,8 @@ import com.lzx.nicemusic.lib.model.MusicProvider;
 import com.lzx.nicemusic.lib.utils.MediaIDHelper;
 
 /**
+ * 播放管理类
+ *
  * @author lzx
  * @date 2018/1/16
  */
@@ -51,6 +53,7 @@ public class PlaybackManager implements Playback.Callback {
 
     /**
      * Handle a request to play music
+     * 处理播放音乐的请求,播放
      */
     public void handlePlayRequest() {
 
@@ -62,6 +65,7 @@ public class PlaybackManager implements Playback.Callback {
     }
 
     /**
+     * 暂停
      * Handle a request to pause music
      */
     public void handlePauseRequest() {
@@ -73,6 +77,7 @@ public class PlaybackManager implements Playback.Callback {
     }
 
     /**
+     * 停止
      * Handle a request to stop music
      *
      * @param withError Error message in case the stop has an unexpected cause. The error
@@ -87,6 +92,7 @@ public class PlaybackManager implements Playback.Callback {
 
 
     /**
+     * 更新当前的媒体播放器状态，可选地显示错误消息。
      * Update the current media player state, optionally showing an error message.
      *
      * @param error if not null, error message to present to the user.
@@ -98,8 +104,7 @@ public class PlaybackManager implements Playback.Callback {
         }
 
         //noinspection ResourceType
-        PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
-                .setActions(getAvailableActions());
+        PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder().setActions(getAvailableActions());
 
         setCustomAction(stateBuilder);
         int state = mPlayback.getState();
@@ -122,8 +127,7 @@ public class PlaybackManager implements Playback.Callback {
 
         mServiceCallback.onPlaybackStateUpdated(stateBuilder.build());
 
-        if (state == PlaybackStateCompat.STATE_PLAYING ||
-                state == PlaybackStateCompat.STATE_PAUSED) {
+        if (state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_PAUSED) {
             mServiceCallback.onNotificationRequired();
         }
     }
@@ -167,16 +171,19 @@ public class PlaybackManager implements Playback.Callback {
 
     /**
      * Implementation of the Playback.Callback interface
+     * 播放完当前音乐
      */
     @Override
     public void onCompletion() {
         // The media player finished playing the current song, so we go ahead
         // and start the next.
+        //有下一首，播放下一首
         if (mQueueManager.skipQueuePosition(1)) {
             handlePlayRequest();
             mQueueManager.updateMetadata();
         } else {
             // If skipping was not possible, we stop and release the resources:
+            //没有则停止
             handleStopRequest(null);
         }
     }
