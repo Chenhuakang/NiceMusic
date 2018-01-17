@@ -1,7 +1,8 @@
 package com.lzx.nicemusic.lib.model;
 
-import android.support.v4.media.MediaMetadataCompat;
 import android.text.TextUtils;
+
+import com.lzx.nicemusic.lib.bean.MusicInfo;
 
 /**
  * @author lzx
@@ -10,13 +11,19 @@ import android.text.TextUtils;
 
 public class MutableMediaMetadata {
     //音乐媒体信息
-    public MediaMetadataCompat metadata;
+    //public MediaMetadataCompat metadata;
+    public MusicInfo metadata;
     public final String trackId;
 
-    public MutableMediaMetadata(String trackId, MediaMetadataCompat metadata) {
+    public MutableMediaMetadata(String trackId, MusicInfo metadata) {
         this.metadata = metadata;
         this.trackId = trackId;
     }
+
+//    public MutableMediaMetadata(String trackId, MediaMetadataCompat metadata) {
+//        this.metadata = metadata;
+//        this.trackId = trackId;
+//    }
 
     @Override
     public boolean equals(Object o) {

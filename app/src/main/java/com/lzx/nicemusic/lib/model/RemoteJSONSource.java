@@ -2,7 +2,8 @@ package com.lzx.nicemusic.lib.model;
 
 import android.support.v4.media.MediaMetadataCompat;
 
-import org.json.JSONArray;
+import com.lzx.nicemusic.lib.bean.MusicInfo;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -13,9 +14,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * 模拟获取音乐数据
+ *
  * @author lzx
  * @date 2018/1/16
  */
@@ -23,8 +26,7 @@ import java.util.Iterator;
 public class RemoteJSONSource implements MusicProviderSource {
 
 
-    protected static final String CATALOG_URL =
-            "http://storage.googleapis.com/automotive-media/music.json";
+    protected static final String CATALOG_URL = "http://storage.googleapis.com/automotive-media/music.json";
 
     private static final String JSON_MUSIC = "music";
     private static final String JSON_TITLE = "title";
@@ -37,27 +39,40 @@ public class RemoteJSONSource implements MusicProviderSource {
     private static final String JSON_TOTAL_TRACK_COUNT = "totalTrackCount";
     private static final String JSON_DURATION = "duration";
 
-    @Override
-    public Iterator<MediaMetadataCompat> iterator() {
-        try {
-            int slashPos = CATALOG_URL.lastIndexOf('/');
-            String path = CATALOG_URL.substring(0, slashPos + 1);
-            JSONObject jsonObj = fetchJSONFromUrl(CATALOG_URL);
-            ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
-            if (jsonObj != null) {
-                JSONArray jsonTracks = jsonObj.getJSONArray(JSON_MUSIC);
+//    @Override
+//    public Iterator<MediaMetadataCompat> iterator() {
+//        try {
+//            int slashPos = CATALOG_URL.lastIndexOf('/');
+//            String path = CATALOG_URL.substring(0, slashPos + 1);
+//            JSONObject jsonObj = fetchJSONFromUrl(CATALOG_URL);
+//            ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
+//            if (jsonObj != null) {
+//                JSONArray jsonTracks = jsonObj.getJSONArray(JSON_MUSIC);
+//
+//                if (jsonTracks != null) {
+//                    for (int j = 0; j < jsonTracks.length(); j++) {
+//                        tracks.add(buildFromJSON(jsonTracks.getJSONObject(j), path));
+//                    }
+//                }
+//            }
+//            //解析每一首个的数据信息，保存到一个list里面
+//            return tracks.iterator();
+//        } catch (JSONException e) {
+//            throw new RuntimeException("Could not retrieve music list", e);
+//        }
+//    }
 
-                if (jsonTracks != null) {
-                    for (int j = 0; j < jsonTracks.length(); j++) {
-                        tracks.add(buildFromJSON(jsonTracks.getJSONObject(j), path));
-                    }
-                }
-            }
-            //解析每一首个的数据信息，保存到一个list里面
-            return tracks.iterator();
-        } catch (JSONException e) {
-            throw new RuntimeException("Could not retrieve music list", e);
-        }
+    private List<MusicInfo> mMusicInfos = new ArrayList<>();
+
+
+    @Override
+    public Iterator<MusicInfo> iterator() {
+        List<MusicInfo> tracks = fetchMusicInfoList(mMusicInfos);
+        return tracks.iterator();
+    }
+
+    public void setMusicInfos(List<MusicInfo> musicInfos) {
+        mMusicInfos = musicInfos;
     }
 
     /**
@@ -138,4 +153,33 @@ public class RemoteJSONSource implements MusicProviderSource {
             }
         }
     }
+
+    public List<MusicInfo> fetchMusicInfoList(List<MusicInfo> musicInfos) {
+        if (musicInfos == null) {
+            return new ArrayList<>();
+        }
+        List<MusicInfo> list = new ArrayList<>();
+        for (MusicInfo info : musicInfos) {
+            info.metadataCompat = getMediaMetadataCompat(info);
+            list.add(info);
+        }
+        return list;
+    }
+
+    private MediaMetadataCompat getMediaMetadataCompat(MusicInfo info) {
+        return new MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, info.musicId)
+                .putString(MusicProviderSource.CUSTOM_METADATA_TRACK_SOURCE, info.musicUrl)
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, info.albumTitle)
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, info.musicArtist)
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, info.musicDuration)
+                .putString(MediaMetadataCompat.METADATA_KEY_GENRE, info.musicGenre)
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, info.albumCover)
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, info.musicTitle)
+                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, info.trackNumber)
+                .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, info.albumMusicCount)
+                .build();
+    }
+
+
 }

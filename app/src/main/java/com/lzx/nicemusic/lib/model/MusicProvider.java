@@ -9,6 +9,7 @@ import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 
 import com.lzx.nicemusic.R;
+import com.lzx.nicemusic.lib.bean.MusicInfo;
 import com.lzx.nicemusic.lib.utils.MediaIDHelper;
 
 import java.util.ArrayList;
@@ -30,7 +31,8 @@ import static com.lzx.nicemusic.lib.utils.MediaIDHelper.MEDIA_ID_ROOT;
 
 public class MusicProvider {
     private MusicProviderSource mSource;
-    private ConcurrentMap<String, List<MediaMetadataCompat>> mMusicListByGenre;
+    //private ConcurrentMap<String, List<MediaMetadataCompat>> mMusicListByGenre;
+    private ConcurrentMap<String, List<MusicInfo>> mMusicListByGenre;
     private final ConcurrentMap<String, MutableMediaMetadata> mMusicListById;
     //喜欢列表
     private final Set<String> mFavoriteTracks;
@@ -48,9 +50,9 @@ public class MusicProvider {
         void onMusicCatalogReady(boolean success);
     }
 
-    public MusicProvider() {
-        this(new RemoteJSONSource()); //加载音乐数据
-    }
+//    public MusicProvider() {
+//        this(new RemoteJSONSource()); //加载音乐数据
+//    }
 
     public MusicProvider(MusicProviderSource source) {
         mSource = source;
@@ -76,11 +78,22 @@ public class MusicProvider {
      * 获取所有歌曲的洗牌集合的迭代器(随机排序)
      * Get an iterator over a shuffled collection of all songs
      */
-    public Iterable<MediaMetadataCompat> getShuffledMusic() {
+//    public Iterable<MediaMetadataCompat> getShuffledMusic() {
+//        if (mCurrentState != State.INITIALIZED) {
+//            return Collections.emptyList();
+//        }
+//        List<MediaMetadataCompat> shuffled = new ArrayList<>(mMusicListById.size());
+//        for (MutableMediaMetadata mutableMetadata : mMusicListById.values()) {
+//            shuffled.add(mutableMetadata.metadata);
+//        }
+//        Collections.shuffle(shuffled);
+//        return shuffled;
+//    }
+    public Iterable<MusicInfo> getShuffledMusic() {
         if (mCurrentState != State.INITIALIZED) {
             return Collections.emptyList();
         }
-        List<MediaMetadataCompat> shuffled = new ArrayList<>(mMusicListById.size());
+        List<MusicInfo> shuffled = new ArrayList<>(mMusicListById.size());
         for (MutableMediaMetadata mutableMetadata : mMusicListById.values()) {
             shuffled.add(mutableMetadata.metadata);
         }
@@ -92,7 +105,13 @@ public class MusicProvider {
      * 获取给定流派的音乐曲目
      * Get music tracks of the given genre
      */
-    public List<MediaMetadataCompat> getMusicsByGenre(String genre) {
+//    public List<MediaMetadataCompat> getMusicsByGenre(String genre) {
+//        if (mCurrentState != State.INITIALIZED || !mMusicListByGenre.containsKey(genre)) {
+//            return Collections.emptyList();
+//        }
+//        return mMusicListByGenre.get(genre);
+//    }
+    public List<MusicInfo> getMusicsByGenre(String genre) {
         if (mCurrentState != State.INITIALIZED || !mMusicListByGenre.containsKey(genre)) {
             return Collections.emptyList();
         }
@@ -105,7 +124,7 @@ public class MusicProvider {
      * the given query.
      * 搜索 包含标题的音乐曲目
      */
-    public List<MediaMetadataCompat> searchMusicBySongTitle(String query) {
+    public List<MusicInfo> searchMusicBySongTitle(String query) {
         return searchMusic(MediaMetadataCompat.METADATA_KEY_TITLE, query);
     }
 
@@ -113,7 +132,7 @@ public class MusicProvider {
      * Very basic implementation of a search that filter music tracks with album containing
      * the given query.
      */
-    public List<MediaMetadataCompat> searchMusicByAlbum(String query) {
+    public List<MusicInfo> searchMusicByAlbum(String query) {
         return searchMusic(MediaMetadataCompat.METADATA_KEY_ALBUM, query);
     }
 
@@ -121,7 +140,7 @@ public class MusicProvider {
      * Very basic implementation of a search that filter music tracks with artist containing
      * the given query.
      */
-    public List<MediaMetadataCompat> searchMusicByArtist(String query) {
+    public List<MusicInfo> searchMusicByArtist(String query) {
         return searchMusic(MediaMetadataCompat.METADATA_KEY_ARTIST, query);
     }
 
@@ -129,24 +148,37 @@ public class MusicProvider {
      * Very basic implementation of a search that filter music tracks with a genre containing
      * the given query.
      */
-    public List<MediaMetadataCompat> searchMusicByGenre(String query) {
+    public List<MusicInfo> searchMusicByGenre(String query) {
         return searchMusic(MediaMetadataCompat.METADATA_KEY_GENRE, query);
     }
 
-    private List<MediaMetadataCompat> searchMusic(String metadataField, String query) {
+    private List<MusicInfo> searchMusic(String metadataField, String query) {
         if (mCurrentState != State.INITIALIZED) {
             return Collections.emptyList();
         }
-        ArrayList<MediaMetadataCompat> result = new ArrayList<>();
+        ArrayList<MusicInfo> result = new ArrayList<>();
         query = query.toLowerCase(Locale.US);
         for (MutableMediaMetadata track : mMusicListById.values()) {
-            if (track.metadata.getString(metadataField).toLowerCase(Locale.US)
-                    .contains(query)) {
+            if (track.metadata.metadataCompat.getString(metadataField).toLowerCase(Locale.US).contains(query)) {
                 result.add(track.metadata);
             }
         }
         return result;
     }
+//    private List<MediaMetadataCompat> searchMusic(String metadataField, String query) {
+//        if (mCurrentState != State.INITIALIZED) {
+//            return Collections.emptyList();
+//        }
+//        ArrayList<MediaMetadataCompat> result = new ArrayList<>();
+//        query = query.toLowerCase(Locale.US);
+//        for (MutableMediaMetadata track : mMusicListById.values()) {
+//            if (track.metadata.getString(metadataField).toLowerCase(Locale.US)
+//                    .contains(query)) {
+//                result.add(track.metadata);
+//            }
+//        }
+//        return result;
+//    }
 
 
     /**
@@ -237,11 +269,11 @@ public class MusicProvider {
     }
 
     private synchronized void buildListsByGenre() {
-        ConcurrentMap<String, List<MediaMetadataCompat>> newMusicListByGenre = new ConcurrentHashMap<>();
+        ConcurrentMap<String, List<MusicInfo>> newMusicListByGenre = new ConcurrentHashMap<>();
 
         for (MutableMediaMetadata m : mMusicListById.values()) {
-            String genre = m.metadata.getString(MediaMetadataCompat.METADATA_KEY_GENRE);
-            List<MediaMetadataCompat> list = newMusicListByGenre.get(genre);
+            String genre = m.metadata.musicGenre;
+            List<MusicInfo> list = newMusicListByGenre.get(genre);
             if (list == null) {
                 list = new ArrayList<>();
                 newMusicListByGenre.put(genre, list);
@@ -259,10 +291,13 @@ public class MusicProvider {
             if (mCurrentState == State.NON_INITIALIZED) {
                 mCurrentState = State.INITIALIZING;
 
-                Iterator<MediaMetadataCompat> tracks = mSource.iterator();
+                //Iterator<MediaMetadataCompat> tracks = mSource.iterator();
+                Iterator<MusicInfo> tracks = mSource.iterator();
                 while (tracks.hasNext()) {
-                    MediaMetadataCompat item = tracks.next();
-                    String musicId = item.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID);
+                    //MediaMetadataCompat item = tracks.next();
+                    MusicInfo item = tracks.next();
+                    //String musicId = item.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID);
+                    String musicId = item.musicId;
                     mMusicListById.put(musicId, new MutableMediaMetadata(musicId, item));
                 }
                 buildListsByGenre();
@@ -278,8 +313,8 @@ public class MusicProvider {
     }
 
 
-    public List<MediaBrowserCompat.MediaItem> getChildren(String mediaId, Resources resources) {
-        List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
+    public List<MusicInfo> getChildren(String mediaId, Resources resources) {
+        List<MusicInfo> mediaItems = new ArrayList<>();
 
         if (!MediaIDHelper.isBrowseable(mediaId)) {
             return mediaItems;
@@ -309,11 +344,9 @@ public class MusicProvider {
                 .setMediaId(MEDIA_ID_MUSICS_BY_GENRE)
                 .setTitle(resources.getString(R.string.browse_genres))
                 .setSubtitle(resources.getString(R.string.browse_genre_subtitle))
-                .setIconUri(Uri.parse("android.resource://" +
-                        "com.example.android.uamp/drawable/ic_by_genre"))
+                .setIconUri(Uri.parse("android.resource://" + "com.example.android.uamp/drawable/ic_by_genre"))
                 .build();
-        return new MediaBrowserCompat.MediaItem(description,
-                MediaBrowserCompat.MediaItem.FLAG_BROWSABLE);
+        return new MediaBrowserCompat.MediaItem(description,  MediaBrowserCompat.MediaItem.FLAG_BROWSABLE);
     }
 
     private MediaBrowserCompat.MediaItem createBrowsableMediaItemForGenre(String genre,
