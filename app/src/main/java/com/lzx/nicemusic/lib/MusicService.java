@@ -67,9 +67,9 @@ public class MusicService extends MediaBrowserServiceCompat implements PlaybackM
     private PlaybackManager mPlaybackManager;
     private Bundle mSessionExtras;
     private final DelayedStopHandler mDelayedStopHandler = new DelayedStopHandler(this);
-    private MediaRouter mMediaRouter;
-    private SessionManager mCastSessionManager;
-    private SessionManagerListener<CastSession> mCastSessionManagerListener;
+//    private MediaRouter mMediaRouter;
+//    private SessionManager mCastSessionManager;
+//    private SessionManagerListener<CastSession> mCastSessionManagerListener;
     private MediaNotificationManager mMediaNotificationManager;
 
     @Override
@@ -129,14 +129,14 @@ public class MusicService extends MediaBrowserServiceCompat implements PlaybackM
             throw new IllegalStateException("Could not create a MediaNotificationManager", e);
         }
 
-        int playServicesAvailable = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
-        if (playServicesAvailable == ConnectionResult.SUCCESS) {
-            mCastSessionManager = CastContext.getSharedInstance(this).getSessionManager();
-            mCastSessionManagerListener = new CastSessionManagerListener();
-            mCastSessionManager.addSessionManagerListener(mCastSessionManagerListener, CastSession.class);
-        }
-
-        mMediaRouter = MediaRouter.getInstance(getApplicationContext());
+//        int playServicesAvailable = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
+//        if (playServicesAvailable == ConnectionResult.SUCCESS) {
+//            mCastSessionManager = CastContext.getSharedInstance(this).getSessionManager();
+//            mCastSessionManagerListener = new CastSessionManagerListener();
+//            mCastSessionManager.addSessionManagerListener(mCastSessionManagerListener, CastSession.class);
+//        }
+//
+//        mMediaRouter = MediaRouter.getInstance(getApplicationContext());
     }
 
     @Override
@@ -175,9 +175,9 @@ public class MusicService extends MediaBrowserServiceCompat implements PlaybackM
         mPlaybackManager.handleStopRequest(null);
         mMediaNotificationManager.stopNotification();
 
-        if (mCastSessionManager != null) {
-            mCastSessionManager.removeSessionManagerListener(mCastSessionManagerListener, CastSession.class);
-        }
+//        if (mCastSessionManager != null) {
+//            mCastSessionManager.removeSessionManagerListener(mCastSessionManagerListener, CastSession.class);
+//        }
 
         mDelayedStopHandler.removeCallbacksAndMessages(null);
         mSession.release();
