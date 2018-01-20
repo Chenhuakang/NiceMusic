@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.CacheControl;
 import okhttp3.FormBody;
+import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -43,7 +44,7 @@ public class RetrofitHelper {
     }
 
     public static MusicApi getMusicApi() {
-        String url = "http://route.showapi.com/";
+        String url = "http://tingapi.ting.baidu.com/v1/restserver/";
         return createApi(MusicApi.class, url);
     }
 
@@ -81,6 +82,7 @@ public class RetrofitHelper {
                 if (mOkHttpClient == null) {
                     mOkHttpClient = new OkHttpClient.Builder()
                             //.cache(cache)
+                            .addInterceptor(new CommonInterceptor())
                             .addInterceptor(interceptor)
                             .addNetworkInterceptor(new CacheInterceptor())
                             .retryOnConnectionFailure(true)
@@ -129,6 +131,31 @@ public class RetrofitHelper {
                         .build();
             }
             return response;
+        }
+    }
+
+    public static class CommonInterceptor implements Interceptor {
+
+        @Override public Response intercept(Interceptor.Chain chain) throws IOException {
+            Request oldRequest = chain.request();
+
+            // 添加新的参数
+            HttpUrl.Builder authorizedUrlBuilder = oldRequest.url()
+                    .newBuilder()
+                    .scheme(oldRequest.url().scheme())
+                    .host(oldRequest.url().host())
+                    .addQueryParameter("format", "json")
+                    .addQueryParameter("form", "webapp_music")
+                    .addQueryParameter("callback", "");
+
+            // 新的请求
+            Request newRequest = oldRequest.newBuilder()
+                    .addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+                    .method(oldRequest.method(), oldRequest.body())
+                    .url(authorizedUrlBuilder.build())
+                    .build();
+
+            return chain.proceed(newRequest);
         }
     }
 }

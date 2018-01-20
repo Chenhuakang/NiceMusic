@@ -3,30 +3,18 @@ package com.lzx.nicemusic.module.area.presenter;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
-import com.lzx.nicemusic.bean.HomeInfo;
-import com.lzx.nicemusic.bean.MusicInfo;
 import com.lzx.nicemusic.db.CacheManager;
-import com.lzx.nicemusic.network.RetrofitHelper;
+import com.lzx.nicemusic.lib.bean.MusicInfo;
 import com.lzx.nicemusic.utils.LogUtil;
 import com.lzx.nicemusic.utils.SpUtil;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.ResponseBody;
 
 /**
  * Created by xian on 2018/1/15.
@@ -63,15 +51,15 @@ public class AreaPresenter extends BasePresenter<AreaContract.View> implements A
                     mView.loadAreaDataSuccess(infoList);
                     updateCache(topid);
                 }, throwable -> {
-                    LogUtil.i("-->" + throwable.getMessage());
+                    LogUtil.i("-requestAreaData->" + throwable.getMessage());
                 });
         addSubscribe(disposable);
     }
 
     private void updateCache(String topid) {
-        long currTime = SpUtil.getInstance().getLong("cache_area_data", System.currentTimeMillis());
+        long currTime = SpUtil.getInstance().getLong("cache_area_data_" + topid, System.currentTimeMillis());
         if (System.currentTimeMillis() - currTime > 24 * 60 * 60 * 1000) {
-            SpUtil.getInstance().putLong("cache_area_data", System.currentTimeMillis());
+            SpUtil.getInstance().putLong("cache_area_data_" + topid, System.currentTimeMillis());
             mAreaModel.requestAreaData(topid)
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())

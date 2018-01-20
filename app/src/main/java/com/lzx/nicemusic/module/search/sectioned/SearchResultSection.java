@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.lzx.nicemusic.R;
-import com.lzx.nicemusic.bean.MusicInfo;
+import com.lzx.nicemusic.lib.bean.MusicInfo;
 import com.lzx.nicemusic.module.search.presenter.SearchPresenter;
 import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.SquareImageView;
@@ -49,9 +49,9 @@ public class SearchResultSection extends StatelessSection {
     public void onBindItemViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         ResultHolder holder = (ResultHolder) viewHolder;
         MusicInfo musicInfo = mMusicInfos.get(position);
-        GlideUtil.loadImageByUrl(mContext, musicInfo.getAlbumpicSmall(), holder.mMusicCover);
-        holder.mMusicName.setText(musicInfo.getSongname());
-        holder.mAlbumName.setText(musicInfo.getSingername());
+        GlideUtil.loadImageByUrl(mContext, musicInfo.albumCover, holder.mMusicCover);
+        holder.mMusicName.setText(musicInfo.musicTitle);
+        holder.mAlbumName.setText(musicInfo.musicArtist);
     }
 
     class ResultHolder extends RecyclerView.ViewHolder {

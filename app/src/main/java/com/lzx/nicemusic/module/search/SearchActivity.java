@@ -7,20 +7,17 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
-import com.lzx.nicemusic.bean.MusicInfo;
+import com.lzx.nicemusic.lib.bean.MusicInfo;
 import com.lzx.nicemusic.module.search.presenter.SearchContract;
 import com.lzx.nicemusic.module.search.presenter.SearchPresenter;
 import com.lzx.nicemusic.module.search.sectioned.SearchHistorySection;
 import com.lzx.nicemusic.module.search.sectioned.SearchResultSection;
 import com.lzx.nicemusic.utils.LogUtil;
-import com.zhy.view.flowlayout.FlowLayout;
-import com.zhy.view.flowlayout.TagFlowLayout;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

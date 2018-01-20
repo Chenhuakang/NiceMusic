@@ -1,10 +1,13 @@
 package com.lzx.nicemusic.module.splash.presenter;
 
+import android.widget.Toast;
+
 import com.google.gson.Gson;
 import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
 import com.lzx.nicemusic.bean.BannerInfo;
 import com.lzx.nicemusic.bean.HomeInfo;
 import com.lzx.nicemusic.db.CacheManager;
+import com.lzx.nicemusic.lib.bean.MusicInfo;
 import com.lzx.nicemusic.module.main.presenter.MainModel;
 import com.lzx.nicemusic.network.RetrofitHelper;
 import com.lzx.nicemusic.utils.LogUtil;
@@ -23,10 +26,12 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
+import retrofit2.HttpException;
 
 /**
  * Created by xian on 2018/1/14.
@@ -52,12 +57,14 @@ public class SplashPresenter extends BasePresenter<SplashContract.View> implemen
             }
             return true;
         })
-                .flatMap(aBoolean -> mMainModel.loadMainData())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(mainDataList1 -> mView.requestMainDataSuccess(false),
-                        throwable -> LogUtil.i("-->" + throwable.getMessage()));
-
+        .flatMap(aBoolean -> mMainModel.loadMainData())
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(mainDataList1 -> mView.requestMainDataSuccess(false),
+                throwable -> {
+                    LogUtil.i("Error#requestMusicList = " + throwable.getMessage());
+                    Toast.makeText(mContext, "数据解析出错", Toast.LENGTH_SHORT).show();
+                });
         addSubscribe(subscriber);
     }
 }

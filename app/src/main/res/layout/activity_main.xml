@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <View
+   <!-- <View
         android:id="@+id/bg_search"
         android:alpha="0"
         android:layout_width="match_parent"
@@ -34,5 +34,5 @@
         android:text="搜索你想要的......"
         android:textColor="#d0333333"
         android:textSize="14sp" />
-
+-->
 </RelativeLayout>

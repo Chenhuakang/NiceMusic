@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:paddingEnd="@dimen/card_margin"
+    android:paddingStart="@dimen/card_margin">
+
+    <Button
+        android:id="@+id/item_btn_more"
+        android:layout_width="120dp"
+        android:layout_height="35dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerInParent="true"
+        android:background="@drawable/btn_more_white"
+        android:text="查看更多"
+        android:textColor="@color/font_normal"
+        android:textSize="@dimen/default_small_text_size"
+        android:visibility="visible" />
+
+
+    <LinearLayout
+        android:id="@+id/item_refresh_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        android:layout_alignParentRight="true">
+
+        <TextView
+            android:id="@+id/item_dynamic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black_80"
+            android:textSize="@dimen/default_tiny_text_size" />
+
+        <Space
+            android:layout_width="@dimen/default_tiny_padding"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/item_btn_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_category_more_refresh"
+            android:tint="@color/refresh_pink_background" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

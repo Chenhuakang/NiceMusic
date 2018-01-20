@@ -1,11 +1,14 @@
 package com.lzx.nicemusic.module.main.presenter;
 
+import android.widget.Toast;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
 import com.lzx.nicemusic.bean.BannerInfo;
 import com.lzx.nicemusic.bean.HomeInfo;
 import com.lzx.nicemusic.db.CacheManager;
+import com.lzx.nicemusic.lib.bean.MusicInfo;
 import com.lzx.nicemusic.network.RetrofitHelper;
 import com.lzx.nicemusic.utils.LogUtil;
 import com.lzx.nicemusic.utils.SpUtil;
@@ -47,16 +50,21 @@ public class MainPresenter extends BasePresenter<MainContract.View> implements M
             String json = CacheManager.getImpl().findCache(CacheManager.KEY_HOME_LIST_DATA);
             emitter.onNext(json);
         })
-                .map((Function<String, List<HomeInfo>>)
-                        json -> new Gson().fromJson(json, new TypeToken<List<HomeInfo>>() {
-                        }.getType()))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(homeInfos -> {
-                            mView.requestMainDataSuccess(homeInfos);
-                            updateCache();
-                        },
-                        throwable -> LogUtil.i("-->" + throwable.getMessage()));
+        .map((Function<String, List<MusicInfo>>)
+                json ->
+                        new Gson().fromJson(json, new TypeToken<List<MusicInfo>>() {
+                        }.getType())
+        )
+        .subscribeOn(Schedulers.newThread())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(homeInfos -> {
+                    mView.requestMainDataSuccess(homeInfos);
+                    updateCache();
+                },
+                throwable -> {
+                    LogUtil.i("Error#requestMusicList = " + throwable.getMessage());
+                    Toast.makeText(mContext, "数据解析出错", Toast.LENGTH_SHORT).show();
+                });
         addSubscribe(subscriber);
     }
 
@@ -65,10 +73,16 @@ public class MainPresenter extends BasePresenter<MainContract.View> implements M
         long currTime = SpUtil.getInstance().getLong("cache_main_data", System.currentTimeMillis());
         if (System.currentTimeMillis() - currTime > 24 * 60 * 60 * 1000) {
             SpUtil.getInstance().putLong("cache_main_data", System.currentTimeMillis());
-            Disposable subscriber = mMainModel.loadMainData().subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(homeInfos -> mView.requestMainDataSuccess(homeInfos),
-                            throwable -> LogUtil.i("-->" + throwable.getMessage()));
+            Disposable subscriber
+            = mMainModel.loadMainData()
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(musicInfos -> {
+                    },
+                    throwable -> {
+                        LogUtil.i("Error#requestMusicList = " + throwable.getMessage());
+                        Toast.makeText(mContext, "更新缓存出错", Toast.LENGTH_SHORT).show();
+                    });
             addSubscribe(subscriber);
         }
     }

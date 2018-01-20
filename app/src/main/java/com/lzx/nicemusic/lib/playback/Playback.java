@@ -1,13 +1,15 @@
 package com.lzx.nicemusic.lib.playback;
 
-import static android.support.v4.media.session.MediaSessionCompat.QueueItem;
+import android.support.v4.media.session.MediaSessionCompat;
+
+import com.lzx.nicemusic.lib.bean.MusicInfo;
 
 /**
- * @author lzx
- * @date 2018/1/16
+ * Created by xian on 2018/1/20.
  */
 
 public interface Playback {
+
     /**
      * Start/setup the playback.
      * Resources/listeners would be allocated by implementations.
@@ -45,7 +47,7 @@ public interface Playback {
     boolean isPlaying();
 
     /**
-     * @return pos if currently playing an item
+     * @return 获取当前播放流的进度位置
      */
     long getCurrentStreamPosition();
 
@@ -54,7 +56,7 @@ public interface Playback {
      */
     void updateLastKnownStreamPosition();
 
-    void play(QueueItem item);
+    void play(MusicInfo info);
 
     void pause();
 
@@ -64,17 +66,17 @@ public interface Playback {
 
     String getCurrentMediaId();
 
+
     interface Callback {
         /**
-         * On current music completed.
-         * 当前音乐播放完成
+         * 当前音乐播放完毕
          */
-        void onCompletion();
+        void onPlayCompletion();
 
         /**
-         * on Playback status changed
-         * Implementations can use this callback to update
-         * playback state on the media sessions.
+         * 在播放状态改变时，可以实现这个回调来更新媒体会话的播放状态。
+         *
+         * @param state
          */
         void onPlaybackStatusChanged(int state);
 
@@ -90,4 +92,5 @@ public interface Playback {
     }
 
     void setCallback(Callback callback);
+
 }

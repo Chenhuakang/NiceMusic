@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.lzx.nicemusic.R;
-import com.lzx.nicemusic.bean.MusicInfo;
+import com.lzx.nicemusic.lib.bean.MusicInfo;
 import com.lzx.nicemusic.utils.FormatUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.SquareImageView;
@@ -25,11 +25,20 @@ public class AreaSection extends StatelessSection {
 
     private Context mContext;
     private List<MusicInfo> mMusicInfos = new ArrayList<>();
+    private OnItemClickListener mOnItemClickListener;
 
     public AreaSection(Context context, List<MusicInfo> musicInfos) {
         super(new SectionParameters.Builder(R.layout.section_area).build());
         mContext = context;
         mMusicInfos = musicInfos;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(List<MusicInfo> list,MusicInfo musicInfo, int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
     }
 
     @Override
@@ -46,10 +55,15 @@ public class AreaSection extends StatelessSection {
     public void onBindItemViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         AreaHolder holder = (AreaHolder) viewHolder;
         MusicInfo musicInfo = mMusicInfos.get(position);
-        GlideUtil.loadImageByUrl(mContext, musicInfo.getAlbumpicBig(), holder.mMusicCover);
-        holder.mMusicName.setText(musicInfo.getSongname());
-        holder.mMusicTitle.setText(musicInfo.getSingername());
-        holder.mMusicPlayCount.setText(FormatUtil.formatNum(musicInfo.getSongid()));
+        GlideUtil.loadImageByUrl(mContext, musicInfo.albumCover, holder.mMusicCover);
+        holder.mMusicName.setText(musicInfo.musicTitle);
+        holder.mMusicTitle.setText(musicInfo.musicArtist);
+        holder.mMusicPlayCount.setText(FormatUtil.formatNum(musicInfo.musicId));
+        holder.itemView.setOnClickListener(view -> {
+            if (mOnItemClickListener != null) {
+                mOnItemClickListener.onItemClick(mMusicInfos,musicInfo, position);
+            }
+        });
     }
 
     class AreaHolder extends RecyclerView.ViewHolder {

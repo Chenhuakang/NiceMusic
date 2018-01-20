@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.lzx.nicemusic.bean.BannerInfo;
 import com.lzx.nicemusic.bean.HomeInfo;
 import com.lzx.nicemusic.db.CacheManager;
+import com.lzx.nicemusic.helper.DataHelper;
+import com.lzx.nicemusic.lib.bean.MusicInfo;
 import com.lzx.nicemusic.network.RetrofitHelper;
 
 import org.json.JSONArray;
@@ -12,9 +14,15 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
+import io.reactivex.functions.Function;
 import okhttp3.ResponseBody;
 
 /**
@@ -23,96 +31,59 @@ import okhttp3.ResponseBody;
 
 public class MainModel {
 
-    public Observable<List<HomeInfo>> loadMainData() {
-        List<HomeInfo> homeInfos = new ArrayList<>();
-        return RetrofitHelper.getNewsApi().requestBanner()
+    /**
+     * 1、新歌榜，2、热歌榜，11、摇滚榜，12、爵士，16、流行，
+     * 21、欧美金曲榜，22、经典老歌榜，23、情歌对唱榜，
+     * 24、影视金曲榜，25、网络歌曲榜
+     *
+     * @return
+     */
+    public Observable<List<MusicInfo>> loadMainData() {
+        List<MusicInfo> infoList = new ArrayList<>();
+        return RetrofitHelper.getMusicApi().requestMusicList(1, 4, 0)
                 .flatMap(responseBody -> {
-                    HomeInfo homeInfo = new HomeInfo();
-                    homeInfo.setBannerList(getBannerList(responseBody, 5, "Banner", HomeInfo.TYPE_ITEM_BANNER));
-                    homeInfos.add(homeInfo);
-                    return RetrofitHelper.getMusicApi().requestMusicList("26");//热歌;
+                    infoList.addAll(DataHelper.fetchJSONFromUrl(responseBody));
+                    return RetrofitHelper.getMusicApi().requestMusicList(2, 4, 0);
                 })
                 .flatMap(responseBody -> {
-                    homeInfos.add(new HomeInfo("流行熱歌", HomeInfo.TYPE_ITEM_TITLE));
-                    homeInfos.addAll(getMusicList(responseBody, 6, "流行熱歌", HomeInfo.TYPE_ITEM_THREE));
-                    return RetrofitHelper.getMusicApi().requestMusicList("27"); //新歌
+                    infoList.addAll(DataHelper.fetchJSONFromUrl(responseBody));
+                    return RetrofitHelper.getMusicApi().requestMusicList(11, 4, 0);
                 })
                 .flatMap(responseBody -> {
-                    homeInfos.add(new HomeInfo("新歌榜", HomeInfo.TYPE_ITEM_TITLE));
-                    homeInfos.addAll(getMusicList(responseBody, 5, "新歌榜", HomeInfo.TYPE_ITEM_ONE));
-                    return RetrofitHelper.getBaiSiBuDeJieApi().requestSong("31"); //百思不得姐音乐
+                    infoList.addAll(DataHelper.fetchJSONFromUrl(responseBody));
+                    return RetrofitHelper.getMusicApi().requestMusicList(12, 4, 0);
                 })
                 .flatMap(responseBody -> {
-                    homeInfos.add(new HomeInfo("随心听", HomeInfo.TYPE_ITEM_TITLE));
-                    JSONObject jsonObject = new JSONObject(responseBody.string());
-                    JSONArray array = jsonObject.getJSONObject("showapi_res_body")
-                            .getJSONObject("pagebean").getJSONArray("contentlist");
-                    for (int i = 0; i < 4; i++) {
-                        HomeInfo baiSiBuDeJieMusic = new Gson().fromJson(array.getJSONObject(i).toString(), HomeInfo.class);
-                        baiSiBuDeJieMusic.setItemTitle("随心听");
-                        baiSiBuDeJieMusic.setItemType(HomeInfo.TYPE_ITEM_TWO);
-                        homeInfos.add(baiSiBuDeJieMusic);
-                    }
-                    return RetrofitHelper.getNewsApi().requestWelfare(38, 3); //大长腿
+                    infoList.addAll(DataHelper.fetchJSONFromUrl(responseBody));
+                    return RetrofitHelper.getMusicApi().requestMusicList(16, 4, 0);
                 })
                 .flatMap(responseBody -> {
-                    HomeInfo homeInfo = new HomeInfo();
-                    homeInfo.setLongLegs(getBannerList(responseBody, 3, "大长腿", HomeInfo.TYPE_ITEM_LONGLEGS));
-                    homeInfo.setItemType(HomeInfo.TYPE_ITEM_LONGLEGS);
-                    homeInfos.add(homeInfo);
-                    return RetrofitHelper.getMusicApi().requestMusicList("36"); //K歌金曲
+                    infoList.addAll(DataHelper.fetchJSONFromUrl(responseBody));
+                    return RetrofitHelper.getMusicApi().requestMusicList(21, 4, 0);
                 })
                 .flatMap(responseBody -> {
-                    homeInfos.add(new HomeInfo("K歌金曲", HomeInfo.TYPE_ITEM_TITLE));
-                    homeInfos.addAll(getMusicList(responseBody, 6, "K歌金曲", HomeInfo.TYPE_ITEM_THREE));
-                    return RetrofitHelper.getMusicApi().requestMusicList("28"); //网络歌曲
+                    infoList.addAll(DataHelper.fetchJSONFromUrl(responseBody));
+                    return RetrofitHelper.getMusicApi().requestMusicList(22, 4, 0);
                 })
                 .flatMap(responseBody -> {
-                    homeInfos.add(new HomeInfo("网络歌曲", HomeInfo.TYPE_ITEM_TITLE));
-                    homeInfos.addAll(getMusicList(responseBody, 6, "网络歌曲", HomeInfo.TYPE_ITEM_THREE));
-                    return RetrofitHelper.getNewsApi().requestWelfare(36, 1); //文艺范
+                    infoList.addAll(DataHelper.fetchJSONFromUrl(responseBody));
+                    return RetrofitHelper.getMusicApi().requestMusicList(23, 4, 0);
+                })
+                .flatMap(responseBody -> {
+                    infoList.addAll(DataHelper.fetchJSONFromUrl(responseBody));
+                    return RetrofitHelper.getMusicApi().requestMusicList(24, 4, 0);
+                })
+                .flatMap(responseBody -> {
+                    infoList.addAll(DataHelper.fetchJSONFromUrl(responseBody));
+                    return RetrofitHelper.getMusicApi().requestMusicList(25, 4, 0);
                 })
                 .map(responseBody -> {
-                    HomeInfo homeInfo = new HomeInfo();
-                    homeInfo.setArtGirl(getBannerList(responseBody, 1, "文艺范", HomeInfo.TYPE_ITEM_ARTS).get(0));
-                    homeInfo.setItemType(HomeInfo.TYPE_ITEM_ARTS);
-                    homeInfos.add(homeInfo);
-
-                    String cacheJson = new Gson().toJson(homeInfos);
-                    CacheManager.getImpl().saveCache(CacheManager.KEY_HOME_LIST_DATA, cacheJson);
-
-                    return homeInfos;
+                    infoList.addAll(DataHelper.fetchJSONFromUrl(responseBody));
+                    String json = new Gson().toJson(infoList);
+                    CacheManager.getImpl().saveCache(CacheManager.KEY_HOME_LIST_DATA, json);
+                    return infoList;
                 });
     }
 
-    private List<HomeInfo> getMusicList(ResponseBody responseBody, int num, String itemTitle, int itemType) throws JSONException, IOException {
-        JSONObject jsonObject = new JSONObject(responseBody.string());
-        JSONArray array = jsonObject.getJSONObject("showapi_res_body")
-                .getJSONObject("pagebean").getJSONArray("songlist");
-        List<HomeInfo> musicInfoList = new ArrayList<>();
-        for (int i = 0; i < num; i++) {
-            HomeInfo musicInfo = new Gson().fromJson(array.getJSONObject(i).toString(), HomeInfo.class);
-            musicInfo.setItemTitle(itemTitle);
-            musicInfo.setItemType(itemType);
-            musicInfoList.add(musicInfo);
-        }
-        return musicInfoList;
-    }
 
-    private List<BannerInfo> getBannerList(ResponseBody responseBody, int num, String itemTitle, int itemType) throws JSONException, IOException {
-        JSONObject jsonObject = new JSONObject(responseBody.string());
-        JSONObject body = jsonObject.getJSONObject("showapi_res_body");
-        List<BannerInfo> list = new ArrayList<>();
-        for (int i = 0; i < num; i++) {
-            JSONObject object = body.getJSONObject(String.valueOf(i));
-            BannerInfo info = new BannerInfo();
-            info.setThumb(object.getString("thumb"));
-            info.setTitle(object.getString("title"));
-            info.setUrl(object.getString("url"));
-            info.setItemTitle(itemTitle);
-            info.setItemType(itemType);
-            list.add(info);
-        }
-        return list;
-    }
 }
