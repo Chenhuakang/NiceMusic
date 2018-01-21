@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="500dp">
+
+                <ImageView
+                    android:id="@+id/blur_image_bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@drawable/shadow_white" />
+
+                <RelativeLayout
+                    android:id="@+id/playing_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/music_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="50dp"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:lines="1"
+                        android:paddingLeft="12dp"
+                        android:paddingRight="12dp"
+                        android:text="大客户打款"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/card_cover"
+                        android:layout_width="250dp"
+                        android:layout_height="250dp"
+                        android:layout_below="@+id/music_name"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="30dp"
+                        android:foreground="?attr/selectableItemBackground"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="8dp">
+
+                        <ImageView
+                            android:id="@+id/music_cover"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitXY" />
+                    </android.support.v7.widget.CardView>
+
+
+                    <ImageView
+                        android:id="@+id/btn_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/card_cover"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="10dp"
+                        android:src="@drawable/ic_switch" />
+
+                    <ImageView
+                        android:id="@+id/btn_favorite"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/card_cover"
+                        android:layout_marginRight="12dp"
+                        android:layout_marginTop="10dp"
+                        android:src="@drawable/ic_favorite" />
+
+                    <TextView
+                        android:id="@+id/text_lyrics"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/card_cover"
+                        android:layout_marginTop="10dp"
+                        android:layout_toLeftOf="@+id/btn_favorite"
+                        android:layout_toRightOf="@+id/btn_switch" />
+
+                    <SeekBar
+                        android:id="@+id/seekBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/text_lyrics"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginTop="10dp" />
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+
+</FrameLayout>

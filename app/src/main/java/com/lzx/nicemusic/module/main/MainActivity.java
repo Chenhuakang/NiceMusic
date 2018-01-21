@@ -104,12 +104,13 @@ public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresent
         mSearchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-
+                LogUtil.i("onQueryTextSubmit = " + query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                LogUtil.i("onQueryTextChange = " + newText);
                 return false;
             }
         });
@@ -131,6 +132,7 @@ public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresent
             if (matches != null && matches.size() > 0) {
                 String searchWrd = matches.get(0);
                 if (!TextUtils.isEmpty(searchWrd)) {
+                    LogUtil.i("onActivityResult = " + searchWrd);
                     mSearchView.setQuery(searchWrd, false);
                 }
             }

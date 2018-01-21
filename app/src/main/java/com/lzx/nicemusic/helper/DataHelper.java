@@ -95,6 +95,8 @@ public class DataHelper {
             info.albumId = object.getString("album_id"); //专辑id
             info.albumTitle = object.getString("album_title"); //专辑名称
             info.albumCover = object.getString("album_500_500"); //专辑封面
+            info.temp_1 = object.getString("pic_huge"); //长方形的封面
+            info.temp_2 = object.getString("pic_premium"); //高清的封面
             info.albumArtist = object.getString("artist_name"); //专辑艺术家
             info.albumMusicCount = 0; //专辑音乐数
             info.albumPlayCount = 0; //专辑播放数

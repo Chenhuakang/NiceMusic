@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.lib.bean.MusicInfo;
+import com.lzx.nicemusic.module.play.PlayingDetailActivity;
 import com.lzx.nicemusic.utils.FormatUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.OuterLayerImageView;
@@ -125,6 +126,7 @@ public class HomeItemSectioned extends StatelessSection {
         holder.mLikeNum.setText(FormatUtil.formatNum(String.valueOf(musicInfo.favorites)));
         holder.mMusicTime.setText(FormatUtil.formatMusicTime(musicInfo.musicDuration));
         holder.mAlbumName.setText(musicInfo.musicArtist + "·" + musicInfo.albumTitle);
+        holder.itemView.setOnClickListener(view -> PlayingDetailActivity.launch(mContext, musicInfo));
     }
 
     static class HeaderHolder extends RecyclerView.ViewHolder {

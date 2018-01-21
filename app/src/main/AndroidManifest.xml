@@ -38,8 +38,12 @@
             android:name=".module.area.AreaActivity"
             android:screenOrientation="portrait" />
 
-        <service
-            android:name=".lib.MusicService"/>
+        <activity
+            android:name=".module.play.PlayingDetailActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+
+        <service android:name=".lib.MusicService" />
     </application>
 
 </manifest>
