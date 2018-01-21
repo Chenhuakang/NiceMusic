@@ -1,10 +1,19 @@
 package com.lzx.nicemusic.module.main;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
+import android.support.design.widget.AppBarLayout;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -24,20 +33,27 @@ import com.lzx.nicemusic.module.main.sectioned.HomeItemSectioned;
 import com.lzx.nicemusic.module.search.SearchActivity;
 import com.lzx.nicemusic.utils.DisplayUtil;
 import com.lzx.nicemusic.utils.LogUtil;
+import com.lzx.nicemusic.utils.SystemBarHelper;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
 @CreatePresenter(MainPresenter.class)
 public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresenter> implements MainContract.View, View.OnClickListener {
 
+    private AppBarLayout mAppBarLayout;
+    private Toolbar mToolbar;
     private RecyclerView mRecyclerView;
-  //  private TextView mEdSearch;
-  //  private View mBgSearch;
+    private MaterialSearchView mSearchView;
     private SectionedRecyclerViewAdapter mSectionedAdapter;
     private Intent intent;
     private float mDistanceY = 0;
@@ -49,9 +65,16 @@ public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresent
 
     @Override
     protected void init(Bundle savedInstanceState) {
-      //  mEdSearch = findViewById(R.id.ed_search);
-      //  mBgSearch = findViewById(R.id.bg_search);
+        mAppBarLayout = findViewById(R.id.app_bar);
+        mToolbar = findViewById(R.id.toolbar);
         mRecyclerView = findViewById(R.id.recycle_view);
+        mSearchView = findViewById(R.id.search_view);
+
+        mToolbar.setTitle("");
+        setSupportActionBar(mToolbar);
+
+        initSearchView();
+
         mSectionedAdapter = new SectionedRecyclerViewAdapter();
         GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
         mLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -69,50 +92,71 @@ public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresent
         });
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mSectionedAdapter);
-        int bgSearchHeight = DisplayUtil.dip2px(this, 80);
-//        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                super.onScrolled(recyclerView, dx, dy);
-//                mDistanceY += dy;
-//                if (mDistanceY <= bgSearchHeight) {
-//                    if (mDistanceY < 0) {
-//                        mDistanceY = 0;
-//                    }
-//                    float scale = mDistanceY / bgSearchHeight;
-//                    mBgSearch.setAlpha(scale);
-//                } else {
-//                    mDistanceY = bgSearchHeight;
-//                    mBgSearch.setAlpha(1f);
-//                }
-//            }
-//        });
         getPresenter().requestMusicList();
+    }
 
-        //搜索
-       // mEdSearch.setOnClickListener(this);
+    private void initSearchView() {
+        //初始化SearchBar
+        mSearchView.setVoiceSearch(false);
+        mSearchView.setCursorDrawable(R.drawable.custom_cursor);
+        mSearchView.setEllipsize(true);
+        mSearchView.setSuggestions(getResources().getStringArray(R.array.query_suggestions));
+        mSearchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
     }
 
     @Override
-    public void requestMainDataSuccess(List<MusicInfo> dataList) {
-//        BaseDiffUtilCallBack<HomeInfo> callBack = new BaseDiffUtilCallBack<>(mMainAdapter.getHomeInfos(), dataList);
-//        callBack.setOnAreItemsTheSameListener((oldData, newData) -> oldData.getFlag().equals(newData.getFlag()));
-//        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callBack, true);
-//        mMainAdapter.setHomeInfos(dataList);
-//        diffResult.dispatchUpdatesTo(mMainAdapter);
-//        mMainAdapter.setOnClickListener(this);
-        int itemSize = dataList.size() / 10;
-        for (int i = 0; i < itemSize; i++) {
-            int index = i * 4;
-            int size = 4 + index;
-            String title = dataList.get(index).musicType;
-            mSectionedAdapter.addSection(new HomeItemSectioned(
-                    this,
-                    DataHelper.subList(dataList, index, size), title));
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.clear();
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuItem item = menu.findItem(R.id.id_action_search);
+        mSearchView.setMenuItem(item);
+        return true;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == MaterialSearchView.REQUEST_VOICE && resultCode == Activity.RESULT_OK) {
+            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (matches != null && matches.size() > 0) {
+                String searchWrd = matches.get(0);
+                if (!TextUtils.isEmpty(searchWrd)) {
+                    mSearchView.setQuery(searchWrd, false);
+                }
+            }
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mSearchView.isSearchOpen()) {
+            mSearchView.closeSearch();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void requestMainDataSuccess(ConcurrentMap<String, List<MusicInfo>> map, List<Map.Entry<String, String>> types) {
+        for (Map.Entry<String, String> mapping : types) {
+            if (map.containsKey(mapping.getKey())) {
+                mSectionedAdapter.addSection(new HomeItemSectioned(
+                        this, map.get(mapping.getKey()), mapping.getValue()));
+            }
         }
         mSectionedAdapter.notifyDataSetChanged();
-
-
     }
 
     @Override

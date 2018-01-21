@@ -10,7 +10,9 @@ import android.widget.TextView;
 
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.lib.bean.MusicInfo;
+import com.lzx.nicemusic.utils.FormatUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
+import com.lzx.nicemusic.widget.OuterLayerImageView;
 
 import java.util.List;
 
@@ -34,6 +36,14 @@ public class HomeItemSectioned extends StatelessSection {
         mMusicInfoList = list;
         this.title = title;
     }
+
+    private int[] icons = new int[]{
+            R.drawable.ic_category_t3, R.drawable.ic_category_t4,
+            R.drawable.ic_category_t13, R.drawable.ic_category_t21,
+            R.drawable.ic_category_t22, R.drawable.ic_category_t26,
+            R.drawable.ic_category_t28, R.drawable.ic_category_t29,
+            R.drawable.ic_category_t31, R.drawable.ic_category_promo
+    };
 
     @Override
     public int getContentItemsTotal() {
@@ -60,12 +70,49 @@ public class HomeItemSectioned extends StatelessSection {
         super.onBindHeaderViewHolder(viewHolder);
         HeaderHolder holder = (HeaderHolder) viewHolder;
         holder.mItemType.setText(title);
+        setTypeIcon(holder);
+    }
+
+    private void setTypeIcon(HeaderHolder headerViewHolder) {
+        switch (title) {
+            case "新歌榜":
+                headerViewHolder.mIcType.setImageResource(icons[9]);
+                break;
+            case "热歌榜":
+                headerViewHolder.mIcType.setImageResource(icons[1]);
+                break;
+            case "摇滚榜":
+                headerViewHolder.mIcType.setImageResource(icons[2]);
+                break;
+            case "爵士":
+                headerViewHolder.mIcType.setImageResource(icons[3]);
+                break;
+            case "流行":
+                headerViewHolder.mIcType.setImageResource(icons[4]);
+                break;
+            case "欧美金曲榜":
+                headerViewHolder.mIcType.setImageResource(icons[5]);
+                break;
+            case "经典老歌榜":
+                headerViewHolder.mIcType.setImageResource(icons[6]);
+                break;
+            case "情歌对唱榜":
+                headerViewHolder.mIcType.setImageResource(icons[7]);
+                break;
+            case "影视金曲榜":
+                headerViewHolder.mIcType.setImageResource(icons[8]);
+                break;
+            case "网络歌曲榜":
+                headerViewHolder.mIcType.setImageResource(icons[0]);
+                break;
+        }
     }
 
     @Override
     public void onBindFooterViewHolder(RecyclerView.ViewHolder viewHolder) {
         super.onBindFooterViewHolder(viewHolder);
         FooterHolder holder = (FooterHolder) viewHolder;
+        holder.mItemDynamic.setText("换一换");
     }
 
     @Override
@@ -74,14 +121,20 @@ public class HomeItemSectioned extends StatelessSection {
         MusicInfo musicInfo = mMusicInfoList.get(position);
         GlideUtil.loadImageByUrl(mContext, musicInfo.musicCover, holder.mMusicCover);
         holder.mMusicTitle.setText(musicInfo.musicTitle);
+        holder.mPlayCount.setText(FormatUtil.formatNum(String.valueOf(musicInfo.playCount)));
+        holder.mLikeNum.setText(FormatUtil.formatNum(String.valueOf(musicInfo.favorites)));
+        holder.mMusicTime.setText(FormatUtil.formatMusicTime(musicInfo.musicDuration));
+        holder.mAlbumName.setText(musicInfo.musicArtist + "·" + musicInfo.albumTitle);
     }
 
     static class HeaderHolder extends RecyclerView.ViewHolder {
         TextView mItemType;
+        ImageView mIcType;
 
         public HeaderHolder(View itemView) {
             super(itemView);
             mItemType = itemView.findViewById(R.id.item_type_tv);
+            mIcType = itemView.findViewById(R.id.ic_type);
         }
     }
 
@@ -101,13 +154,17 @@ public class HomeItemSectioned extends StatelessSection {
     }
 
     static class ItemHolder extends RecyclerView.ViewHolder {
-        ImageView mMusicCover;
-        TextView mMusicTitle;
+        OuterLayerImageView mMusicCover;
+        TextView mMusicTitle, mPlayCount, mLikeNum, mAlbumName, mMusicTime;
 
         public ItemHolder(View itemView) {
             super(itemView);
             mMusicCover = itemView.findViewById(R.id.music_cover);
             mMusicTitle = itemView.findViewById(R.id.music_title);
+            mPlayCount = itemView.findViewById(R.id.play_count);
+            mLikeNum = itemView.findViewById(R.id.like_num);
+            mAlbumName = itemView.findViewById(R.id.album_name);
+            mMusicTime = itemView.findViewById(R.id.music_time);
         }
     }
 

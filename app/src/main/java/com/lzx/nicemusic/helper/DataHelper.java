@@ -112,4 +112,14 @@ public class DataHelper {
         return musicInfos;
     }
 
+    public static List<MusicInfo> getMusicByType(List<MusicInfo> list, String type) {
+        List<MusicInfo> musicInfos = new ArrayList<>();
+        for (MusicInfo info : list) {
+            if (info.musicType.equals(type)) {
+                musicInfos.add(info);
+            }
+        }
+        return musicInfos;
+    }
+
 }

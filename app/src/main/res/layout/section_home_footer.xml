@@ -44,8 +44,8 @@
 
         <ImageView
             android:id="@+id/item_btn_refresh"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:src="@drawable/ic_category_more_refresh"
             android:tint="@color/refresh_pink_background" />
 
