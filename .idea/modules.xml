@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/NiceMusic.iml" filepath="$PROJECT_DIR$/NiceMusic.iml" />
-      <module fileurl="file://C:\Users\xian\Desktop\NiceMusic\.idea\NiceMusic.iml" filepath="C:\Users\xian\Desktop\NiceMusic\.idea\NiceMusic.iml" />
       <module fileurl="file://E:\NiceMusic\NiceMusic.iml" filepath="E:\NiceMusic\NiceMusic.iml" />
+      <module fileurl="file://C:\Users\xian\Desktop\NiceMusic\.idea\NiceMusic.iml" filepath="C:\Users\xian\Desktop\NiceMusic\.idea\NiceMusic.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
