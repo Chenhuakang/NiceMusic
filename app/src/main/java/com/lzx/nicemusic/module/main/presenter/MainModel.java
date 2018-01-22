@@ -1,29 +1,15 @@
 package com.lzx.nicemusic.module.main.presenter;
 
 import com.google.gson.Gson;
-import com.lzx.nicemusic.bean.BannerInfo;
-import com.lzx.nicemusic.bean.HomeInfo;
 import com.lzx.nicemusic.db.CacheManager;
 import com.lzx.nicemusic.helper.DataHelper;
-import com.lzx.nicemusic.lib.bean.MusicInfo;
+import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.nicemusic.network.RetrofitHelper;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
-import io.reactivex.functions.Function;
-import okhttp3.ResponseBody;
 
 /**
  * Created by xian on 2018/1/14.

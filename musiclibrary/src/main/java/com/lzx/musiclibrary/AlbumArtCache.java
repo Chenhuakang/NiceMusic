@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.lzx.nicemusic.lib;
+package com.lzx.musiclibrary;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.LruCache;
 
 
-import com.lzx.nicemusic.lib.helper.BitmapHelper;
+import com.lzx.musiclibrary.helper.BitmapHelper;
 
 import java.io.IOException;
 

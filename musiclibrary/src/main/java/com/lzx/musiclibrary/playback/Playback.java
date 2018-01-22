@@ -1,8 +1,8 @@
-package com.lzx.nicemusic.lib.playback;
+package com.lzx.musiclibrary.playback;
 
 import android.support.v4.media.session.MediaSessionCompat;
 
-import com.lzx.nicemusic.lib.bean.MusicInfo;
+import com.lzx.musiclibrary.bean.MusicInfo;
 
 /**
  * Created by xian on 2018/1/20.

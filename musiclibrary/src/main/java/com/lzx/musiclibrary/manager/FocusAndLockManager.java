@@ -1,4 +1,4 @@
-package com.lzx.nicemusic.lib.manager;
+package com.lzx.musiclibrary.manager;
 
 import android.content.Context;
 import android.media.AudioManager;

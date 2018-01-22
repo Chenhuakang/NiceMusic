@@ -1,4 +1,4 @@
-package com.lzx.nicemusic.lib.playback;
+package com.lzx.musiclibrary.playback;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -30,17 +30,17 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
-import com.lzx.nicemusic.lib.MusicService;
-import com.lzx.nicemusic.lib.bean.MusicInfo;
-import com.lzx.nicemusic.lib.manager.FocusAndLockManager;
+import com.lzx.musiclibrary.MusicService;
+import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.musiclibrary.manager.FocusAndLockManager;
 import com.lzx.nicemusic.utils.LogUtil;
 
 import static com.google.android.exoplayer2.C.CONTENT_TYPE_MUSIC;
 import static com.google.android.exoplayer2.C.USAGE_MEDIA;
-import static com.lzx.nicemusic.lib.manager.FocusAndLockManager.AUDIO_NO_FOCUS_CAN_DUCK;
-import static com.lzx.nicemusic.lib.manager.FocusAndLockManager.AUDIO_NO_FOCUS_NO_DUCK;
-import static com.lzx.nicemusic.lib.manager.FocusAndLockManager.VOLUME_DUCK;
-import static com.lzx.nicemusic.lib.manager.FocusAndLockManager.VOLUME_NORMAL;
+import static com.lzx.musiclibrary.manager.FocusAndLockManager.AUDIO_NO_FOCUS_CAN_DUCK;
+import static com.lzx.musiclibrary.manager.FocusAndLockManager.AUDIO_NO_FOCUS_NO_DUCK;
+import static com.lzx.musiclibrary.manager.FocusAndLockManager.VOLUME_DUCK;
+import static com.lzx.musiclibrary.manager.FocusAndLockManager.VOLUME_NORMAL;
 
 /**
  * Created by xian on 2018/1/20.

@@ -1,4 +1,4 @@
-package com.lzx.nicemusic.lib.playback;
+package com.lzx.musiclibrary.playback;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,7 +8,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.lzx.nicemusic.R;
-import com.lzx.nicemusic.lib.bean.MusicInfo;
+import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.nicemusic.utils.LogUtil;
 
 /**

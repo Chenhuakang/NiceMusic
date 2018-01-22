@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.lzx.nicemusic.R;
-import com.lzx.nicemusic.lib.bean.MusicInfo;
+import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.nicemusic.utils.FormatUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.SquareImageView;

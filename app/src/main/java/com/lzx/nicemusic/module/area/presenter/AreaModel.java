@@ -1,18 +1,8 @@
 package com.lzx.nicemusic.module.area.presenter;
 
 
-import android.graphics.Bitmap;
+import com.lzx.musiclibrary.bean.MusicInfo;
 
-import com.google.gson.Gson;
-import com.lzx.nicemusic.db.CacheManager;
-import com.lzx.nicemusic.helper.DataHelper;
-import com.lzx.nicemusic.lib.bean.MusicInfo;
-import com.lzx.nicemusic.network.RetrofitHelper;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;

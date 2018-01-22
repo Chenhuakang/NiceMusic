@@ -1,12 +1,13 @@
-package com.lzx.nicemusic.lib.playback;
+package com.lzx.musiclibrary.playback;
 
 import android.graphics.Bitmap;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 
-import com.lzx.nicemusic.lib.AlbumArtCache;
-import com.lzx.nicemusic.lib.bean.MusicInfo;
+import com.lzx.musiclibrary.AlbumArtCache;
+import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.musiclibrary.helper.QueueHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,7 +36,7 @@ public class QueueManager {
     /**
      * 设置当前的播放列表
      *
-     * @param newQueue
+     * @param newQueue     整个队列
      * @param currentIndex 当前第几首
      */
     public void setCurrentQueue(List<MusicInfo> newQueue, int currentIndex) {
@@ -52,74 +53,36 @@ public class QueueManager {
         }
 
         //通知播放列表更新了
-        List<MediaSessionCompat.QueueItem> queueItems = getQueueItems(mPlayingQueue);
-        mListener.onQueueUpdated(queueItems);
+        List<MediaSessionCompat.QueueItem> queueItems = QueueHelper.getQueueItems(mMusicListById);
+        mListener.onQueueUpdated(queueItems, mPlayingQueue);
     }
 
+    /**
+     * 设置当前的播放列表 默认第一首
+     *
+     * @param newQueue 整个队列
+     */
     public void setCurrentQueue(List<MusicInfo> newQueue) {
         setCurrentQueue(newQueue, -1);
     }
 
+    /**
+     * 添加一个音乐信息到队列中
+     *
+     * @param info 音乐信息
+     */
     public void addQueueItem(MusicInfo info) {
         mPlayingQueue.add(info);
         mMusicListById.put(info.musicId, info);
         //通知播放列表更新了
-        List<MediaSessionCompat.QueueItem> queueItems = getQueueItems(mPlayingQueue);
-        mListener.onQueueUpdated(queueItems);
+        List<MediaSessionCompat.QueueItem> queueItems = QueueHelper.getQueueItems(mMusicListById);
+        mListener.onQueueUpdated(queueItems, mPlayingQueue);
     }
-
-    public MusicInfo getMusicInfoById(String musicId) {
-        return mMusicListById.containsKey(musicId) ? mMusicListById.get(musicId) : null;
-    }
-
-    public List<MediaSessionCompat.QueueItem> getQueueItems(List<MusicInfo> queue) {
-        List<MediaMetadataCompat> result = new ArrayList<>();
-        Iterable<MediaMetadataCompat> musics = getMusics();
-        for (MediaMetadataCompat metadata : musics) {
-            result.add(metadata);
-        }
-        return convertToQueue(result);
-    }
-
-    public Iterable<MediaMetadataCompat> getMusics() {
-        if (mMusicListById.size() == 0) {
-            return Collections.emptyList();
-        }
-        List<MediaMetadataCompat> compatArrayList = new ArrayList<>(mMusicListById.size());
-        for (MusicInfo mutableMetadata : mMusicListById.values()) {
-            compatArrayList.add(mutableMetadata.metadataCompat);
-        }
-        return compatArrayList;
-    }
-
-    private static List<MediaSessionCompat.QueueItem> convertToQueue(Iterable<MediaMetadataCompat> tracks) {
-        List<MediaSessionCompat.QueueItem> queue = new ArrayList<>();
-        int count = 0;
-        for (MediaMetadataCompat track : tracks) {
-
-            // We create a hierarchy-aware mediaID, so we know what the queue is about by looking
-            // at the QueueItem media IDs.
-            String hierarchyAwareMediaID = track.getDescription().getMediaId();
-
-            MediaMetadataCompat trackCopy = new MediaMetadataCompat.Builder(track)
-                    .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, hierarchyAwareMediaID)
-                    .build();
-
-            // We don't expect queues to change after created, so we use the item index as the
-            // queueId. Any other number unique in the queue would work.
-            MediaSessionCompat.QueueItem item = new MediaSessionCompat.QueueItem(
-                    trackCopy.getDescription(), count++);
-            queue.add(item);
-        }
-        return queue;
-
-    }
-
 
     /**
      * 得到列表长度
      *
-     * @return
+     * @return 队列长度
      */
     public int getCurrentQueueSize() {
         if (mPlayingQueue == null) {
@@ -131,15 +94,21 @@ public class QueueManager {
     /**
      * 得到当前播放的音乐信息
      *
-     * @return
+     * @return 音乐信息
      */
     public MusicInfo getCurrentMusic() {
-        if (!isIndexPlayable(mCurrentIndex, mPlayingQueue)) {
+        if (!QueueHelper.isIndexPlayable(mCurrentIndex, mPlayingQueue)) {
             return null;
         }
         return mPlayingQueue.get(mCurrentIndex);
     }
 
+    /**
+     * 转跳到指定位置
+     *
+     * @param amount 维度
+     * @return
+     */
     public boolean skipQueuePosition(int amount) {
         int index = mCurrentIndex + amount;
         if (index < 0) {
@@ -149,44 +118,53 @@ public class QueueManager {
             //当在最后一首歌时点下一首将返回第一首个
             index %= mPlayingQueue.size();
         }
-        if (!isIndexPlayable(index, mPlayingQueue)) {
+        if (!QueueHelper.isIndexPlayable(index, mPlayingQueue)) {
             return false;
         }
         mCurrentIndex = index;
         return true;
     }
 
+    /**
+     * 更新音乐艺术家信息
+     *
+     * @param musicId
+     * @param bitmap
+     * @param icon
+     */
     public void updateMusicArt(String musicId, Bitmap bitmap, Bitmap icon) {
-        MusicInfo musicInfo = getMusicInfoById(musicId);
+        MusicInfo musicInfo = QueueHelper.getMusicInfoById(mMusicListById, musicId);
+        if (musicInfo == null) {
+            return;
+        }
         int index = mPlayingQueue.indexOf(musicInfo);
         musicInfo.musicCoverBitmap = bitmap;
         mPlayingQueue.set(index, musicInfo);
     }
 
+    /**
+     * 设置当前的音乐item，用于播放
+     *
+     * @param mediaId 音乐id
+     * @return
+     */
     public boolean setCurrentQueueItem(String mediaId) {
         // set the current index on queue from the music Id:
-        int index = getMusicIndexOnQueue(mPlayingQueue, mediaId);
+        int index = QueueHelper.getMusicIndexOnQueue(mPlayingQueue, mediaId);
         setCurrentQueueIndex(index);
         return index >= 0;
     }
 
+    /**
+     * 设置当前的音乐item，用于播放
+     *
+     * @param index 队列下标
+     */
     private void setCurrentQueueIndex(int index) {
         if (index >= 0 && index < mPlayingQueue.size()) {
             mCurrentIndex = index;
             mListener.onCurrentQueueIndexUpdated(mCurrentIndex);
         }
-    }
-
-    public static int getMusicIndexOnQueue(Iterable<MusicInfo> queue,
-                                           String mediaId) {
-        int index = 0;
-        for (MusicInfo item : queue) {
-            if (mediaId.equals(item.musicId)) {
-                return index;
-            }
-            index++;
-        }
-        return -1;
     }
 
     /**
@@ -199,7 +177,7 @@ public class QueueManager {
             return;
         }
         final String musicId = currentMusic.musicId;
-        MusicInfo metadata = getMusicInfoById(musicId);
+        MusicInfo metadata = QueueHelper.getMusicInfoById(mMusicListById, musicId);
         if (metadata == null) {
             throw new IllegalArgumentException("Invalid musicId " + musicId);
         }
@@ -222,19 +200,13 @@ public class QueueManager {
                     }
                     String currentPlayingId = currentMusic.musicId;
                     if (musicId.equals(currentPlayingId)) {
-                        mListener.onMetadataChanged(getMusicInfoById(currentPlayingId));
+                        mListener.onMetadataChanged(QueueHelper.getMusicInfoById(mMusicListById, currentPlayingId));
                     }
                 }
             });
         }
     }
 
-    /**
-     * 判断index是否合法
-     */
-    public static boolean isIndexPlayable(int index, List<MusicInfo> queue) {
-        return (queue != null && index >= 0 && index < queue.size());
-    }
 
     public interface MetadataUpdateListener {
         void onMetadataChanged(MusicInfo metadata);
@@ -243,7 +215,7 @@ public class QueueManager {
 
         void onCurrentQueueIndexUpdated(int queueIndex);
 
-        void onQueueUpdated(List<MediaSessionCompat.QueueItem> newQueue);
+        void onQueueUpdated(List<MediaSessionCompat.QueueItem> newQueue, List<MusicInfo> playingQueue);
     }
 
 

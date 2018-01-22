@@ -1,4 +1,4 @@
-package com.lzx.nicemusic.lib.manager;
+package com.lzx.musiclibrary.manager;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -9,8 +9,8 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
-import com.lzx.nicemusic.lib.MusicService;
-import com.lzx.nicemusic.lib.bean.MusicInfo;
+import com.lzx.musiclibrary.MusicService;
+import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.nicemusic.utils.LogUtil;
 
 /**

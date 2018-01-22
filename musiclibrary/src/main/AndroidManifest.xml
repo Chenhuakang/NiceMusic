@@ -1,0 +1,13 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.lzx.musiclibrary">
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <application>
+        <service android:name="com.lzx.musiclibrary.MusicService" />
+        <provider
+            android:name=".db.MusicContentProvider"
+            android:authorities="com.lzx.musiclibrary.db.provider"
+            android:exported="false" />
+    </application>
+
+</manifest>

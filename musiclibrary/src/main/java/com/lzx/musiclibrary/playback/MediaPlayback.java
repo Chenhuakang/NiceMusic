@@ -1,9 +1,9 @@
-package com.lzx.nicemusic.lib.playback;
+package com.lzx.musiclibrary.playback;
 
 import android.content.Context;
 import android.media.MediaPlayer;
 
-import com.lzx.nicemusic.lib.bean.MusicInfo;
+import com.lzx.musiclibrary.bean.MusicInfo;
 
 /**
  * Created by xian on 2018/1/20.

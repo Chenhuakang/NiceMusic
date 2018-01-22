@@ -13,7 +13,7 @@ import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
 import com.lzx.nicemusic.bean.SingerInfo;
-import com.lzx.nicemusic.lib.bean.MusicInfo;
+import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.nicemusic.module.play.presenter.PlayContract;
 import com.lzx.nicemusic.module.play.presenter.PlayPresenter;
 import com.lzx.nicemusic.utils.GlideUtil;
@@ -71,7 +71,6 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View,Pla
         mMusicName.setText(mMusicInfo.musicTitle);
         GlideUtil.loadImageByUrl(this, mMusicInfo.musicCover, mMusicCover);
         getPresenter().requestSingerInfo(mMusicInfo.artistId);
-
     }
 
     @Override

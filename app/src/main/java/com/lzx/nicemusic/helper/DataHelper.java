@@ -1,6 +1,6 @@
 package com.lzx.nicemusic.helper;
 
-import com.lzx.nicemusic.lib.bean.MusicInfo;
+import com.lzx.musiclibrary.bean.MusicInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;

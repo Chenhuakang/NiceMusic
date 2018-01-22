@@ -1,4 +1,4 @@
-package com.lzx.nicemusic.lib;
+package com.lzx.musiclibrary;
 
 import android.app.Service;
 import android.content.Intent;
@@ -11,12 +11,12 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.lzx.nicemusic.R;
-import com.lzx.nicemusic.lib.bean.MusicInfo;
-import com.lzx.nicemusic.lib.helper.SourceHelper;
-import com.lzx.nicemusic.lib.playback.ExoPlayback;
-import com.lzx.nicemusic.lib.playback.Playback;
-import com.lzx.nicemusic.lib.playback.PlaybackManager;
-import com.lzx.nicemusic.lib.playback.QueueManager;
+import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.musiclibrary.helper.SourceHelper;
+import com.lzx.musiclibrary.playback.ExoPlayback;
+import com.lzx.musiclibrary.playback.Playback;
+import com.lzx.musiclibrary.playback.PlaybackManager;
+import com.lzx.musiclibrary.playback.QueueManager;
 import com.lzx.nicemusic.utils.LogUtil;
 
 import java.lang.ref.WeakReference;
@@ -75,12 +75,14 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
 
     @Override
     public void onCurrentQueueIndexUpdated(int queueIndex) {
-        LogUtil.i("onCurrentQueueIndexUpdated = " + queueIndex);
         mPlaybackManager.handlePlayRequest();
     }
 
+    /**
+     * 播放队列更新时回调
+     */
     @Override
-    public void onQueueUpdated(List<MediaSessionCompat.QueueItem> newQueue) {
+    public void onQueueUpdated(List<MediaSessionCompat.QueueItem> newQueue, List<MusicInfo> playingQueue) {
         mSession.setQueue(newQueue);
     }
 

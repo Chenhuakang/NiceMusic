@@ -1,4 +1,4 @@
-package com.lzx.nicemusic.lib;
+package com.lzx.musiclibrary;
 
 /**
  * Created by xian on 2018/1/20.

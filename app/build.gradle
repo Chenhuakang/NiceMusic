@@ -55,4 +55,6 @@ dependencies {
     compile 'com.google.android.exoplayer:exoplayer:r2.5.0'
     //materialsearchview
     compile 'com.miguelcatalan:materialsearchview:1.4.0'
+
+    compile project(':musiclibrary')
 }

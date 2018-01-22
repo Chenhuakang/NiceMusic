@@ -1,4 +1,4 @@
-package com.lzx.nicemusic.lib.bean;
+package com.lzx.musiclibrary.bean;
 
 import android.graphics.Bitmap;
 import android.os.Parcel;

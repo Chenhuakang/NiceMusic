@@ -3,7 +3,7 @@ package com.lzx.nicemusic.helper;
 import android.content.Context;
 import android.widget.Toast;
 
-import com.lzx.nicemusic.lib.bean.MusicInfo;
+import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.nicemusic.network.RetrofitHelper;
 
 import org.json.JSONObject;

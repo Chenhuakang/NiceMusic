@@ -4,7 +4,7 @@ package com.lzx.nicemusic.module.search.presenter;
 import com.google.gson.Gson;
 import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
 import com.lzx.nicemusic.db.SearchManager;
-import com.lzx.nicemusic.lib.bean.MusicInfo;
+import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.nicemusic.network.RetrofitHelper;
 import com.lzx.nicemusic.utils.LogUtil;
 

@@ -1,8 +1,8 @@
-package com.lzx.nicemusic.lib.helper;
+package com.lzx.musiclibrary.helper;
 
 import android.support.v4.media.MediaMetadataCompat;
 
-import com.lzx.nicemusic.lib.bean.MusicInfo;
+import com.lzx.musiclibrary.bean.MusicInfo;
 
 import java.util.ArrayList;
 import java.util.List;

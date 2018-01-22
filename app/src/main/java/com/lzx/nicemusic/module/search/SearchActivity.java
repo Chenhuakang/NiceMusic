@@ -12,7 +12,7 @@ import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
-import com.lzx.nicemusic.lib.bean.MusicInfo;
+import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.nicemusic.module.search.presenter.SearchContract;
 import com.lzx.nicemusic.module.search.presenter.SearchPresenter;
 import com.lzx.nicemusic.module.search.sectioned.SearchHistorySection;
