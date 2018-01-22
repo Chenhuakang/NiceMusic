@@ -1,9 +1,6 @@
 package com.lzx.nicemusic.helper;
 
-import android.graphics.Bitmap;
-
 import com.lzx.nicemusic.lib.bean.MusicInfo;
-import com.lzx.nicemusic.utils.LogUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,7 +68,7 @@ public class DataHelper {
             MusicInfo info = new MusicInfo();
             info.musicId = object.getString("song_id"); //音乐id
             info.musicTitle = object.getString("title"); //音乐标题
-            info.musicCover = object.getString("pic_big"); //音乐封面
+            info.musicCover = object.getString("pic_s500"); //音乐封面
             info.musicUrl = ""; //音乐播放地址
             info.musicGenre = billboard.getString("name"); //类型（流派）
             info.musicType = billboard.getString("billboard_type"); //类型
@@ -123,5 +120,6 @@ public class DataHelper {
         }
         return musicInfos;
     }
+
 
 }

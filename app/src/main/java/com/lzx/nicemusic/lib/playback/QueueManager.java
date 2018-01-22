@@ -60,6 +60,14 @@ public class QueueManager {
         setCurrentQueue(newQueue, -1);
     }
 
+    public void addQueueItem(MusicInfo info) {
+        mPlayingQueue.add(info);
+        mMusicListById.put(info.musicId, info);
+        //通知播放列表更新了
+        List<MediaSessionCompat.QueueItem> queueItems = getQueueItems(mPlayingQueue);
+        mListener.onQueueUpdated(queueItems);
+    }
+
     public MusicInfo getMusicInfoById(String musicId) {
         return mMusicListById.containsKey(musicId) ? mMusicListById.get(musicId) : null;
     }
