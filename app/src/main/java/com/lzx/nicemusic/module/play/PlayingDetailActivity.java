@@ -9,11 +9,12 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
 import com.lzx.nicemusic.bean.SingerInfo;
-import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.nicemusic.helper.PlayHelper;
 import com.lzx.nicemusic.module.play.presenter.PlayContract;
 import com.lzx.nicemusic.module.play.presenter.PlayPresenter;
 import com.lzx.nicemusic.utils.GlideUtil;
@@ -23,11 +24,11 @@ import com.lzx.nicemusic.widget.OuterLayerImageView;
  * Created by xian on 2018/1/21.
  */
 @CreatePresenter(PlayPresenter.class)
-public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View,PlayPresenter> implements PlayContract.View, View.OnClickListener {
+public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, PlayPresenter> implements PlayContract.View, View.OnClickListener {
 
-    private TextView mMusicName,mNickname,mAlbumName,mCountry,mSingerDesc;
+    private TextView mMusicName, mNickname, mAlbumName, mCountry, mSingerDesc;
     private OuterLayerImageView mMusicCover;
-    private ImageView mAvatar,mBtnMusicList,mBtnPlayMode,mBtnPlayPause,mBtnPre,mBtnNext;
+    private ImageView mAvatar, mBtnMusicList, mBtnPlayMode, mBtnPlayPause, mBtnPre, mBtnNext;
     private Button mBtnAllMusic;
     private SeekBar mSeekBar;
     private MusicInfo mMusicInfo;
@@ -71,6 +72,8 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View,Pla
         mMusicName.setText(mMusicInfo.musicTitle);
         GlideUtil.loadImageByUrl(this, mMusicInfo.musicCover, mMusicCover);
         getPresenter().requestSingerInfo(mMusicInfo.artistId);
+
+
     }
 
     @Override
@@ -84,7 +87,7 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View,Pla
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btn_all_music:
                 break;
             case R.id.btn_music_list:
@@ -92,6 +95,7 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View,Pla
             case R.id.btn_play_mode:
                 break;
             case R.id.btn_play_pause:
+                PlayHelper.playMusic(this, mMusicInfo);
                 break;
             case R.id.btn_pre:
                 break;

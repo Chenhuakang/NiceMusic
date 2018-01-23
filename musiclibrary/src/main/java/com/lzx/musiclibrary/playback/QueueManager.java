@@ -1,7 +1,6 @@
 package com.lzx.musiclibrary.playback;
 
 import android.graphics.Bitmap;
-import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 
@@ -40,7 +39,7 @@ public class QueueManager {
      * @param currentIndex 当前第几首
      */
     public void setCurrentQueue(List<MusicInfo> newQueue, int currentIndex) {
-        mPlayingQueue = newQueue;
+        mPlayingQueue = QueueHelper.fetchListWithMediaMetadata(newQueue);
         int index = 0;
         if (currentIndex != -1) {
             index = currentIndex;
@@ -72,6 +71,10 @@ public class QueueManager {
      * @param info 音乐信息
      */
     public void addQueueItem(MusicInfo info) {
+        info = QueueHelper.fetchInfoWithMediaMetadata(info);
+        if (mPlayingQueue.contains(info)) {
+            return;
+        }
         mPlayingQueue.add(info);
         mMusicListById.put(info.musicId, info);
         //通知播放列表更新了

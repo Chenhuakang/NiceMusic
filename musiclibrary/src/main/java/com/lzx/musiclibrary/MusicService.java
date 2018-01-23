@@ -18,6 +18,7 @@ import com.lzx.musiclibrary.playback.MediaPlayback;
 import com.lzx.musiclibrary.playback.Playback;
 import com.lzx.musiclibrary.playback.PlaybackManager;
 import com.lzx.musiclibrary.playback.QueueManager;
+import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -61,6 +62,8 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
         mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
         mPlaybackManager.updatePlaybackState(null);
+
+        LogUtil.i("服务初始化成功....");
     }
 
     @Nullable
@@ -81,7 +84,7 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
 
     @Override
     public void onCurrentQueueIndexUpdated(int queueIndex) {
-        mPlaybackManager.handlePlayRequest();
+        mPlaybackManager.handlePlayPauseRequest();
     }
 
     /**
@@ -180,23 +183,24 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
                     break;
                 //设置播放列表
                 case MusicConstants.MSG_INIT_MUSIC_QUEUE:
-                    List<MusicInfo> musicInfos = msg.getData().getParcelableArrayList(MusicConstants.KEY_MUSIC_LIST);
+                    List<MusicInfo> musicInfos = bundle.getParcelableArrayList(MusicConstants.KEY_MUSIC_LIST);
                     List<MusicInfo> musicQueue = SourceHelper.fetchMusicQueue(musicInfos);
                     service.mQueueManager.setCurrentQueue(musicQueue);
                     break;
                 //根据音乐id播放
                 case MusicConstants.MSG_PLAY_BY_MUSIC_ID:
-                    String musicId = msg.getData().getString(MusicConstants.KEY_MUSIC_ID);
+                    String musicId = bundle.getString(MusicConstants.KEY_MUSIC_ID);
 
                     service.mQueueManager.setCurrentQueueItem(musicId);
                     break;
                 //开始或暂停
-                case MusicConstants.MSG_START_OR_PAUSE:
-                    if (service.mPlaybackManager.getPlayback().isPlaying()) {
-                        service.mPlaybackManager.handlePauseRequest();
-                    }else {
-
+                case MusicConstants.MSG_PLAY_BY_MUSIC_INFO:
+                    MusicInfo info = bundle.getParcelable(MusicConstants.KEY_MUSIC_INFO);
+                    if (info == null) {
+                        return;
                     }
+                    service.mQueueManager.addQueueItem(info);
+                    service.mQueueManager.setCurrentQueueItem(info.musicId);
                     break;
                 default:
                     break;

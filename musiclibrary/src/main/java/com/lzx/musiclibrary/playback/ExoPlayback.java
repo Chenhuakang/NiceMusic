@@ -30,6 +30,7 @@ import com.google.android.exoplayer2.util.Util;
 import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.musiclibrary.manager.FocusAndLockManager;
+import com.lzx.musiclibrary.utils.LogUtil;
 
 import static com.google.android.exoplayer2.C.CONTENT_TYPE_MUSIC;
 import static com.google.android.exoplayer2.C.USAGE_MEDIA;
@@ -121,6 +122,10 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
 
     @Override
     public int getState() {
+        //STATE_IDLE      没有任何媒体播放。
+        //STATE_BUFFERING 无法立即从当前位置进行播放
+        //STATE_READY     可以从当前位置立即进行播放。 如果  {@link #getPlayWhenReady（）}为true，立即播放，否则暂停。
+        //STATE_ENDED     已经完成播放媒体。
         if (mExoPlayer == null) {
             return mExoPlayerNullIsStopped ? PlaybackStateCompat.STATE_STOPPED : PlaybackStateCompat.STATE_NONE;
         }
@@ -176,7 +181,7 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
             if (source != null) {
                 source = source.replaceAll(" ", "%20"); // Escape spaces for URLs
             }
-
+            LogUtil.i("source = " + source);
             if (mExoPlayer == null) {
                 mExoPlayer = ExoPlayerFactory.newSimpleInstance(mContext, new DefaultTrackSelector(), new DefaultLoadControl());
                 mExoPlayer.addListener(mEventListener);

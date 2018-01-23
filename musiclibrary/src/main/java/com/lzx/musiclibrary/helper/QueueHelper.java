@@ -16,6 +16,35 @@ import java.util.concurrent.ConcurrentMap;
 
 public class QueueHelper {
 
+    public static List<MusicInfo> fetchListWithMediaMetadata(List<MusicInfo> list) {
+        List<MusicInfo> infos = new ArrayList<>();
+        for (MusicInfo info : list) {
+            info.metadataCompat = getMediaMetadataCompat(info);
+            infos.add(info);
+        }
+        return infos;
+    }
+
+    public static MusicInfo fetchInfoWithMediaMetadata(MusicInfo info) {
+        info.metadataCompat = getMediaMetadataCompat(info);
+        return info;
+    }
+
+    private static MediaMetadataCompat getMediaMetadataCompat(MusicInfo info) {
+        return new MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, info.musicId)
+                .putString("__SOURCE__", info.musicUrl)
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, info.albumTitle)
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, info.musicArtist)
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, info.musicDuration)
+                .putString(MediaMetadataCompat.METADATA_KEY_GENRE, info.musicGenre)
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, info.albumCover)
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, info.musicTitle)
+                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, info.trackNumber)
+                .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, info.albumMusicCount)
+                .build();
+    }
+
     public static List<MediaSessionCompat.QueueItem> getQueueItems(ConcurrentMap<String, MusicInfo> musicListById) {
         List<MediaMetadataCompat> result = new ArrayList<>();
         Iterable<MediaMetadataCompat> musics = getMusics(musicListById);
@@ -55,7 +84,7 @@ public class QueueHelper {
     }
 
 
-    public static MusicInfo getMusicInfoById(ConcurrentMap<String, MusicInfo> musicListById,String musicId) {
+    public static MusicInfo getMusicInfoById(ConcurrentMap<String, MusicInfo> musicListById, String musicId) {
         return musicListById.containsKey(musicId) ? musicListById.get(musicId) : null;
     }
 

@@ -53,6 +53,7 @@ public class MusicManager {
             Message message = Message.obtain(null, MusicConstants.MSG_INIT);
             Bundle bundle = new Bundle();
             bundle.putBoolean(MusicConstants.KEY_IS_USE_MEDIAPLAYER, isUseMediaPlayer);
+            message.setData(bundle);
             sendMessage(message);
         }
 
@@ -72,7 +73,11 @@ public class MusicManager {
 
     public void playMusic(MusicInfo musicInfo) {
         if (mMessenger != null) {
-
+            Message message = Message.obtain(null, MusicConstants.MSG_PLAY_BY_MUSIC_INFO);
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(MusicConstants.KEY_MUSIC_INFO, musicInfo);
+            message.setData(bundle);
+            sendMessage(message);
         }
     }
 

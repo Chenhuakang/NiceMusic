@@ -3,6 +3,7 @@ package com.lzx.nicemusic;
 import android.app.Application;
 import android.content.Context;
 
+import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.nicemusic.utils.CrashHandler;
 import com.lzx.nicemusic.utils.SpUtil;
 
@@ -20,6 +21,7 @@ public class NiceMusicApplication extends Application {
         sContext = this;
         SpUtil.getInstance().init(this);
         CrashHandler.getInstance().init(this);
+        MusicManager.get().init(this);
     }
 
     public static Context getContext() {

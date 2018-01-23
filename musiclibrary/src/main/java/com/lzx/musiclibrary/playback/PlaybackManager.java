@@ -70,6 +70,22 @@ public class PlaybackManager implements Playback.Callback {
         updatePlaybackState(withError);
     }
 
+    /**
+     * 播放/暂停
+     */
+    public void handlePlayPauseRequest() {
+        int state = mPlayback.getState();
+        if ( state == PlaybackStateCompat.STATE_STOPPED || state == PlaybackStateCompat.STATE_NONE) {
+            handlePlayRequest();
+        } else if (state == PlaybackStateCompat.STATE_BUFFERING) {
+            handleStopRequest(null);
+        } else if (state == PlaybackStateCompat.STATE_PLAYING) {
+            handlePauseRequest();
+        }else if (state==PlaybackStateCompat.STATE_PAUSED){
+            handlePlayRequest();
+        }
+    }
+
     @Override
     public void onPlayCompletion() {
         //判断是否有下一首
