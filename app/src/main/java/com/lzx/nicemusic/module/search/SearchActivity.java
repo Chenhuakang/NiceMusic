@@ -17,7 +17,7 @@ import com.lzx.nicemusic.module.search.presenter.SearchContract;
 import com.lzx.nicemusic.module.search.presenter.SearchPresenter;
 import com.lzx.nicemusic.module.search.sectioned.SearchHistorySection;
 import com.lzx.nicemusic.module.search.sectioned.SearchResultSection;
-import com.lzx.nicemusic.utils.LogUtil;
+import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

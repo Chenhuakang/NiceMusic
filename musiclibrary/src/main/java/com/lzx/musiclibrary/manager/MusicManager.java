@@ -4,14 +4,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
+import com.lzx.musiclibrary.MusicConstants;
 import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.bean.MusicInfo;
-import com.lzx.nicemusic.utils.LogUtil;
+
 
 /**
  * @author lzx
@@ -22,6 +24,7 @@ public class MusicManager {
 
     private Context mContext;
     private MusicService mMusicService;
+    private boolean isUseMediaPlayer = false;
     private Messenger mMessenger;
 
     public static MusicManager get() {
@@ -33,18 +36,24 @@ public class MusicManager {
     }
 
     public void init(Context context) {
-        mContext = context;
+        init(context, false);
+    }
 
+    public void init(Context context, boolean isUseMediaPlayer) {
+        mContext = context;
+        this.isUseMediaPlayer = isUseMediaPlayer;
         Intent intent = new Intent(mContext, MusicService.class);
         mContext.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
-
     }
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mMessenger = new Messenger(iBinder);
-            LogUtil.i("服务链接成功...");
+            Message message = Message.obtain(null, MusicConstants.MSG_INIT);
+            Bundle bundle = new Bundle();
+            bundle.putBoolean(MusicConstants.KEY_IS_USE_MEDIAPLAYER, isUseMediaPlayer);
+            sendMessage(message);
         }
 
         @Override

@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
 import com.lzx.nicemusic.bean.SingerInfo;
 import com.lzx.nicemusic.network.RetrofitHelper;
-import com.lzx.nicemusic.utils.LogUtil;
+import com.lzx.musiclibrary.utils.LogUtil;
 
 import org.json.JSONObject;
 

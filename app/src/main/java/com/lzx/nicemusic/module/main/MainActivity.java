@@ -22,7 +22,7 @@ import com.lzx.nicemusic.module.main.presenter.MainContract;
 import com.lzx.nicemusic.module.main.presenter.MainPresenter;
 import com.lzx.nicemusic.module.main.sectioned.HomeItemSectioned;
 import com.lzx.nicemusic.module.search.SearchActivity;
-import com.lzx.nicemusic.utils.LogUtil;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;

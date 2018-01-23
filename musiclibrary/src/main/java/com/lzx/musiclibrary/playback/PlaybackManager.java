@@ -7,9 +7,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
-import com.lzx.nicemusic.R;
 import com.lzx.musiclibrary.bean.MusicInfo;
-import com.lzx.nicemusic.utils.LogUtil;
+
 
 /**
  * Created by xian on 2018/1/20.
@@ -45,7 +44,6 @@ public class PlaybackManager implements Playback.Callback {
     public void handlePlayRequest() {
         MusicInfo currentMusic = mQueueManager.getCurrentMusic();
         if (currentMusic != null) {
-            LogUtil.i("handlePlayRequest#musicId = " + currentMusic.musicId);
             mServiceCallback.onPlaybackStart();
             mPlayback.play(currentMusic);
         }

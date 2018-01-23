@@ -6,7 +6,7 @@ import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
 import com.lzx.nicemusic.db.SearchManager;
 import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.nicemusic.network.RetrofitHelper;
-import com.lzx.nicemusic.utils.LogUtil;
+import com.lzx.musiclibrary.utils.LogUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

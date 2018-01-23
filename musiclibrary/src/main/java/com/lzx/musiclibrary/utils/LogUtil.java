@@ -1,4 +1,4 @@
-package com.lzx.nicemusic.utils;
+package com.lzx.musiclibrary.utils;
 
 import android.util.Log;
 

@@ -51,8 +51,7 @@ dependencies {
     implementation 'com.hyman:flowlayout-lib:1.1.2'
     //coordinatortablayout
     implementation 'cn.hugeterry.coordinatortablayout:coordinatortablayout:1.2.2'
-    //exoplayer
-    compile 'com.google.android.exoplayer:exoplayer:r2.5.0'
+
     //materialsearchview
     compile 'com.miguelcatalan:materialsearchview:1.4.0'
 

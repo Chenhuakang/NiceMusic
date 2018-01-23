@@ -2,6 +2,7 @@ package com.lzx.musiclibrary;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -10,14 +11,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
-import com.lzx.nicemusic.R;
 import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.musiclibrary.helper.SourceHelper;
 import com.lzx.musiclibrary.playback.ExoPlayback;
+import com.lzx.musiclibrary.playback.MediaPlayback;
 import com.lzx.musiclibrary.playback.Playback;
 import com.lzx.musiclibrary.playback.PlaybackManager;
 import com.lzx.musiclibrary.playback.QueueManager;
-import com.lzx.nicemusic.utils.LogUtil;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -41,20 +41,26 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
     @Override
     public void onCreate() {
         super.onCreate();
+        mMessengerHandler = new MessengerHandler(this);
+        mMessenger = new Messenger(mMessengerHandler);
+    }
+
+    private void init(boolean isUseMediaPlayer) {
         mQueueManager = new QueueManager(this);
 
-        Playback playback = new ExoPlayback(this);
+        Playback playback;
+        if (isUseMediaPlayer) {
+            playback = new MediaPlayback(this);
+        } else {
+            playback = new ExoPlayback(this);
+        }
         mPlaybackManager = new PlaybackManager(playback, mQueueManager, this);
 
         mSession = new MediaSessionCompat(this, "MusicService");
         mSession.setCallback(mPlaybackManager.getMediaSessionCallback());
-        mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
         mPlaybackManager.updatePlaybackState(null);
-
-        mMessengerHandler = new MessengerHandler(this);
-        mMessenger = new Messenger(mMessengerHandler);
     }
 
     @Nullable
@@ -165,16 +171,32 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
             if (service == null) {
                 return;
             }
+            Bundle bundle = msg.getData();
             switch (msg.what) {
+                //初始化
+                case MusicConstants.MSG_INIT:
+                    boolean isUseMediaPlayer = bundle.getBoolean(MusicConstants.KEY_IS_USE_MEDIAPLAYER);
+                    service.init(isUseMediaPlayer);
+                    break;
+                //设置播放列表
                 case MusicConstants.MSG_INIT_MUSIC_QUEUE:
                     List<MusicInfo> musicInfos = msg.getData().getParcelableArrayList(MusicConstants.KEY_MUSIC_LIST);
                     List<MusicInfo> musicQueue = SourceHelper.fetchMusicQueue(musicInfos);
                     service.mQueueManager.setCurrentQueue(musicQueue);
                     break;
+                //根据音乐id播放
                 case MusicConstants.MSG_PLAY_BY_MUSIC_ID:
                     String musicId = msg.getData().getString(MusicConstants.KEY_MUSIC_ID);
-                    LogUtil.i("musicId = " + musicId);
+
                     service.mQueueManager.setCurrentQueueItem(musicId);
+                    break;
+                //开始或暂停
+                case MusicConstants.MSG_START_OR_PAUSE:
+                    if (service.mPlaybackManager.getPlayback().isPlaying()) {
+                        service.mPlaybackManager.handlePauseRequest();
+                    }else {
+
+                    }
                     break;
                 default:
                     break;

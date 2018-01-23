@@ -6,14 +6,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.net.Uri;
-import android.net.wifi.WifiManager;
-import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
@@ -33,7 +30,6 @@ import com.google.android.exoplayer2.util.Util;
 import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.musiclibrary.manager.FocusAndLockManager;
-import com.lzx.nicemusic.utils.LogUtil;
 
 import static com.google.android.exoplayer2.C.CONTENT_TYPE_MUSIC;
 import static com.google.android.exoplayer2.C.USAGE_MEDIA;
@@ -67,7 +63,7 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
     public ExoPlayback(Context context) {
         Context applicationContext = context.getApplicationContext();
         this.mContext = applicationContext;
-        mFocusAndLockManager = new FocusAndLockManager(applicationContext,this);
+        mFocusAndLockManager = new FocusAndLockManager(applicationContext, this);
     }
 
     private final IntentFilter mAudioNoisyIntentFilter =
@@ -126,9 +122,7 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
     @Override
     public int getState() {
         if (mExoPlayer == null) {
-            return mExoPlayerNullIsStopped
-                    ? PlaybackStateCompat.STATE_STOPPED
-                    : PlaybackStateCompat.STATE_NONE;
+            return mExoPlayerNullIsStopped ? PlaybackStateCompat.STATE_STOPPED : PlaybackStateCompat.STATE_NONE;
         }
         switch (mExoPlayer.getPlaybackState()) {
             case Player.STATE_IDLE:
@@ -136,9 +130,7 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
             case Player.STATE_BUFFERING:
                 return PlaybackStateCompat.STATE_BUFFERING;
             case Player.STATE_READY:
-                return mExoPlayer.getPlayWhenReady()
-                        ? PlaybackStateCompat.STATE_PLAYING
-                        : PlaybackStateCompat.STATE_PAUSED;
+                return mExoPlayer.getPlayWhenReady() ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED;
             case Player.STATE_ENDED:
                 return PlaybackStateCompat.STATE_PAUSED;
             default:
@@ -176,7 +168,7 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
         if (mediaHasChanged) {
             mCurrentMediaId = mediaId;
         }
-        LogUtil.i("play#mCurrentMediaId = " + mCurrentMediaId);
+
         if (mediaHasChanged || mExoPlayer == null) {
             releaseResources(false); // release everything except the player
 
@@ -184,19 +176,12 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
             if (source != null) {
                 source = source.replaceAll(" ", "%20"); // Escape spaces for URLs
             }
-            LogUtil.i("play#source = " + source);
+
             if (mExoPlayer == null) {
-                mExoPlayer =
-                        ExoPlayerFactory.newSimpleInstance(
-                                mContext, new DefaultTrackSelector(), new DefaultLoadControl());
+                mExoPlayer = ExoPlayerFactory.newSimpleInstance(mContext, new DefaultTrackSelector(), new DefaultLoadControl());
                 mExoPlayer.addListener(mEventListener);
             }
 
-            // Android "O" makes much greater use of AudioAttributes, especially
-            // with regards to AudioFocus. All of UAMP's tracks are music, but
-            // if your content includes spoken word such as audiobooks or podcasts
-            // then the content type should be set to CONTENT_TYPE_SPEECH for those
-            // tracks.
             final AudioAttributes audioAttributes = new AudioAttributes.Builder()
                     .setContentType(CONTENT_TYPE_MUSIC)
                     .setUsage(USAGE_MEDIA)
@@ -204,15 +189,11 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
             mExoPlayer.setAudioAttributes(audioAttributes);
 
             // Produces DataSource instances through which media data is loaded.
-            DataSource.Factory dataSourceFactory =
-                    new DefaultDataSourceFactory(
-                            mContext, Util.getUserAgent(mContext, "uamp"), null);
+            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(mContext, Util.getUserAgent(mContext, "musiclibrary"), null);
             // Produces Extractor instances for parsing the media data.
             ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
             // The MediaSource represents the media to be played.
-            MediaSource mediaSource =
-                    new ExtractorMediaSource(
-                            Uri.parse(source), dataSourceFactory, extractorsFactory, null, null);
+            MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(source), dataSourceFactory, extractorsFactory, null, null);
 
             // Prepares media to play (happens on background thread) and triggers
             // {@code onPlayerStateChanged} callback when the stream is ready to play.

@@ -14,16 +14,16 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.lzx.musiclibrary.MusicConstants;
+import com.lzx.musiclibrary.MusicService;
+import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpFragment;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
-import com.lzx.nicemusic.lib.MusicConstants;
-import com.lzx.nicemusic.lib.MusicService;
-import com.lzx.musiclibrary.bean.MusicInfo;
-import com.lzx.nicemusic.module.area.presenter.AreaPresenter;
 import com.lzx.nicemusic.module.area.presenter.AreaContract;
+import com.lzx.nicemusic.module.area.presenter.AreaPresenter;
 import com.lzx.nicemusic.module.area.sectioned.AreaSection;
-import com.lzx.nicemusic.utils.LogUtil;
+import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
