@@ -151,10 +151,9 @@ public class QueueManager {
      * @param mediaId 音乐id
      * @return
      */
-    public boolean setCurrentQueueItem(String mediaId) {
-        // set the current index on queue from the music Id:
+    public boolean setCurrentQueueItem(String mediaId,boolean isSwitchMusic) {
         int index = QueueHelper.getMusicIndexOnQueue(mPlayingQueue, mediaId);
-        setCurrentQueueIndex(index);
+        setCurrentQueueIndex(index, isSwitchMusic);
         return index >= 0;
     }
 
@@ -163,10 +162,10 @@ public class QueueManager {
      *
      * @param index 队列下标
      */
-    private void setCurrentQueueIndex(int index) {
+    private void setCurrentQueueIndex(int index, boolean isSwitchMusic) {
         if (index >= 0 && index < mPlayingQueue.size()) {
             mCurrentIndex = index;
-            mListener.onCurrentQueueIndexUpdated(mCurrentIndex);
+            mListener.onCurrentQueueIndexUpdated(mCurrentIndex, isSwitchMusic);
         }
     }
 
@@ -216,7 +215,7 @@ public class QueueManager {
 
         void onMetadataRetrieveError();
 
-        void onCurrentQueueIndexUpdated(int queueIndex);
+        void onCurrentQueueIndexUpdated(int queueIndex,boolean isSwitchMusic);
 
         void onQueueUpdated(List<MediaSessionCompat.QueueItem> newQueue, List<MusicInfo> playingQueue);
     }

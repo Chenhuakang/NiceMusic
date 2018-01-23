@@ -11,6 +11,9 @@ public class MusicConstants {
     public static final int MSG_PLAY_BY_MUSIC_INFO = 4000;
     public static final int MSG_START_OR_PAUSE = 5000;
 
+    public static final int MSG_MUSIC_START = 6000;
+    public static final int MSG_MUSIC_PAUSE = 7000;
+    public static final int MSG_MUSIC_STOP = 8000;
 
 
     public static final String KEY_IS_USE_MEDIAPLAYER = "KEY_IS_USE_MEDIAPLAYER";

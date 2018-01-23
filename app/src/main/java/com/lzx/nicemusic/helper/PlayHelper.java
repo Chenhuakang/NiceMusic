@@ -1,6 +1,7 @@
 package com.lzx.nicemusic.helper;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.lzx.musiclibrary.bean.MusicInfo;
@@ -19,7 +20,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class PlayHelper {
 
-    public static void playMusic(Context context, MusicInfo musicInfo ) {
+    public static void playMusic(Context context, MusicInfo musicInfo) {
         RetrofitHelper.getMusicApi().playMusic(musicInfo.musicId)
                 .map(responseBody -> {
                     String json = responseBody.string();

@@ -44,8 +44,8 @@ public class PlaybackManager implements Playback.Callback {
     public void handlePlayRequest() {
         MusicInfo currentMusic = mQueueManager.getCurrentMusic();
         if (currentMusic != null) {
-            mServiceCallback.onPlaybackStart();
             mPlayback.play(currentMusic);
+            mServiceCallback.onPlaybackStart();
         }
     }
 
@@ -55,7 +55,7 @@ public class PlaybackManager implements Playback.Callback {
     public void handlePauseRequest() {
         if (mPlayback.isPlaying()) {
             mPlayback.pause();
-            mServiceCallback.onPlaybackStop();
+            mServiceCallback.onPlaybackPause();
         }
     }
 
@@ -73,15 +73,19 @@ public class PlaybackManager implements Playback.Callback {
     /**
      * 播放/暂停
      */
-    public void handlePlayPauseRequest() {
+    public void handlePlayPauseRequest(boolean isSwitchMusic) {
         int state = mPlayback.getState();
-        if ( state == PlaybackStateCompat.STATE_STOPPED || state == PlaybackStateCompat.STATE_NONE) {
+        if (state == PlaybackStateCompat.STATE_STOPPED || state == PlaybackStateCompat.STATE_NONE) {
             handlePlayRequest();
         } else if (state == PlaybackStateCompat.STATE_BUFFERING) {
             handleStopRequest(null);
         } else if (state == PlaybackStateCompat.STATE_PLAYING) {
-            handlePauseRequest();
-        }else if (state==PlaybackStateCompat.STATE_PAUSED){
+            if (!isSwitchMusic) {
+                handlePauseRequest();
+            } else {
+                handlePlayRequest();
+            }
+        } else if (state == PlaybackStateCompat.STATE_PAUSED) {
             handlePlayRequest();
         }
     }
@@ -123,11 +127,9 @@ public class PlaybackManager implements Playback.Callback {
         if (mPlayback != null && mPlayback.isConnected()) {
             position = mPlayback.getCurrentStreamPosition();
         }
-
         //noinspection ResourceType
         PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
                 .setActions(getAvailableActions());
-
 
         int state = mPlayback.getState();
 
@@ -140,13 +142,11 @@ public class PlaybackManager implements Playback.Callback {
         }
         //noinspection ResourceType
         stateBuilder.setState(state, position, 1.0f, SystemClock.elapsedRealtime());
-
         // Set the activeQueueItemId if the current index is valid.
         MusicInfo currentMusic = mQueueManager.getCurrentMusic();
         if (currentMusic != null) {
             stateBuilder.setActiveQueueItemId(currentMusic.trackNumber);
         }
-
         mServiceCallback.onPlaybackStateUpdated(stateBuilder.build());
         //播放/暂停状态就通知通知栏更新
         if (state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_PAUSED) {
@@ -219,7 +219,7 @@ public class PlaybackManager implements Playback.Callback {
 
         @Override
         public void onSkipToQueueItem(long queueId) {
-            mQueueManager.setCurrentQueueItem(String.valueOf(queueId));
+            mQueueManager.setCurrentQueueItem(String.valueOf(queueId), true);
             mQueueManager.updateMetadata();
         }
 
@@ -308,9 +308,11 @@ public class PlaybackManager implements Playback.Callback {
     public interface PlaybackServiceCallback {
         void onPlaybackStart();
 
-        void onNotificationRequired();
+        void onPlaybackPause();
 
         void onPlaybackStop();
+
+        void onNotificationRequired();
 
         void onPlaybackStateUpdated(PlaybackStateCompat newState);
     }
