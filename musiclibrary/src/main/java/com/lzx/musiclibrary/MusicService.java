@@ -40,6 +40,7 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
     private Messenger mMessenger;
     private Messenger client;
     private MessengerHandler mMessengerHandler;
+    private Handler mProgressHandler = new Handler();
 
     @Override
     public void onCreate() {
@@ -147,9 +148,19 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
         mPlaybackManager.handleStopRequest(null);
         mDelayedStopHandler.removeCallbacksAndMessages(null);
         mMessengerHandler.removeCallbacksAndMessages(null);
+        mProgressHandler.removeCallbacksAndMessages(null);
         mMessengerHandler = null;
+        mProgressHandler = null;
         mSession.release();
     }
+
+    private Runnable mPublishRunnable = new Runnable() {
+        @Override
+        public void run() {
+            sendMsgToClient(MusicConstants.MSG_MUSIC_PROGRESS,mPlaybackManager.getCurrentPosition());
+            mProgressHandler.postDelayed(this, 1000);
+        }
+    };
 
     private static class DelayedStopHandler extends Handler {
         private final WeakReference<MusicService> mWeakReference;

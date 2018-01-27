@@ -90,6 +90,18 @@ public class PlaybackManager implements Playback.Callback {
         }
     }
 
+    /**
+     * 获取当前进度
+     * @return
+     */
+    public long getCurrentPosition(){
+        long position = 0;
+        if (mPlayback != null && mPlayback.isConnected()) {
+             position = mPlayback.getCurrentStreamPosition();
+        }
+        return position;
+    }
+
     @Override
     public void onPlayCompletion() {
         //判断是否有下一首
