@@ -52,7 +52,7 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
             playback = new ExoPlayback(this);
         }
         mPlaybackManager = new PlaybackManager(playback, mQueueManager, this);
-        mPlayControl = new PlayControl(mQueueManager, mPlaybackManager);
+        mPlayControl = new PlayControl(this,mQueueManager, mPlaybackManager);
 
         mSession = new MediaSessionCompat(this, "MusicService");
         mSession.setCallback(mPlaybackManager.getMediaSessionCallback());
@@ -70,6 +70,7 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
     }
 
     public class PlayBinder extends Binder {
+
         public MusicService getService() {
             return MusicService.this;
         }
