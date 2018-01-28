@@ -2,18 +2,17 @@ package com.lzx.musiclibrary;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Bundle;
+import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.lzx.musiclibrary.bean.MusicInfo;
-import com.lzx.musiclibrary.helper.SourceHelper;
+import com.lzx.musiclibrary.control.IPlayControl;
+import com.lzx.musiclibrary.control.PlayControl;
 import com.lzx.musiclibrary.playback.ExoPlayback;
 import com.lzx.musiclibrary.playback.MediaPlayback;
 import com.lzx.musiclibrary.playback.Playback;
@@ -32,32 +31,28 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
 
     private static final int STOP_DELAY = 30000;
 
-
     private PlaybackManager mPlaybackManager;
     private QueueManager mQueueManager;
     private MediaSessionCompat mSession;
-    private final DelayedStopHandler mDelayedStopHandler = new DelayedStopHandler(this);
-    private Messenger mMessenger;
-    private Messenger client;
-    private MessengerHandler mMessengerHandler;
+    private DelayedStopHandler mDelayedStopHandler;
+    private IPlayControl mPlayControl;
+    private Playback playback;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mMessengerHandler = new MessengerHandler(this);
-        mMessenger = new Messenger(mMessengerHandler);
+        mDelayedStopHandler = new DelayedStopHandler(this);
+        mQueueManager = new QueueManager(this);
     }
 
-    private void init(boolean isUseMediaPlayer) {
-        mQueueManager = new QueueManager(this);
-
-        Playback playback;
+    public void init(boolean isUseMediaPlayer) {
         if (isUseMediaPlayer) {
             playback = new MediaPlayback(this);
         } else {
             playback = new ExoPlayback(this);
         }
         mPlaybackManager = new PlaybackManager(playback, mQueueManager, this);
+        mPlayControl = new PlayControl(mQueueManager, mPlaybackManager);
 
         mSession = new MediaSessionCompat(this, "MusicService");
         mSession.setCallback(mPlaybackManager.getMediaSessionCallback());
@@ -71,7 +66,17 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return mMessenger.getBinder();
+        return new PlayBinder();
+    }
+
+    public class PlayBinder extends Binder {
+        public MusicService getService() {
+            return MusicService.this;
+        }
+
+        public IPlayControl getPlayControl() {
+            return mPlayControl;
+        }
     }
 
     @Override
@@ -102,12 +107,12 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
         mSession.setActive(true);
         mDelayedStopHandler.removeCallbacksAndMessages(null);
         startService(new Intent(getApplicationContext(), MusicService.class));
-        sendMsgToClient(MusicConstants.MSG_MUSIC_START, null);
+
     }
 
     @Override
     public void onPlaybackPause() {
-        sendMsgToClient(MusicConstants.MSG_MUSIC_PAUSE, null);
+
     }
 
     @Override
@@ -120,7 +125,7 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
         mDelayedStopHandler.removeCallbacksAndMessages(null);
         mDelayedStopHandler.sendEmptyMessageDelayed(0, STOP_DELAY);
         stopForeground(true);
-        sendMsgToClient(MusicConstants.MSG_MUSIC_STOP, null);
+
     }
 
     @Override
@@ -146,8 +151,7 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
         super.onDestroy();
         mPlaybackManager.handleStopRequest(null);
         mDelayedStopHandler.removeCallbacksAndMessages(null);
-        mMessengerHandler.removeCallbacksAndMessages(null);
-        mMessengerHandler = null;
+
         mSession.release();
     }
 
@@ -170,70 +174,5 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
         }
     }
 
-    private static class MessengerHandler extends Handler {
-        private final WeakReference<MusicService> mWeakReference;
-
-        private MessengerHandler(MusicService service) {
-            mWeakReference = new WeakReference<>(service);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            MusicService service = mWeakReference.get();
-            if (service == null) {
-                return;
-            }
-            service.client = msg.replyTo;
-            Bundle bundle = msg.getData();
-            switch (msg.what) {
-                //初始化
-                case MusicConstants.MSG_INIT:
-                    boolean isUseMediaPlayer = bundle.getBoolean(MusicConstants.KEY_IS_USE_MEDIAPLAYER);
-                    service.init(isUseMediaPlayer);
-                    break;
-                //设置播放列表
-                case MusicConstants.MSG_INIT_MUSIC_QUEUE:
-                    List<MusicInfo> musicInfos = bundle.getParcelableArrayList(MusicConstants.KEY_MUSIC_LIST);
-                    List<MusicInfo> musicQueue = SourceHelper.fetchMusicQueue(musicInfos);
-                    service.mQueueManager.setCurrentQueue(musicQueue);
-                    break;
-                //根据音乐id播放
-                case MusicConstants.MSG_PLAY_BY_MUSIC_ID:
-                    String musicId = bundle.getString(MusicConstants.KEY_MUSIC_ID);
-                    service.mQueueManager.setCurrentQueueItem(musicId, true);
-                    break;
-                //开始或暂停或切歌
-                case MusicConstants.MSG_PLAY_BY_MUSIC_INFO:
-                    MusicInfo info = bundle.getParcelable(MusicConstants.KEY_MUSIC_INFO);
-                    if (info == null) {
-                        return;
-                    }
-                    service.mQueueManager.addQueueItem(info);
-                    String currMusicId = service.mQueueManager.getCurrentMusic().musicId;
-                    service.mQueueManager.setCurrentQueueItem(info.musicId, !currMusicId.equals(info.musicId));
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    /**
-     * 发送消息给客户端
-     *
-     * @param what   类型
-     * @param bundle 数据
-     */
-    private void sendMsgToClient(int what, Bundle bundle) {
-        if (client != null) {
-            Message message = Message.obtain(null, what);
-            message.setData(bundle);
-            try {
-                client.send(message);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
 }

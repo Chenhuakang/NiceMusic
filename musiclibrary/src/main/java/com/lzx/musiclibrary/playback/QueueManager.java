@@ -33,6 +33,22 @@ public class QueueManager {
     }
 
     /**
+     * 获取播放列表
+     * @return
+     */
+    public List<MusicInfo> getPlayingQueue() {
+        return mPlayingQueue;
+    }
+
+    /**
+     * 获取当前索引
+     * @return
+     */
+    public int getCurrentIndex() {
+        return mCurrentIndex;
+    }
+
+    /**
      * 设置当前的播放列表
      *
      * @param newQueue     整个队列
@@ -148,11 +164,11 @@ public class QueueManager {
     /**
      * 设置当前的音乐item，用于播放
      *
-     * @param mediaId 音乐id
+     * @param musicId 音乐id
      * @return
      */
-    public boolean setCurrentQueueItem(String mediaId,boolean isSwitchMusic) {
-        int index = QueueHelper.getMusicIndexOnQueue(mPlayingQueue, mediaId);
+    public boolean setCurrentQueueItem(String musicId, boolean isSwitchMusic) {
+        int index = QueueHelper.getMusicIndexOnQueue(mPlayingQueue, musicId);
         setCurrentQueueIndex(index, isSwitchMusic);
         return index >= 0;
     }
@@ -167,6 +183,32 @@ public class QueueManager {
             mCurrentIndex = index;
             mListener.onCurrentQueueIndexUpdated(mCurrentIndex, isSwitchMusic);
         }
+    }
+
+    /**
+     * 得到上一首音乐信息
+     */
+    public MusicInfo getPreMusicInfo() {
+        int index;
+        if (mCurrentIndex - 1 < 0) {
+            index = 0;
+        } else {
+            index = mCurrentIndex - 1;
+        }
+        return mPlayingQueue.get(index);
+    }
+
+    /**
+     * 得到下一首音乐信息
+     */
+    public MusicInfo getNextMusicInfo() {
+        int index;
+        if (mCurrentIndex + 1 > mPlayingQueue.size() - 1) {
+            index = mPlayingQueue.size() - 1;
+        } else {
+            index = mCurrentIndex + 1;
+        }
+        return mPlayingQueue.get(index);
     }
 
     /**
@@ -215,7 +257,7 @@ public class QueueManager {
 
         void onMetadataRetrieveError();
 
-        void onCurrentQueueIndexUpdated(int queueIndex,boolean isSwitchMusic);
+        void onCurrentQueueIndexUpdated(int queueIndex, boolean isSwitchMusic);
 
         void onQueueUpdated(List<MediaSessionCompat.QueueItem> newQueue, List<MusicInfo> playingQueue);
     }

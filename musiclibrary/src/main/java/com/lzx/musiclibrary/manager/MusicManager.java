@@ -17,6 +17,7 @@ import com.lzx.musiclibrary.MusicConstants;
 import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.OnPlayerEventListener;
 import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.musiclibrary.control.IPlayControl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,13 +29,12 @@ import java.util.List;
  * @date 2018/1/22
  */
 
-public class MusicManager {
+public class MusicManager implements IPlayControl {
 
     private Context mContext;
     private boolean isUseMediaPlayer = false;
-    private Messenger mMessenger;
-    private Messenger mGetReplyMessenger = new Messenger(new MessengerHandler());
     private static List<OnPlayerEventListener> mPlayerEventListeners = new ArrayList<>();
+    private IPlayControl control;
 
     public static MusicManager get() {
         return SingletonHolder.sInstance;
@@ -59,12 +59,9 @@ public class MusicManager {
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            mMessenger = new Messenger(iBinder);
-            Message message = Message.obtain(null, MusicConstants.MSG_INIT);
-            Bundle bundle = new Bundle();
-            bundle.putBoolean(MusicConstants.KEY_IS_USE_MEDIAPLAYER, isUseMediaPlayer);
-            message.setData(bundle);
-            sendMessage(message);
+            MusicService service = ((MusicService.PlayBinder) iBinder).getService();
+            service.init(isUseMediaPlayer);
+            control = ((MusicService.PlayBinder) iBinder).getPlayControl();
         }
 
         @Override
@@ -79,31 +76,6 @@ public class MusicManager {
 
     private MusicManager() {
 
-    }
-
-    private static class MessengerHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MusicConstants.MSG_MUSIC_START:
-                    for (OnPlayerEventListener listener : mPlayerEventListeners) {
-                        listener.onPlayerStart();
-                    }
-                    break;
-                case MusicConstants.MSG_MUSIC_PAUSE:
-                    for (OnPlayerEventListener listener : mPlayerEventListeners) {
-                        listener.onPlayerPause();
-                    }
-                    break;
-                case MusicConstants.MSG_MUSIC_STOP:
-                    for (OnPlayerEventListener listener : mPlayerEventListeners) {
-                        listener.onPlayCompletion();
-                    }
-                    break;
-                default:
-                    super.handleMessage(msg);
-            }
-        }
     }
 
     /**
@@ -141,38 +113,192 @@ public class MusicManager {
      * 清除监听
      */
     public void clearPlayerEventListener() {
-        Iterator<OnPlayerEventListener> iterator = mPlayerEventListeners.iterator();
-        while (iterator.hasNext()) {
-            iterator.remove();
+        mPlayerEventListeners.clear();
+    }
+
+    @Override
+    public void playMusic(List<MusicInfo> list, int index) {
+        if (control != null) {
+            control.playMusic(list, index);
         }
     }
 
-    /**
-     * 播放/暂停/切歌
-     * 会在音乐列表最后添加一个音乐信息并且播放
-     *
-     * @param musicInfo 音乐信息
-     */
-    public void playMusic(MusicInfo musicInfo) {
-        if (mMessenger != null) {
-            Message message = Message.obtain(null, MusicConstants.MSG_PLAY_BY_MUSIC_INFO);
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(MusicConstants.KEY_MUSIC_INFO, musicInfo);
-            message.setData(bundle);
-            message.replyTo = mGetReplyMessenger;
-            sendMessage(message);
+    @Override
+    public void playMusic(MusicInfo info) {
+        if (control != null) {
+            control.playMusic(info);
         }
     }
 
-    /**
-     * 发送消息
-     */
-    private void sendMessage(Message message) {
-        try {
-            mMessenger.send(message);
-        } catch (RemoteException e) {
-            e.printStackTrace();
+    @Override
+    public void playMusic(int index) {
+        if (control != null) {
+            control.playMusic(index);
         }
     }
 
+    @Override
+    public void playMusicAutoStopWhen(List<MusicInfo> list, int index, int time) {
+        if (control != null) {
+            control.playMusicAutoStopWhen(list, index, time);
+        }
+    }
+
+    @Override
+    public void playMusicAutoStopWhen(MusicInfo info, int time) {
+        if (control != null) {
+            control.playMusicAutoStopWhen(info, time);
+        }
+    }
+
+    @Override
+    public void playMusicAutoStopWhen(int index, int time) {
+        if (control != null) {
+            control.playMusicAutoStopWhen(index, time);
+        }
+    }
+
+    @Override
+    public void setAutoStopTime(int time) {
+        if (control != null) {
+            control.setAutoStopTime(time);
+        }
+    }
+
+    @Override
+    public MusicInfo getCurrPlayingMusic() {
+        if (control != null) {
+            return control.getCurrPlayingMusic();
+        }
+        return null;
+    }
+
+    @Override
+    public int getCurrPlayingIndex() {
+        if (control != null) {
+            return control.getCurrPlayingIndex();
+        }
+        return -1;
+    }
+
+    @Override
+    public void pauseMusic() {
+        if (control != null) {
+            control.pauseMusic();
+        }
+    }
+
+    @Override
+    public void resumeMusic() {
+        if (control != null) {
+            control.resumeMusic();
+        }
+    }
+
+    @Override
+    public void stopMusic() {
+        if (control != null) {
+            control.stopMusic();
+        }
+    }
+
+    @Override
+    public void setPlayList(List<MusicInfo> list) {
+        if (control != null) {
+            control.setPlayList(list);
+        }
+    }
+
+    @Override
+    public List<MusicInfo> getPlayList() {
+        if (control != null) {
+            control.getPlayList();
+        }
+        return null;
+    }
+
+    @Override
+    public int getStatus() {
+        if (control != null) {
+            control.getStatus();
+        }
+        return 0;
+    }
+
+    @Override
+    public void playNext() {
+        if (control != null) {
+            control.playNext();
+        }
+    }
+
+    @Override
+    public void playPre() {
+        if (control != null) {
+            control.playPre();
+        }
+    }
+
+    @Override
+    public boolean hasPre() {
+        return control != null && control.hasPre();
+    }
+
+    @Override
+    public boolean hasNext() {
+        return control != null && control.hasNext();
+    }
+
+    @Override
+    public MusicInfo getPreMusic() {
+        if (control != null) {
+            return control.getPreMusic();
+        }
+        return null;
+    }
+
+    @Override
+    public MusicInfo getNextMusic() {
+        if (control != null) {
+            return control.getNextMusic();
+        }
+        return null;
+    }
+
+    @Override
+    public void setPlayMode(int mode) {
+        if (control != null) {
+            control.setPlayMode(mode);
+        }
+    }
+
+    @Override
+    public int getPlayMode() {
+        if (control != null) {
+            return control.getPlayMode();
+        }
+        return 0;
+    }
+
+    @Override
+    public long getProgress() {
+        if (control != null) {
+            return control.getProgress();
+        }
+        return 0;
+    }
+
+    @Override
+    public void seekTo(int position) {
+        if (control != null) {
+            control.seekTo(position);
+        }
+    }
+
+    @Override
+    public void reset() {
+        if (control != null) {
+            control.reset();
+        }
+    }
 }
