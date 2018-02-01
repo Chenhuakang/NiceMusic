@@ -5,15 +5,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
-import android.util.Log;
 
-import com.lzx.musiclibrary.MusicConstants;
 import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.OnPlayerEventListener;
 import com.lzx.musiclibrary.bean.MusicInfo;
@@ -174,6 +167,13 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
+    public void setCurrMusic(MusicInfo info, int index) {
+        if (control != null) {
+            control.setCurrMusic(info, index);
+        }
+    }
+
+    @Override
     public int getCurrPlayingIndex() {
         if (control != null) {
             return control.getCurrPlayingIndex();
@@ -206,6 +206,13 @@ public class MusicManager implements IPlayControl {
     public void setPlayList(List<MusicInfo> list) {
         if (control != null) {
             control.setPlayList(list);
+        }
+    }
+
+    @Override
+    public void setPlayList(List<MusicInfo> list, int index) {
+        if (control != null) {
+            control.setPlayList(list, index);
         }
     }
 

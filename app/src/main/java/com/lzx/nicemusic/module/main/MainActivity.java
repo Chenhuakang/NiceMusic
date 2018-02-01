@@ -13,16 +13,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
-import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.nicemusic.module.area.AreaActivity;
 import com.lzx.nicemusic.module.main.presenter.MainContract;
 import com.lzx.nicemusic.module.main.presenter.MainPresenter;
 import com.lzx.nicemusic.module.main.sectioned.HomeItemSectioned;
 import com.lzx.nicemusic.module.search.SearchActivity;
-import com.lzx.musiclibrary.utils.LogUtil;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;
@@ -78,7 +78,10 @@ public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresent
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mSectionedAdapter);
         getPresenter().requestMusicList();
+
+
     }
+
 
     private void initSearchView() {
         //初始化SearchBar

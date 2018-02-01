@@ -45,6 +45,7 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
         mQueueManager = new QueueManager(this);
     }
 
+
     public void init(boolean isUseMediaPlayer) {
         if (isUseMediaPlayer) {
             playback = new MediaPlayback(this);

@@ -32,9 +32,6 @@ public interface IPlayControl {
     //设置定时时间
     void setAutoStopTime(int time);
 
-    //得到当前播放信息
-    MusicInfo getCurrPlayingMusic();
-
     //得到当前播放索引
     int getCurrPlayingIndex();
 
@@ -49,6 +46,9 @@ public interface IPlayControl {
 
     //设置播放列表
     void setPlayList(List<MusicInfo> list);
+
+    //设置播放列表
+    void setPlayList(List<MusicInfo> list,int index);
 
     //得到播放列表
     List<MusicInfo> getPlayList();
@@ -73,6 +73,12 @@ public interface IPlayControl {
 
     //得到下一首信息
     MusicInfo getNextMusic();
+
+    //得到当前播放信息
+    MusicInfo getCurrPlayingMusic();
+
+    //设置当前音乐信息
+    void setCurrMusic(MusicInfo info,int index);
 
     //设置播放模式
     void setPlayMode(int mode);

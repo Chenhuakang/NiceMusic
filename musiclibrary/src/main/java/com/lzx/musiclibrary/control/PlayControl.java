@@ -87,6 +87,11 @@ public class PlayControl implements IPlayControl {
     }
 
     @Override
+    public void setCurrMusic(MusicInfo info, int index) {
+
+    }
+
+    @Override
     public int getCurrPlayingIndex() {
         return mQueueManager.getCurrentIndex();
     }
@@ -109,6 +114,11 @@ public class PlayControl implements IPlayControl {
     @Override
     public void setPlayList(List<MusicInfo> list) {
         mQueueManager.setCurrentQueue(list);
+    }
+
+    @Override
+    public void setPlayList(List<MusicInfo> list, int index) {
+        mQueueManager.setCurrentQueue(list, index);
     }
 
     @Override

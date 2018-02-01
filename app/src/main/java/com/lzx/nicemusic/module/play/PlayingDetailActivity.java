@@ -9,7 +9,9 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.lzx.musiclibrary.TimerTaskManager;
 import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
@@ -32,6 +34,8 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
     private Button mBtnAllMusic;
     private SeekBar mSeekBar;
     private MusicInfo mMusicInfo;
+
+    private TimerTaskManager mTimerTaskManager;
 
     public static void launch(Context context, MusicInfo info) {
         Intent intent = new Intent(context, PlayingDetailActivity.class);
@@ -73,6 +77,9 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         GlideUtil.loadImageByUrl(this, mMusicInfo.musicCover, mMusicCover);
         getPresenter().requestSingerInfo(mMusicInfo.artistId);
 
+        mSeekBar.setMax((int) mMusicInfo.musicDuration);
+        mTimerTaskManager = new TimerTaskManager();
+        mTimerTaskManager.setUpdateProgressTask(this::updateProgress);
 
     }
 
@@ -83,6 +90,11 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         mAlbumName.setText(mMusicInfo.albumTitle);
         mCountry.setText(singerInfo.getCountry());
         mSingerDesc.setText(singerInfo.getIntro());
+
+    }
+
+    private void updateProgress() {
+        mSeekBar.setProgress((int) MusicManager.get().getProgress());
     }
 
     @Override
@@ -96,11 +108,18 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
                 break;
             case R.id.btn_play_pause:
                 PlayHelper.playMusic(this, mMusicInfo);
+                mTimerTaskManager.scheduleSeekBarUpdate();
                 break;
             case R.id.btn_pre:
                 break;
             case R.id.btn_next:
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mTimerTaskManager.onRemoveUpdateProgressTask();
     }
 }
