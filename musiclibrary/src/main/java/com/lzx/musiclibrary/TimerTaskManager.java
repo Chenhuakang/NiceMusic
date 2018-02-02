@@ -61,7 +61,7 @@ public class TimerTaskManager {
 //        }
 //    }
 
-    private void stopSeekBarUpdate() {
+    public void stopSeekBarUpdate() {
         if (mScheduleFuture != null) {
             mScheduleFuture.cancel(false);
         }

@@ -52,8 +52,9 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
         } else {
             playback = new ExoPlayback(this);
         }
-        mPlaybackManager = new PlaybackManager(playback, mQueueManager, this);
-        mPlayControl = new PlayControl(this,mQueueManager, mPlaybackManager);
+        mPlaybackManager = new PlaybackManager(playback, mQueueManager);
+        mPlaybackManager.setServiceCallback(this);
+        mPlayControl = new PlayControl(this, mQueueManager, mPlaybackManager);
 
         mSession = new MediaSessionCompat(this, "MusicService");
         mSession.setCallback(mPlaybackManager.getMediaSessionCallback());

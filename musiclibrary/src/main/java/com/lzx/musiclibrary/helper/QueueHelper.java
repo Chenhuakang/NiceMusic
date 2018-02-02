@@ -4,6 +4,7 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 
 import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.musiclibrary.playback.QueueManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -106,5 +107,20 @@ public class QueueHelper {
         return -1;
     }
 
+    /**
+     * 是否需要切歌
+     */
+    public static boolean isNeedToSwitchMusic(QueueManager queueManager, List<MusicInfo> list, int index) {
+        return isNeedToSwitchMusic(queueManager, list.get(index));
+    }
+
+    /**
+     * 是否需要切歌
+     */
+    public static boolean isNeedToSwitchMusic(QueueManager queueManager, MusicInfo info) {
+        String playingMusicId = queueManager.getCurrentMusic().musicId;
+        String currMusicId = info.musicId;
+        return !playingMusicId.equals(currMusicId);
+    }
 
 }

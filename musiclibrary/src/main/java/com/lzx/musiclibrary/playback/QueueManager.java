@@ -34,6 +34,7 @@ public class QueueManager {
 
     /**
      * 获取播放列表
+     *
      * @return
      */
     public List<MusicInfo> getPlayingQueue() {
@@ -42,6 +43,7 @@ public class QueueManager {
 
     /**
      * 获取当前索引
+     *
      * @return
      */
     public int getCurrentIndex() {
@@ -120,6 +122,16 @@ public class QueueManager {
             return null;
         }
         return mPlayingQueue.get(mCurrentIndex);
+    }
+
+    public void setCurrentMusic(int currentIndex) {
+        if (mPlayingQueue.size() == 0) {
+            return;
+        }
+        if (!QueueHelper.isIndexPlayable(currentIndex, mPlayingQueue)) {
+            return;
+        }
+        this.mCurrentIndex = currentIndex;
     }
 
     /**

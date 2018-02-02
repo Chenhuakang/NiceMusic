@@ -21,13 +21,15 @@ public class PlaybackManager implements Playback.Callback {
     private PlaybackServiceCallback mServiceCallback;
     private MediaSessionCallback mMediaSessionCallback;
 
-    public PlaybackManager(Playback playback, QueueManager queueManager
-            , PlaybackServiceCallback serviceCallback) {
+    public PlaybackManager(Playback playback, QueueManager queueManager) {
         mPlayback = playback;
         mPlayback.setCallback(this);
         mQueueManager = queueManager;
-        mServiceCallback = serviceCallback;
         mMediaSessionCallback = new MediaSessionCallback();
+    }
+
+    public void setServiceCallback(PlaybackServiceCallback serviceCallback) {
+        mServiceCallback = serviceCallback;
     }
 
     public Playback getPlayback() {
@@ -45,7 +47,9 @@ public class PlaybackManager implements Playback.Callback {
         MusicInfo currentMusic = mQueueManager.getCurrentMusic();
         if (currentMusic != null) {
             mPlayback.play(currentMusic);
-            mServiceCallback.onPlaybackStart();
+            if (mServiceCallback != null) {
+                mServiceCallback.onPlaybackStart();
+            }
         }
     }
 
@@ -55,7 +59,9 @@ public class PlaybackManager implements Playback.Callback {
     public void handlePauseRequest() {
         if (mPlayback.isPlaying()) {
             mPlayback.pause();
-            mServiceCallback.onPlaybackPause();
+            if (mServiceCallback != null) {
+                mServiceCallback.onPlaybackPause();
+            }
         }
     }
 
@@ -66,7 +72,9 @@ public class PlaybackManager implements Playback.Callback {
      */
     public void handleStopRequest(String withError) {
         mPlayback.stop(true);
-        mServiceCallback.onPlaybackStop();
+        if (mServiceCallback != null) {
+            mServiceCallback.onPlaybackStop();
+        }
         updatePlaybackState(withError);
     }
 
@@ -92,12 +100,13 @@ public class PlaybackManager implements Playback.Callback {
 
     /**
      * 获取当前进度
+     *
      * @return
      */
-    public long getCurrentPosition(){
+    public long getCurrentPosition() {
         long position = 0;
         if (mPlayback != null && mPlayback.isConnected()) {
-             position = mPlayback.getCurrentStreamPosition();
+            position = mPlayback.getCurrentStreamPosition();
         }
         return position;
     }
@@ -159,10 +168,14 @@ public class PlaybackManager implements Playback.Callback {
         if (currentMusic != null) {
             stateBuilder.setActiveQueueItemId(currentMusic.trackNumber);
         }
-        mServiceCallback.onPlaybackStateUpdated(stateBuilder.build());
+        if (mServiceCallback != null) {
+            mServiceCallback.onPlaybackStateUpdated(stateBuilder.build());
+        }
         //播放/暂停状态就通知通知栏更新
         if (state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_PAUSED) {
-            mServiceCallback.onNotificationRequired();
+            if (mServiceCallback != null) {
+                mServiceCallback.onNotificationRequired();
+            }
         }
     }
 

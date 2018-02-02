@@ -1,31 +1,38 @@
 package com.lzx.musiclibrary.control;
 
 import android.content.Context;
+import android.support.v4.media.session.PlaybackStateCompat;
 
+import com.lzx.musiclibrary.OnPlayerEventListener;
 import com.lzx.musiclibrary.PlayMode;
 import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.musiclibrary.helper.QueueHelper;
 import com.lzx.musiclibrary.playback.PlaybackManager;
 import com.lzx.musiclibrary.playback.QueueManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by xian on 2018/1/28.
  */
 
-public class PlayControl implements IPlayControl {
+public class PlayControl implements IPlayControl, PlaybackManager.PlaybackServiceCallback {
 
     private QueueManager mQueueManager;
     private PlaybackManager mPlaybackManager;
     private PlayMode mPlayMode;
     private Context mContext;
 
+    private List<OnPlayerEventListener> mOnPlayerEventListeners;
+
     public PlayControl(Context context, QueueManager queueManager, PlaybackManager playbackManager) {
         mQueueManager = queueManager;
         mPlaybackManager = playbackManager;
         mContext = context;
         mPlayMode = new PlayMode();
+        mPlaybackManager.setServiceCallback(this);
+        mOnPlayerEventListeners = new ArrayList<>();
     }
 
     @Override
@@ -34,8 +41,7 @@ public class PlayControl implements IPlayControl {
             return;
         }
         mQueueManager.setCurrentQueue(list, index);
-        String currMusicId = mQueueManager.getCurrentMusic().musicId;
-        mQueueManager.setCurrentQueueItem(list.get(index).musicId, !currMusicId.equals(list.get(index).musicId));
+        mQueueManager.setCurrentQueueItem(list.get(index).musicId, QueueHelper.isNeedToSwitchMusic(mQueueManager, list, index));
     }
 
     @Override
@@ -44,8 +50,7 @@ public class PlayControl implements IPlayControl {
             return;
         }
         mQueueManager.addQueueItem(info);
-        String currMusicId = mQueueManager.getCurrentMusic().musicId;
-        mQueueManager.setCurrentQueueItem(info.musicId, !currMusicId.equals(info.musicId));
+        mQueueManager.setCurrentQueueItem(info.musicId, QueueHelper.isNeedToSwitchMusic(mQueueManager, info));
     }
 
     @Override
@@ -56,9 +61,8 @@ public class PlayControl implements IPlayControl {
         if (!QueueHelper.isIndexPlayable(index, mQueueManager.getPlayingQueue())) {
             return;
         }
-        String currMusicId = mQueueManager.getCurrentMusic().musicId;
         MusicInfo playInfo = mQueueManager.getPlayingQueue().get(index);
-        mQueueManager.setCurrentQueueItem(playInfo.musicId, !currMusicId.equals(playInfo.musicId));
+        mQueueManager.setCurrentQueueItem(playInfo.musicId, QueueHelper.isNeedToSwitchMusic(mQueueManager, playInfo));
     }
 
     @Override
@@ -87,8 +91,8 @@ public class PlayControl implements IPlayControl {
     }
 
     @Override
-    public void setCurrMusic(MusicInfo info, int index) {
-
+    public void setCurrMusic(int index) {
+        mQueueManager.setCurrentMusic(index);
     }
 
     @Override
@@ -133,16 +137,14 @@ public class PlayControl implements IPlayControl {
 
     @Override
     public void playNext() {
-        String currMusicId = mQueueManager.getCurrentMusic().musicId;
         MusicInfo playInfo = mQueueManager.getNextMusicInfo();
-        mQueueManager.setCurrentQueueItem(playInfo.musicId, !currMusicId.equals(playInfo.musicId));
+        mQueueManager.setCurrentQueueItem(playInfo.musicId, QueueHelper.isNeedToSwitchMusic(mQueueManager, playInfo));
     }
 
     @Override
     public void playPre() {
-        String currMusicId = mQueueManager.getCurrentMusic().musicId;
         MusicInfo playInfo = mQueueManager.getPreMusicInfo();
-        mQueueManager.setCurrentQueueItem(playInfo.musicId, !currMusicId.equals(playInfo.musicId));
+        mQueueManager.setCurrentQueueItem(playInfo.musicId, QueueHelper.isNeedToSwitchMusic(mQueueManager, playInfo));
     }
 
     @Override
@@ -187,6 +189,46 @@ public class PlayControl implements IPlayControl {
 
     @Override
     public void reset() {
+
+    }
+
+    @Override
+    public void addPlayerEventListener(OnPlayerEventListener listener) {
+        if (listener != null) {
+            if (!mOnPlayerEventListeners.contains(listener)) {
+                mOnPlayerEventListeners.add(listener);
+            }
+        }
+    }
+
+    @Override
+    public void onPlaybackStart() {
+        for (OnPlayerEventListener listener : mOnPlayerEventListeners) {
+            listener.onPlayerStart();
+        }
+    }
+
+    @Override
+    public void onPlaybackPause() {
+        for (OnPlayerEventListener listener : mOnPlayerEventListeners) {
+            listener.onPlayerPause();
+        }
+    }
+
+    @Override
+    public void onPlaybackStop() {
+        for (OnPlayerEventListener listener : mOnPlayerEventListeners) {
+            listener.onPlayerStop();
+        }
+    }
+
+    @Override
+    public void onNotificationRequired() {
+
+    }
+
+    @Override
+    public void onPlaybackStateUpdated(PlaybackStateCompat newState) {
 
     }
 }

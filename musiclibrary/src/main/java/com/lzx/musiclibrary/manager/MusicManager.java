@@ -6,14 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.OnPlayerEventListener;
 import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.musiclibrary.control.IPlayControl;
+import com.lzx.musiclibrary.playback.PlaybackManager;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -22,15 +22,39 @@ import java.util.List;
  * @date 2018/1/22
  */
 
-public class MusicManager implements IPlayControl {
+public class MusicManager implements IPlayControl,PlaybackManager.PlaybackServiceCallback {
 
     private Context mContext;
     private boolean isUseMediaPlayer = false;
-    private static List<OnPlayerEventListener> mPlayerEventListeners = new ArrayList<>();
     private IPlayControl control;
 
     public static MusicManager get() {
         return SingletonHolder.sInstance;
+    }
+
+    @Override
+    public void onPlaybackStart() {
+
+    }
+
+    @Override
+    public void onPlaybackPause() {
+
+    }
+
+    @Override
+    public void onPlaybackStop() {
+
+    }
+
+    @Override
+    public void onNotificationRequired() {
+
+    }
+
+    @Override
+    public void onPlaybackStateUpdated(PlaybackStateCompat newState) {
+
     }
 
     private static class SingletonHolder {
@@ -71,43 +95,7 @@ public class MusicManager implements IPlayControl {
 
     }
 
-    /**
-     * 添加监听
-     *
-     * @param onPlayerEventListener
-     */
-    public void addOnPlayerEventListener(OnPlayerEventListener onPlayerEventListener) {
-        if (onPlayerEventListener != null) {
-            mPlayerEventListeners.add(onPlayerEventListener);
-        }
-    }
 
-    /**
-     * 移除监听
-     *
-     * @param onPlayerEventListener
-     */
-    public void removePlayerEventListener(OnPlayerEventListener onPlayerEventListener) {
-        if (onPlayerEventListener != null) {
-            if (mPlayerEventListeners.contains(onPlayerEventListener)) {
-                Iterator<OnPlayerEventListener> iterator = mPlayerEventListeners.iterator();
-                while (iterator.hasNext()) {
-                    OnPlayerEventListener listener = iterator.next();
-                    if (listener == onPlayerEventListener) {
-                        iterator.remove();
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * 清除监听
-     */
-    public void clearPlayerEventListener() {
-        mPlayerEventListeners.clear();
-    }
 
     @Override
     public void playMusic(List<MusicInfo> list, int index) {
@@ -167,9 +155,9 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public void setCurrMusic(MusicInfo info, int index) {
+    public void setCurrMusic(int index) {
         if (control != null) {
-            control.setCurrMusic(info, index);
+            control.setCurrMusic(index);
         }
     }
 
@@ -306,6 +294,13 @@ public class MusicManager implements IPlayControl {
     public void reset() {
         if (control != null) {
             control.reset();
+        }
+    }
+
+    @Override
+    public void addPlayerEventListener(OnPlayerEventListener listener) {
+        if (control != null) {
+            control.addPlayerEventListener(listener);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.lzx.musiclibrary.control;
 
+import com.lzx.musiclibrary.OnPlayerEventListener;
 import com.lzx.musiclibrary.bean.MusicInfo;
 
 import java.util.List;
@@ -78,7 +79,7 @@ public interface IPlayControl {
     MusicInfo getCurrPlayingMusic();
 
     //设置当前音乐信息
-    void setCurrMusic(MusicInfo info,int index);
+    void setCurrMusic( int index);
 
     //设置播放模式
     void setPlayMode(int mode);
@@ -94,4 +95,6 @@ public interface IPlayControl {
 
     //初始化
     void reset();
+
+    void addPlayerEventListener(OnPlayerEventListener listener);
 }
