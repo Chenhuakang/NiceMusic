@@ -97,4 +97,8 @@ public interface IPlayControl {
     void reset();
 
     void addPlayerEventListener(OnPlayerEventListener listener);
+
+    void removePlayerEventListener(OnPlayerEventListener listener);
+
+    void clearPlayerEventListener();
 }

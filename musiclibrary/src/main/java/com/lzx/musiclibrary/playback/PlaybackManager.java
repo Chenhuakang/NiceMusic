@@ -7,7 +7,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
+import com.lzx.musiclibrary.PlayMode;
 import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.musiclibrary.helper.QueueHelper;
 
 
 /**
@@ -20,12 +22,14 @@ public class PlaybackManager implements Playback.Callback {
     private QueueManager mQueueManager;
     private PlaybackServiceCallback mServiceCallback;
     private MediaSessionCallback mMediaSessionCallback;
+    private PlayMode mPlayMode;
 
     public PlaybackManager(Playback playback, QueueManager queueManager) {
         mPlayback = playback;
         mPlayback.setCallback(this);
         mQueueManager = queueManager;
         mMediaSessionCallback = new MediaSessionCallback();
+        mPlayMode = new PlayMode();
     }
 
     public void setServiceCallback(PlaybackServiceCallback serviceCallback) {
@@ -111,15 +115,79 @@ public class PlaybackManager implements Playback.Callback {
         return position;
     }
 
+    /**
+     * 播放完成
+     */
     @Override
     public void onPlayCompletion() {
-        //判断是否有下一首
-        if (mQueueManager.skipQueuePosition(1)) {
-            handlePlayRequest();
-            mQueueManager.updateMetadata();
-        } else {
-            // If skipping was not possible, we stop and release the resources:
-            handleStopRequest(null);
+        if (mServiceCallback != null) {
+            mServiceCallback.onPlaybackCompletion();
+        }
+        playNextOrPre(1);
+    }
+
+    /**
+     * 播放上一首和下一首
+     *
+     * @param amount 负数为上一首，正数为下一首
+     */
+    public void playNextOrPre(int amount) {
+        switch (mPlayMode.getCurrPlayMode()) {
+            //顺序播放
+            case PlayMode.PLAY_IN_ORDER:
+                if (QueueHelper.isIndexPlayable(mQueueManager.getCurrentIndex(), mQueueManager.getPlayingQueue())) {
+                    if (mQueueManager.skipQueuePosition(amount)) {
+                        handlePlayRequest();
+                        mQueueManager.updateMetadata();
+                    }
+                } else {
+                    handleStopRequest(null);
+                }
+                break;
+            //单曲循环
+            case PlayMode.PLAY_IN_SINGLE_LOOP:
+                if (mQueueManager.skipQueuePosition(0)) {
+                    handlePlayRequest();
+                    mQueueManager.updateMetadata();
+                } else {
+                    handleStopRequest(null);
+                }
+                break;
+            //随机播放
+            case PlayMode.PLAY_IN_RANDOM:
+                //0到size-1的随机数
+                int random = (int) (Math.random() * mQueueManager.getCurrentQueueSize() - 1);
+                if (mQueueManager.skipQueuePosition(random)) {
+                    handlePlayRequest();
+                    mQueueManager.updateMetadata();
+                } else {
+                    handleStopRequest(null);
+                }
+                break;
+            //列表循环
+            case PlayMode.PLAY_IN_LIST_LOOP:
+                if (mQueueManager.skipQueuePosition(amount)) {
+                    handlePlayRequest();
+                    mQueueManager.updateMetadata();
+                }
+                break;
+            default:
+                handleStopRequest(null);
+                break;
+        }
+    }
+
+    public boolean hasNextOrPre() {
+        switch (mPlayMode.getCurrPlayMode()) {
+            //顺序播放
+            case PlayMode.PLAY_IN_ORDER:
+                return QueueHelper.isIndexPlayable(mQueueManager.getCurrentIndex(), mQueueManager.getPlayingQueue());
+            case PlayMode.PLAY_IN_SINGLE_LOOP:  //单曲循环
+            case PlayMode.PLAY_IN_RANDOM:  //随机播放
+            case PlayMode.PLAY_IN_LIST_LOOP:   //列表循环
+                return true;
+            default:
+                return false;
         }
     }
 
@@ -170,6 +238,7 @@ public class PlaybackManager implements Playback.Callback {
         }
         if (mServiceCallback != null) {
             mServiceCallback.onPlaybackStateUpdated(stateBuilder.build());
+            mServiceCallback.onPlaybackError(error);
         }
         //播放/暂停状态就通知通知栏更新
         if (state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_PAUSED) {
@@ -336,6 +405,10 @@ public class PlaybackManager implements Playback.Callback {
         void onPlaybackPause();
 
         void onPlaybackStop();
+
+        void onPlaybackError(String errorMsg);
+
+        void onPlaybackCompletion();
 
         void onNotificationRequired();
 

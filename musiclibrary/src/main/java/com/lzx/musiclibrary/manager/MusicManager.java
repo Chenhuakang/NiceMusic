@@ -48,6 +48,16 @@ public class MusicManager implements IPlayControl,PlaybackManager.PlaybackServic
     }
 
     @Override
+    public void onPlaybackError(String errorMsg) {
+
+    }
+
+    @Override
+    public void onPlaybackCompletion() {
+
+    }
+
+    @Override
     public void onNotificationRequired() {
 
     }
@@ -301,6 +311,20 @@ public class MusicManager implements IPlayControl,PlaybackManager.PlaybackServic
     public void addPlayerEventListener(OnPlayerEventListener listener) {
         if (control != null) {
             control.addPlayerEventListener(listener);
+        }
+    }
+
+    @Override
+    public void removePlayerEventListener(OnPlayerEventListener listener) {
+        if (control!=null){
+            control.removePlayerEventListener(listener);
+        }
+    }
+
+    @Override
+    public void clearPlayerEventListener() {
+        if (control!=null){
+            control.clearPlayerEventListener();
         }
     }
 }

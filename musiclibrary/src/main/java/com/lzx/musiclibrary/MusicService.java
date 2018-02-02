@@ -132,6 +132,16 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
     }
 
     @Override
+    public void onPlaybackError(String errorMsg) {
+        onPlaybackStop();
+    }
+
+    @Override
+    public void onPlaybackCompletion() {
+
+    }
+
+    @Override
     public void onPlaybackStateUpdated(PlaybackStateCompat newState) {
         mSession.setPlaybackState(newState);
     }

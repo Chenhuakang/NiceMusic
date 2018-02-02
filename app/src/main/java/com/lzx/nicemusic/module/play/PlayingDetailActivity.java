@@ -3,6 +3,7 @@ package com.lzx.nicemusic.module.play;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -20,6 +21,7 @@ import com.lzx.nicemusic.bean.SingerInfo;
 import com.lzx.nicemusic.helper.PlayHelper;
 import com.lzx.nicemusic.module.play.presenter.PlayContract;
 import com.lzx.nicemusic.module.play.presenter.PlayPresenter;
+import com.lzx.nicemusic.utils.FormatUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.OuterLayerImageView;
 
@@ -29,7 +31,7 @@ import com.lzx.nicemusic.widget.OuterLayerImageView;
 @CreatePresenter(PlayPresenter.class)
 public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, PlayPresenter> implements PlayContract.View, View.OnClickListener, OnPlayerEventListener {
 
-    private TextView mMusicName, mNickname, mAlbumName, mCountry, mSingerDesc;
+    private TextView mMusicName, mNickname, mAlbumName, mCountry, mSingerDesc, mStartTime, mTotalTime;
     private OuterLayerImageView mMusicCover;
     private ImageView mAvatar, mBtnMusicList, mBtnPlayMode, mBtnPlayPause, mBtnPre, mBtnNext;
     private Button mBtnAllMusic;
@@ -66,6 +68,8 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         mBtnPre = findViewById(R.id.btn_pre);
         mBtnNext = findViewById(R.id.btn_next);
         mSeekBar = findViewById(R.id.seekBar);
+        mStartTime = findViewById(R.id.start_time);
+        mTotalTime = findViewById(R.id.total_time);
 
         mBtnAllMusic.setOnClickListener(this);
         mBtnMusicList.setOnClickListener(this);
@@ -79,9 +83,33 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         getPresenter().requestSingerInfo(mMusicInfo.artistId);
 
         mSeekBar.setMax((int) mMusicInfo.musicDuration);
+        mTotalTime.setText(FormatUtil.formatMusicTime(mMusicInfo.musicDuration));
+        if (MusicManager.get().getStatus() == PlaybackStateCompat.STATE_PAUSED) {
+            if (mMusicInfo.musicId.equals(MusicManager.get().getCurrPlayingMusic().musicId)) {
+                mStartTime.setText(FormatUtil.formatMusicTime(MusicManager.get().getProgress()));
+                mSeekBar.setProgress((int) MusicManager.get().getProgress());
+            }
+        }
+
         mTimerTaskManager = new TimerTaskManager();
         mTimerTaskManager.setUpdateProgressTask(this::updateProgress);
         MusicManager.get().addPlayerEventListener(this);
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                MusicManager.get().seekTo(seekBar.getProgress());
+            }
+        });
     }
 
     @Override
@@ -91,11 +119,12 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         mAlbumName.setText(mMusicInfo.albumTitle);
         mCountry.setText(singerInfo.getCountry());
         mSingerDesc.setText(singerInfo.getIntro());
-
     }
 
     private void updateProgress() {
-        mSeekBar.setProgress((int) MusicManager.get().getProgress());
+        long progress = MusicManager.get().getProgress();
+        mSeekBar.setProgress((int) progress);
+        mStartTime.setText(FormatUtil.formatMusicTime(progress));
     }
 
     @Override
@@ -109,19 +138,14 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
                 break;
             case R.id.btn_play_pause:
                 PlayHelper.playMusic(this, mMusicInfo);
-
                 break;
             case R.id.btn_pre:
+                MusicManager.get().playPre();
                 break;
             case R.id.btn_next:
+                MusicManager.get().playNext();
                 break;
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mTimerTaskManager.onRemoveUpdateProgressTask();
     }
 
     @Override
@@ -143,16 +167,23 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
 
     @Override
     public void onPlayerStop() {
-
+        mTimerTaskManager.stopSeekBarUpdate();
     }
 
     @Override
     public void onPlayCompletion() {
-
+        mTimerTaskManager.stopSeekBarUpdate();
     }
 
     @Override
-    public void onError(int what, int extra) {
+    public void onError(String errorMsg) {
+        mTimerTaskManager.stopSeekBarUpdate();
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mTimerTaskManager.onRemoveUpdateProgressTask();
+        MusicManager.get().removePlayerEventListener(this);
     }
 }

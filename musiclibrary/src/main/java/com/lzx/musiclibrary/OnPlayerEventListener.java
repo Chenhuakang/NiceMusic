@@ -31,5 +31,5 @@ public interface OnPlayerEventListener {
     void onPlayCompletion();
 
 
-    void onError(int what, int extra);
+    void onError(String errorMsg);
 }

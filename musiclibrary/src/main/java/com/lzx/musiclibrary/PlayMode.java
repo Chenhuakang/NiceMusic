@@ -40,4 +40,12 @@ public class PlayMode {
         this.currPlayMode = currPlayMode;
         SPUtils.put(context, "music_key_play_model", currPlayMode);
     }
+
+    public int getCurrPlayMode() {
+        return currPlayMode;
+    }
+
+    public void setCurrPlayMode(int currPlayMode) {
+        this.currPlayMode = currPlayMode;
+    }
 }

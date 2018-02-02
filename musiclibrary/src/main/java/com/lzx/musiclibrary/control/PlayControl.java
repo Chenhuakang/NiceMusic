@@ -11,7 +11,9 @@ import com.lzx.musiclibrary.playback.PlaybackManager;
 import com.lzx.musiclibrary.playback.QueueManager;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by xian on 2018/1/28.
@@ -24,7 +26,7 @@ public class PlayControl implements IPlayControl, PlaybackManager.PlaybackServic
     private PlayMode mPlayMode;
     private Context mContext;
 
-    private List<OnPlayerEventListener> mOnPlayerEventListeners;
+    private CopyOnWriteArrayList<OnPlayerEventListener> mOnPlayerEventListeners;
 
     public PlayControl(Context context, QueueManager queueManager, PlaybackManager playbackManager) {
         mQueueManager = queueManager;
@@ -32,7 +34,7 @@ public class PlayControl implements IPlayControl, PlaybackManager.PlaybackServic
         mContext = context;
         mPlayMode = new PlayMode();
         mPlaybackManager.setServiceCallback(this);
-        mOnPlayerEventListeners = new ArrayList<>();
+        mOnPlayerEventListeners = new CopyOnWriteArrayList<>();
     }
 
     @Override
@@ -137,24 +139,22 @@ public class PlayControl implements IPlayControl, PlaybackManager.PlaybackServic
 
     @Override
     public void playNext() {
-        MusicInfo playInfo = mQueueManager.getNextMusicInfo();
-        mQueueManager.setCurrentQueueItem(playInfo.musicId, QueueHelper.isNeedToSwitchMusic(mQueueManager, playInfo));
+        mPlaybackManager.playNextOrPre(1);
     }
 
     @Override
     public void playPre() {
-        MusicInfo playInfo = mQueueManager.getPreMusicInfo();
-        mQueueManager.setCurrentQueueItem(playInfo.musicId, QueueHelper.isNeedToSwitchMusic(mQueueManager, playInfo));
+        mPlaybackManager.playNextOrPre(-1);
     }
 
     @Override
     public boolean hasPre() {
-        return false;
+        return mPlaybackManager.hasNextOrPre();
     }
 
     @Override
     public boolean hasNext() {
-        return false;
+        return mPlaybackManager.hasNextOrPre();
     }
 
     @Override
@@ -202,6 +202,20 @@ public class PlayControl implements IPlayControl, PlaybackManager.PlaybackServic
     }
 
     @Override
+    public void removePlayerEventListener(OnPlayerEventListener listener) {
+        if (listener != null) {
+            if (mOnPlayerEventListeners.contains(listener)) {
+                mOnPlayerEventListeners.remove(listener);
+            }
+        }
+    }
+
+    @Override
+    public void clearPlayerEventListener() {
+        mOnPlayerEventListeners.clear();
+    }
+
+    @Override
     public void onPlaybackStart() {
         for (OnPlayerEventListener listener : mOnPlayerEventListeners) {
             listener.onPlayerStart();
@@ -219,6 +233,20 @@ public class PlayControl implements IPlayControl, PlaybackManager.PlaybackServic
     public void onPlaybackStop() {
         for (OnPlayerEventListener listener : mOnPlayerEventListeners) {
             listener.onPlayerStop();
+        }
+    }
+
+    @Override
+    public void onPlaybackError(String errorMsg) {
+        for (OnPlayerEventListener listener : mOnPlayerEventListeners) {
+            listener.onError(errorMsg);
+        }
+    }
+
+    @Override
+    public void onPlaybackCompletion() {
+        for (OnPlayerEventListener listener : mOnPlayerEventListeners) {
+            listener.onPlayCompletion();
         }
     }
 

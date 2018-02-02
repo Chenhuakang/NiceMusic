@@ -181,7 +181,7 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
             if (source != null) {
                 source = source.replaceAll(" ", "%20"); // Escape spaces for URLs
             }
-            LogUtil.i("source = " + source);
+
             if (mExoPlayer == null) {
                 mExoPlayer = ExoPlayerFactory.newSimpleInstance(mContext, new DefaultTrackSelector(), new DefaultLoadControl());
                 mExoPlayer.addListener(mEventListener);
