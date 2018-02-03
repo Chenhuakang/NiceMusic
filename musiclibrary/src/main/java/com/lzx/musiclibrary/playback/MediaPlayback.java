@@ -3,7 +3,7 @@ package com.lzx.musiclibrary.playback;
 import android.content.Context;
 import android.media.MediaPlayer;
 
-import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
 
 /**
  * Created by xian on 2018/1/20.

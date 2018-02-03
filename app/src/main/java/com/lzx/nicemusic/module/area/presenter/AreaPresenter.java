@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
 import com.lzx.nicemusic.db.CacheManager;
-import com.lzx.musiclibrary.bean.MusicInfo;
-import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.utils.SpUtil;
 
 import java.util.List;
@@ -51,7 +49,7 @@ public class AreaPresenter extends BasePresenter<AreaContract.View> implements A
                     mView.loadAreaDataSuccess(infoList);
                     updateCache(topid);
                 }, throwable -> {
-                    LogUtil.i("-requestAreaData->" + throwable.getMessage());
+                   LogUtil.i("-requestAreaData->" + throwable.getMessage());
                 });
         addSubscribe(disposable);
     }

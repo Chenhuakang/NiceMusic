@@ -2,7 +2,7 @@ package com.lzx.musiclibrary.helper;
 
 import android.support.v4.media.MediaMetadataCompat;
 
-import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
 
 import java.util.ArrayList;
 import java.util.List;

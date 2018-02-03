@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.lzx.nicemusic.R;
-import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.nicemusic.utils.FormatUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.SquareImageView;
@@ -22,6 +21,7 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
  */
 
 public class AreaSection extends StatelessSection {
+
 
     private Context mContext;
     private List<MusicInfo> mMusicInfos = new ArrayList<>();

@@ -3,7 +3,7 @@ package com.lzx.musiclibrary.helper;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 
-import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.playback.QueueManager;
 
 import java.util.ArrayList;

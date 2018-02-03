@@ -8,7 +8,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.lzx.musiclibrary.PlayMode;
-import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.helper.QueueHelper;
 
 

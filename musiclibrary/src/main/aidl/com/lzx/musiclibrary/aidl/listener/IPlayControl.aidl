@@ -1,34 +1,29 @@
-package com.lzx.musiclibrary.control;
+// IPlayControl.aidl
+package com.lzx.musiclibrary.aidl.listener;
 
-import com.lzx.musiclibrary.OnPlayerEventListener;
-import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.listener.IOnPlayerEventListener;
 
-import java.util.List;
+interface IPlayControl {
 
-/**
- * Created by xian on 2018/1/28.
- */
-
-
-public interface IPlayControl {
 
     //播放，并设置播放列表
-    void playMusic(List<MusicInfo> list, int index);
+     void playMusic(in List<MusicInfo> list, int index);
 
     //根据音乐信息播放
-    void playMusic(MusicInfo info);
+     void playMusicByInfo(in MusicInfo info);
 
     //根据索引播放
-    void playMusic(int index);
+    void playMusicByIndex(int index);
 
     //定时播放
-    void playMusicAutoStopWhen(List<MusicInfo> list, int index, int time);
+    void playMusicAutoStopWhen(in List<MusicInfo> list, int index, int time);
 
     //定时播放
-    void playMusicAutoStopWhen(MusicInfo info, int time);
+    void playMusicByInfoAutoStopWhen(in MusicInfo info, int time);
 
     //定时播放
-    void playMusicAutoStopWhen(int index, int time);
+    void playMusicByIndexAutoStopWhen(int index, int time);
 
     //设置定时时间
     void setAutoStopTime(int time);
@@ -46,10 +41,10 @@ public interface IPlayControl {
     void stopMusic();
 
     //设置播放列表
-    void setPlayList(List<MusicInfo> list);
+    void setPlayList(in List<MusicInfo> list);
 
     //设置播放列表
-    void setPlayList(List<MusicInfo> list,int index);
+    void setPlayListWithIndex(in List<MusicInfo> list,int index);
 
     //得到播放列表
     List<MusicInfo> getPlayList();
@@ -79,7 +74,7 @@ public interface IPlayControl {
     MusicInfo getCurrPlayingMusic();
 
     //设置当前音乐信息
-    void setCurrMusic( int index);
+    void setCurrMusic(int index);
 
     //设置播放模式
     void setPlayMode(int mode);
@@ -96,9 +91,7 @@ public interface IPlayControl {
     //初始化
     void reset();
 
-    void addPlayerEventListener(OnPlayerEventListener listener);
+    void registerPlayerEventListener(IOnPlayerEventListener listener);
 
-    void removePlayerEventListener(OnPlayerEventListener listener);
-
-    void clearPlayerEventListener();
+    void unregisterPlayerEventListener(IOnPlayerEventListener listener);
 }

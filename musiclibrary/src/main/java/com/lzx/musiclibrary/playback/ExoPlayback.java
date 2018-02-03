@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.net.Uri;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -28,9 +27,8 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.lzx.musiclibrary.MusicService;
-import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.manager.FocusAndLockManager;
-import com.lzx.musiclibrary.utils.LogUtil;
 
 import static com.google.android.exoplayer2.C.CONTENT_TYPE_MUSIC;
 import static com.google.android.exoplayer2.C.USAGE_MEDIA;
@@ -127,19 +125,19 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
         //STATE_READY     可以从当前位置立即进行播放。 如果  {@link #getPlayWhenReady（）}为true，立即播放，否则暂停。
         //STATE_ENDED     已经完成播放媒体。
         if (mExoPlayer == null) {
-            return mExoPlayerNullIsStopped ? PlaybackStateCompat.STATE_STOPPED : PlaybackStateCompat.STATE_NONE;
+            return mExoPlayerNullIsStopped ? State.STATE_STOPPED : State.STATE_NONE;
         }
         switch (mExoPlayer.getPlaybackState()) {
             case Player.STATE_IDLE:
-                return PlaybackStateCompat.STATE_PAUSED;
+                return State.STATE_IDLE;
             case Player.STATE_BUFFERING:
-                return PlaybackStateCompat.STATE_BUFFERING;
+                return State.STATE_BUFFERING;
             case Player.STATE_READY:
-                return mExoPlayer.getPlayWhenReady() ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED;
+                return mExoPlayer.getPlayWhenReady() ? State.STATE_PLAYING : State.STATE_PAUSED;
             case Player.STATE_ENDED:
-                return PlaybackStateCompat.STATE_PAUSED;
+                return State.STATE_ENDED;
             default:
-                return PlaybackStateCompat.STATE_NONE;
+                return State.STATE_NONE;
         }
     }
 

@@ -10,15 +10,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
-import com.lzx.musiclibrary.bean.MusicInfo;
-import com.lzx.musiclibrary.control.IPlayControl;
-import com.lzx.musiclibrary.control.PlayControl;
+import com.lzx.musiclibrary.aidl.listener.PlayControl;
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.playback.ExoPlayback;
 import com.lzx.musiclibrary.playback.MediaPlayback;
 import com.lzx.musiclibrary.playback.Playback;
 import com.lzx.musiclibrary.playback.PlaybackManager;
 import com.lzx.musiclibrary.playback.QueueManager;
-import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -35,8 +33,8 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
     private QueueManager mQueueManager;
     private MediaSessionCompat mSession;
     private DelayedStopHandler mDelayedStopHandler;
-    private IPlayControl mPlayControl;
     private Playback playback;
+    private Binder mBinder;
 
     @Override
     public void onCreate() {
@@ -45,41 +43,25 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
         mQueueManager = new QueueManager(this);
     }
 
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        boolean isUseMediaPlayer = intent.getBooleanExtra("isUseMediaPlayer", false);
+        init(isUseMediaPlayer);
+        return mBinder;
+    }
 
     public void init(boolean isUseMediaPlayer) {
-        if (isUseMediaPlayer) {
-            playback = new MediaPlayback(this);
-        } else {
-            playback = new ExoPlayback(this);
-        }
+        playback = isUseMediaPlayer ? new MediaPlayback(this) : new ExoPlayback(this);
         mPlaybackManager = new PlaybackManager(playback, mQueueManager);
         mPlaybackManager.setServiceCallback(this);
-        mPlayControl = new PlayControl(this, mQueueManager, mPlaybackManager);
+        mPlaybackManager.updatePlaybackState(null);
 
         mSession = new MediaSessionCompat(this, "MusicService");
         mSession.setCallback(mPlaybackManager.getMediaSessionCallback());
         mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
-        mPlaybackManager.updatePlaybackState(null);
-
-        LogUtil.i("服务初始化成功....");
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return new PlayBinder();
-    }
-
-    public class PlayBinder extends Binder {
-
-        public MusicService getService() {
-            return MusicService.this;
-        }
-
-        public IPlayControl getPlayControl() {
-            return mPlayControl;
-        }
+        mBinder = new PlayControl(this, mQueueManager, mPlaybackManager);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.lzx.nicemusic.module.area.presenter;
 
 import com.lzx.nicemusic.base.mvp.BaseContract;
-import com.lzx.musiclibrary.bean.MusicInfo;
 
 import java.util.List;
 
@@ -11,7 +10,7 @@ import java.util.List;
 
 public interface AreaContract {
     interface View extends BaseContract.BaseView {
-        void loadAreaDataSuccess(List<MusicInfo> infoList);
+       void loadAreaDataSuccess(List<MusicInfo> infoList);
     }
 
     interface Presenter<T> extends BaseContract.BasePresenter<T> {

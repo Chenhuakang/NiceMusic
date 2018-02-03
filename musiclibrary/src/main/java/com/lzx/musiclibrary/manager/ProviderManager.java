@@ -6,7 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.db.DbConstants;
 import com.lzx.musiclibrary.db.MusicContentProvider;
 import com.lzx.musiclibrary.playback.QueueManager;

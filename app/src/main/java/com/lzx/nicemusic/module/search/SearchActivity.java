@@ -12,12 +12,10 @@ import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
-import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.nicemusic.module.search.presenter.SearchContract;
 import com.lzx.nicemusic.module.search.presenter.SearchPresenter;
 import com.lzx.nicemusic.module.search.sectioned.SearchHistorySection;
 import com.lzx.nicemusic.module.search.sectioned.SearchResultSection;
-import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

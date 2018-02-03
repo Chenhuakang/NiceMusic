@@ -1,4 +1,4 @@
-package com.lzx.musiclibrary.bean;
+package com.lzx.musiclibrary.aidl.model;
 
 import android.graphics.Bitmap;
 import android.os.Parcel;
@@ -158,6 +158,10 @@ public class MusicInfo implements Parcelable {
         this.temp_7 = in.readString();
         this.temp_8 = in.readString();
         this.temp_9 = in.readString();
+    }
+
+    public MusicInfo readFromParcel(Parcel source){
+        return new MusicInfo(source);
     }
 
     public static final Parcelable.Creator<MusicInfo> CREATOR = new Parcelable.Creator<MusicInfo>() {

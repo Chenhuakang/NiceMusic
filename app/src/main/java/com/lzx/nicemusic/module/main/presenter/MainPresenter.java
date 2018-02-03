@@ -7,8 +7,6 @@ import com.google.gson.reflect.TypeToken;
 import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
 import com.lzx.nicemusic.db.CacheManager;
 import com.lzx.nicemusic.helper.DataHelper;
-import com.lzx.musiclibrary.bean.MusicInfo;
-import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -5,7 +5,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 
 import com.lzx.musiclibrary.AlbumArtCache;
-import com.lzx.musiclibrary.bean.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.helper.QueueHelper;
 
 import java.util.ArrayList;

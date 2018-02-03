@@ -7,8 +7,6 @@ import android.os.Build;
 import android.os.Looper;
 import android.widget.Toast;
 
-import com.lzx.musiclibrary.utils.LogUtil;
-
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;

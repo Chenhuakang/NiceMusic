@@ -1,7 +1,5 @@
 package com.lzx.nicemusic.helper;
 
-import com.lzx.musiclibrary.bean.MusicInfo;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,9 +39,12 @@ public class DataHelper {
         }
     }
 
+
     /**
      * 得到一个随机列表
      *
+     * @param list
+     * @param size
      * @return
      */
     public static List<MusicInfo> getShuffleMusicList(List<MusicInfo> list, int size) {
@@ -57,6 +58,11 @@ public class DataHelper {
 
     /**
      * 解析json
+     *
+     * @param responseBody
+     * @return
+     * @throws IOException
+     * @throws JSONException
      */
     public static List<MusicInfo> fetchJSONFromUrl(ResponseBody responseBody) throws IOException, JSONException {
         List<MusicInfo> musicInfos = new ArrayList<>();
@@ -120,6 +126,5 @@ public class DataHelper {
         }
         return musicInfos;
     }
-
 
 }

@@ -9,7 +9,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.lzx.nicemusic.R;
-import com.lzx.musiclibrary.bean.MusicInfo;
 import com.lzx.nicemusic.module.play.PlayingDetailActivity;
 import com.lzx.nicemusic.utils.FormatUtil;
 import com.lzx.nicemusic.utils.GlideUtil;

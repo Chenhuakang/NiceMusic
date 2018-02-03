@@ -1,7 +1,6 @@
 package com.lzx.nicemusic.module.search.presenter;
 
 import com.lzx.nicemusic.base.mvp.BaseContract;
-import com.lzx.musiclibrary.bean.MusicInfo;
 
 import java.util.List;
 

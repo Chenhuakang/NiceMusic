@@ -5,7 +5,6 @@ import android.widget.Toast;
 import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
 import com.lzx.nicemusic.db.CacheManager;
 import com.lzx.nicemusic.module.main.presenter.MainModel;
-import com.lzx.musiclibrary.utils.LogUtil;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
