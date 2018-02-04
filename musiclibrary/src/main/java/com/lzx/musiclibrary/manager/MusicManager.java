@@ -5,7 +5,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 import android.os.RemoteException;
 
 import com.lzx.musiclibrary.MusicService;
@@ -14,7 +17,9 @@ import com.lzx.musiclibrary.aidl.listener.IPlayControl;
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
@@ -24,18 +29,31 @@ import java.util.List;
 
 public class MusicManager implements IPlayControl {
 
+    private static final int MSG_MUSIC_CHANGE = 0;
+    private static final int MSG_PLAYER_START = 1;
+    private static final int MSG_PLAYER_PAUSE = 2;
+    private static final int MSG_PLAYER_STOP = 3;
+    private static final int MSG_PLAY_COMPLETION = 4;
+    private static final int MSG_PLAYER_ERROR = 5;
+    private static final int MSG_BUFFERING = 6;
+
     private Context mContext;
     private boolean isUseMediaPlayer;
     private IPlayControl control;
+    private ClientHandler mClientHandler;
+    private CopyOnWriteArrayList<OnPlayerEventListener> mPlayerEventListeners = new CopyOnWriteArrayList<>();
 
     public static MusicManager get() {
         return SingletonHolder.sInstance;
     }
 
-
     private static class SingletonHolder {
         @SuppressLint("StaticFieldLeak")
         private static final MusicManager sInstance = new MusicManager();
+    }
+
+    MusicManager() {
+        mClientHandler = new ClientHandler(this);
     }
 
     public MusicManager setContext(Context context) {
@@ -48,7 +66,7 @@ public class MusicManager implements IPlayControl {
         return this;
     }
 
-    public void build() {
+    public void bindService() {
         Intent intent = new Intent(mContext, MusicService.class);
         intent.putExtra("isUseMediaPlayer", isUseMediaPlayer);
         mContext.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
@@ -72,48 +90,143 @@ public class MusicManager implements IPlayControl {
     };
 
     public void unbindService() {
+        try {
+            if (control != null && control.asBinder().isBinderAlive()) {
+                control.unregisterPlayerEventListener(mOnPlayerEventListener);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
         mContext.unbindService(mServiceConnection);
     }
 
-    private OnPlayerEventListener mOnPlayerEventListener = new OnPlayerEventListener() {
+    private IOnPlayerEventListener mOnPlayerEventListener = new IOnPlayerEventListener.Stub() {
         @Override
         public void onMusicChange(MusicInfo music) {
-
+            mClientHandler.obtainMessage(MSG_MUSIC_CHANGE, music).sendToTarget();
         }
 
         @Override
         public void onPlayerStart() {
-
+            mClientHandler.obtainMessage(MSG_PLAYER_START).sendToTarget();
         }
 
         @Override
         public void onPlayerPause() {
-
+            mClientHandler.obtainMessage(MSG_PLAYER_PAUSE).sendToTarget();
         }
 
         @Override
         public void onPlayerStop() {
-
+            mClientHandler.obtainMessage(MSG_PLAYER_STOP).sendToTarget();
         }
 
         @Override
         public void onPlayCompletion() {
-
+            mClientHandler.obtainMessage(MSG_PLAY_COMPLETION).sendToTarget();
         }
 
         @Override
         public void onError(String errorMsg) {
-
+            mClientHandler.obtainMessage(MSG_PLAYER_ERROR, errorMsg).sendToTarget();
         }
 
         @Override
-        public void onBuffering(boolean isFinishBuffer) throws RemoteException {
-
+        public void onBuffering(boolean isFinishBuffer) {
+            mClientHandler.obtainMessage(MSG_BUFFERING, isFinishBuffer).sendToTarget();
         }
     };
 
-    private MusicManager() {
+    private static class ClientHandler extends Handler {
 
+        private final WeakReference<MusicManager> mWeakReference;
+
+        ClientHandler(MusicManager manager) {
+            super(Looper.getMainLooper());
+            mWeakReference = new WeakReference<>(manager);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            MusicManager manager = mWeakReference.get();
+            switch (msg.what) {
+                case MSG_MUSIC_CHANGE:
+                    MusicInfo musicInfo = (MusicInfo) msg.obj;
+                    manager.notifyPlayerEventChange(MSG_MUSIC_CHANGE, musicInfo, "", false);
+                    break;
+                case MSG_PLAYER_START:
+                    manager.notifyPlayerEventChange(MSG_PLAYER_START, null, "", false);
+                    break;
+                case MSG_PLAYER_PAUSE:
+                    manager.notifyPlayerEventChange(MSG_PLAYER_PAUSE, null, "", false);
+                    break;
+                case MSG_PLAYER_STOP:
+                    manager.notifyPlayerEventChange(MSG_PLAYER_STOP, null, "", false);
+                    break;
+                case MSG_PLAY_COMPLETION:
+                    manager.notifyPlayerEventChange(MSG_PLAY_COMPLETION, null, "", false);
+                    break;
+                case MSG_PLAYER_ERROR:
+                    String errMsg = (String) msg.obj;
+                    manager.notifyPlayerEventChange(MSG_PLAYER_ERROR, null, errMsg, false);
+                    break;
+                case MSG_BUFFERING:
+                    boolean isFinishBuffer = (boolean) msg.obj;
+                    manager.notifyPlayerEventChange(MSG_BUFFERING, null, "", isFinishBuffer);
+                    break;
+                default:
+                    super.handleMessage(msg);
+                    break;
+            }
+        }
+    }
+
+    public void addPlayerEventListener(OnPlayerEventListener listener) {
+        if (listener != null) {
+            if (!mPlayerEventListeners.contains(listener)) {
+                mPlayerEventListeners.add(listener);
+            }
+        }
+    }
+
+    public void removePlayerEventListener(OnPlayerEventListener listener) {
+        if (listener != null) {
+            if (mPlayerEventListeners.contains(listener)) {
+                mPlayerEventListeners.remove(listener);
+            }
+        }
+    }
+
+    public void clearPlayerEventListener() {
+        mPlayerEventListeners.clear();
+    }
+
+    private void notifyPlayerEventChange(int msg, MusicInfo info, String errorMsg, boolean isFinishBuffer) {
+        for (OnPlayerEventListener listener : mPlayerEventListeners) {
+            switch (msg) {
+                case MSG_MUSIC_CHANGE:
+                    listener.onMusicChange(info);
+                    break;
+                case MSG_PLAYER_START:
+                    listener.onPlayerStart();
+                    break;
+                case MSG_PLAYER_PAUSE:
+                    listener.onPlayerPause();
+                    break;
+                case MSG_PLAYER_STOP:
+                    listener.onPlayerStop();
+                    break;
+                case MSG_PLAY_COMPLETION:
+                    listener.onPlayCompletion();
+                    break;
+                case MSG_PLAYER_ERROR:
+                    listener.onError(errorMsg);
+                    break;
+                case MSG_BUFFERING:
+                    listener.onBuffering(isFinishBuffer);
+                    break;
+            }
+        }
     }
 
     @Override
@@ -128,147 +241,319 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public void playMusicByInfo(MusicInfo info) throws RemoteException {
-
+    public void playMusicByInfo(MusicInfo info) {
+        if (control != null) {
+            try {
+                control.playMusicByInfo(info);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public void playMusicByIndex(int index) throws RemoteException {
-
+    public void playMusicByIndex(int index) {
+        if (control != null) {
+            try {
+                control.playMusicByIndex(index);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public void playMusicAutoStopWhen(List<MusicInfo> list, int index, int time) throws RemoteException {
-
+    public void playMusicAutoStopWhen(List<MusicInfo> list, int index, int time) {
+        if (control != null) {
+            try {
+                control.playMusicAutoStopWhen(list, index, time);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public void playMusicByInfoAutoStopWhen(MusicInfo info, int time) throws RemoteException {
-
+    public void playMusicByInfoAutoStopWhen(MusicInfo info, int time) {
+        if (control != null) {
+            try {
+                control.playMusicByInfoAutoStopWhen(info, time);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public void playMusicByIndexAutoStopWhen(int index, int time) throws RemoteException {
-
+    public void playMusicByIndexAutoStopWhen(int index, int time) {
+        if (control != null) {
+            try {
+                control.playMusicByIndexAutoStopWhen(index, time);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public void setAutoStopTime(int time) throws RemoteException {
-
+    public void setAutoStopTime(int time) {
+        if (control != null) {
+            try {
+                control.setAutoStopTime(time);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public int getCurrPlayingIndex() throws RemoteException {
+    public int getCurrPlayingIndex() {
+        if (control != null) {
+            try {
+                return control.getCurrPlayingIndex();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
         return 0;
     }
 
     @Override
-    public void pauseMusic() throws RemoteException {
-
+    public void pauseMusic() {
+        if (control != null) {
+            try {
+                control.pauseMusic();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public void resumeMusic() throws RemoteException {
-
+    public void resumeMusic() {
+        if (control != null) {
+            try {
+                control.resumeMusic();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public void stopMusic() throws RemoteException {
-
+    public void stopMusic() {
+        if (control != null) {
+            try {
+                control.stopMusic();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public void setPlayList(List<MusicInfo> list) throws RemoteException {
-
+    public void setPlayList(List<MusicInfo> list) {
+        if (control != null) {
+            try {
+                control.setPlayList(list);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public void setPlayListWithIndex(List<MusicInfo> list, int index) throws RemoteException {
-
+    public void setPlayListWithIndex(List<MusicInfo> list, int index) {
+        if (control != null) {
+            try {
+                control.setPlayListWithIndex(list, index);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public List<MusicInfo> getPlayList() throws RemoteException {
+    public List<MusicInfo> getPlayList() {
+        if (control != null) {
+            try {
+                return control.getPlayList();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
         return null;
     }
 
     @Override
-    public int getStatus() throws RemoteException {
+    public int getStatus() {
+        if (control != null) {
+            try {
+                return control.getStatus();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
         return 0;
     }
 
     @Override
-    public void playNext() throws RemoteException {
-
+    public void playNext() {
+        if (control != null) {
+            try {
+                control.playNext();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public void playPre() throws RemoteException {
-
+    public void playPre() {
+        if (control != null) {
+            try {
+                control.playPre();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public boolean hasPre() throws RemoteException {
+    public boolean hasPre() {
+        if (control != null) {
+            try {
+                return control.hasPre();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
         return false;
     }
 
     @Override
-    public boolean hasNext() throws RemoteException {
+    public boolean hasNext() {
+        if (control != null) {
+            try {
+                return control.hasNext();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
         return false;
     }
 
     @Override
-    public MusicInfo getPreMusic() throws RemoteException {
+    public MusicInfo getPreMusic() {
+        if (control != null) {
+            try {
+                return control.getPreMusic();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
         return null;
     }
 
     @Override
-    public MusicInfo getNextMusic() throws RemoteException {
+    public MusicInfo getNextMusic() {
+        if (control != null) {
+            try {
+                return control.getNextMusic();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
         return null;
     }
 
     @Override
-    public MusicInfo getCurrPlayingMusic() throws RemoteException {
+    public MusicInfo getCurrPlayingMusic() {
+        if (control != null) {
+            try {
+                return control.getCurrPlayingMusic();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
         return null;
     }
 
     @Override
-    public void setCurrMusic(int index) throws RemoteException {
-
+    public void setCurrMusic(int index) {
+        if (control != null) {
+            try {
+                control.setCurrMusic(index);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public void setPlayMode(int mode) throws RemoteException {
-
+    public void setPlayMode(int mode) {
+        if (control != null) {
+            try {
+                control.setPlayMode(mode);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public int getPlayMode() throws RemoteException {
+    public int getPlayMode() {
+        if (control != null) {
+            try {
+                return control.getPlayMode();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
         return 0;
     }
 
     @Override
-    public long getProgress() throws RemoteException {
+    public long getProgress() {
+        if (control != null) {
+            try {
+                return control.getProgress();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
         return 0;
     }
 
     @Override
-    public void seekTo(int position) throws RemoteException {
+    public void seekTo(int position) {
+        if (control != null) {
+            try {
+                control.seekTo(position);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void reset() {
+        if (control != null) {
+            try {
+                control.reset();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void registerPlayerEventListener(IOnPlayerEventListener listener) {
 
     }
 
     @Override
-    public void reset() throws RemoteException {
-
-    }
-
-    @Override
-    public void registerPlayerEventListener(IOnPlayerEventListener listener) throws RemoteException {
-
-    }
-
-    @Override
-    public void unregisterPlayerEventListener(IOnPlayerEventListener listener) throws RemoteException {
+    public void unregisterPlayerEventListener(IOnPlayerEventListener listener) {
 
     }
 

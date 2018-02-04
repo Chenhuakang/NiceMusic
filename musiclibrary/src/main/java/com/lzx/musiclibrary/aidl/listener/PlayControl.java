@@ -42,7 +42,7 @@ public class PlayControl extends IPlayControl.Stub implements PlaybackManager.Pl
     private class NotifyStatusChange implements NotifyContract.NotifyStatusChanged {
 
         @Override
-        public void notify(MusicInfo info, int index, int status) {
+        public void notify(MusicInfo info, int index, int status, String errorMsg) {
             synchronized (NotifyStatusChange.class) {
                 final int N = mRemoteCallbackList.beginBroadcast();
                 for (int i = 0; i < N; i++) {
@@ -69,7 +69,7 @@ public class PlayControl extends IPlayControl.Stub implements PlaybackManager.Pl
                                 case State.STATE_STOPPED:
                                     listener.onPlayerStop();
                                     break;
-                                case State.STATE_NONE:
+                                case State.STATE_ERROR:
                                     listener.onError("");
                                     break;
                                 default:
@@ -86,37 +86,11 @@ public class PlayControl extends IPlayControl.Stub implements PlaybackManager.Pl
         }
     }
 
-    @Override
-    public void onPlaybackStart() {
-        try {
-            mNotifyStatusChanged.notify(getCurrPlayingMusic(), getCurrPlayingIndex(), State.STATE_PLAYING);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onPlaybackPause() {
-        try {
-            mNotifyStatusChanged.notify(getCurrPlayingMusic(), getCurrPlayingIndex(), State.STATE_PAUSED);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onPlaybackStop() {
-        try {
-            mNotifyStatusChanged.notify(getCurrPlayingMusic(), getCurrPlayingIndex(), State.STATE_STOPPED);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public void onPlaybackError(String errorMsg) {
         try {
-            mNotifyStatusChanged.notify(getCurrPlayingMusic(), getCurrPlayingIndex(), State.STATE_NONE);
+            mNotifyStatusChanged.notify(getCurrPlayingMusic(), getCurrPlayingIndex(), State.STATE_ERROR, errorMsg);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -124,11 +98,7 @@ public class PlayControl extends IPlayControl.Stub implements PlaybackManager.Pl
 
     @Override
     public void onPlaybackCompletion() {
-        try {
-            mNotifyStatusChanged.notify(getCurrPlayingMusic(), getCurrPlayingIndex(), State.STATE_ENDED);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+
     }
 
     @Override
@@ -137,8 +107,12 @@ public class PlayControl extends IPlayControl.Stub implements PlaybackManager.Pl
     }
 
     @Override
-    public void onPlaybackStateUpdated(PlaybackStateCompat newState) {
-
+    public void onPlaybackStateUpdated(int state, PlaybackStateCompat newState) {
+        try {
+            mNotifyStatusChanged.notify(getCurrPlayingMusic(), getCurrPlayingIndex(), state, null);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.lzx.nicemusic.module.splash.presenter;
 
 import android.widget.Toast;
 
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
 import com.lzx.nicemusic.db.CacheManager;
 import com.lzx.nicemusic.module.main.presenter.MainModel;

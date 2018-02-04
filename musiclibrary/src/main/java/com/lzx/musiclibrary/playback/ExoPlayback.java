@@ -29,6 +29,7 @@ import com.google.android.exoplayer2.util.Util;
 import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.manager.FocusAndLockManager;
+import com.lzx.musiclibrary.utils.LogUtil;
 
 import static com.google.android.exoplayer2.C.CONTENT_TYPE_MUSIC;
 import static com.google.android.exoplayer2.C.USAGE_MEDIA;
@@ -124,21 +125,26 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
         //STATE_BUFFERING 无法立即从当前位置进行播放
         //STATE_READY     可以从当前位置立即进行播放。 如果  {@link #getPlayWhenReady（）}为true，立即播放，否则暂停。
         //STATE_ENDED     已经完成播放媒体。
+        int state = State.STATE_NONE;
         if (mExoPlayer == null) {
-            return mExoPlayerNullIsStopped ? State.STATE_STOPPED : State.STATE_NONE;
+            state = mExoPlayerNullIsStopped ? State.STATE_STOPPED : State.STATE_NONE;
+        } else {
+            switch (mExoPlayer.getPlaybackState()) {
+                case Player.STATE_IDLE:
+                    state = State.STATE_IDLE;
+                    break;
+                case Player.STATE_BUFFERING:
+                    state = State.STATE_BUFFERING;
+                    break;
+                case Player.STATE_READY:
+                    state = mExoPlayer.getPlayWhenReady() ? State.STATE_PLAYING : State.STATE_PAUSED;
+                    break;
+                case Player.STATE_ENDED:
+                    state = State.STATE_ENDED;
+                    break;
+            }
         }
-        switch (mExoPlayer.getPlaybackState()) {
-            case Player.STATE_IDLE:
-                return State.STATE_IDLE;
-            case Player.STATE_BUFFERING:
-                return State.STATE_BUFFERING;
-            case Player.STATE_READY:
-                return mExoPlayer.getPlayWhenReady() ? State.STATE_PLAYING : State.STATE_PAUSED;
-            case Player.STATE_ENDED:
-                return State.STATE_ENDED;
-            default:
-                return State.STATE_NONE;
-        }
+        return state;
     }
 
     @Override
@@ -191,20 +197,14 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
                     .build();
             mExoPlayer.setAudioAttributes(audioAttributes);
 
-            // Produces DataSource instances through which media data is loaded.
             DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(mContext, Util.getUserAgent(mContext, "musiclibrary"), null);
-            // Produces Extractor instances for parsing the media data.
+
             ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-            // The MediaSource represents the media to be played.
+
             MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(source), dataSourceFactory, extractorsFactory, null, null);
 
-            // Prepares media to play (happens on background thread) and triggers
-            // {@code onPlayerStateChanged} callback when the stream is ready to play.
             mExoPlayer.prepare(mediaSource);
 
-            // If we are streaming from the internet, we want to hold a
-            // Wifi lock, which prevents the Wifi radio from going to
-            // sleep while the song is playing.
             mFocusAndLockManager.acquireWifiLock();
         }
 
@@ -324,19 +324,23 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            switch (playbackState) {
-                case Player.STATE_IDLE:
-                case Player.STATE_BUFFERING:
-                case Player.STATE_READY:
-                    if (mCallback != null) {
-                        mCallback.onPlaybackStatusChanged(getState());
-                    }
-                    break;
-                case Player.STATE_ENDED:
-                    if (mCallback != null) {
+            LogUtil.i("playWhenReady = " + playWhenReady + " playbackState = " + playbackState);
+            if (mCallback != null) {
+                switch (playbackState) {
+                    case Player.STATE_IDLE:
+                        mCallback.onPlaybackStatusChanged(State.STATE_IDLE);
+                        break;
+                    case Player.STATE_BUFFERING:
+                        mCallback.onPlaybackStatusChanged(State.STATE_BUFFERING);
+                        break;
+                    case Player.STATE_READY:
+                        mCallback.onPlaybackStatusChanged(playWhenReady ? State.STATE_PLAYING : State.STATE_PAUSED);
+                        break;
+                    case Player.STATE_ENDED:
                         mCallback.onPlayCompletion();
-                    }
-                    break;
+                        mCallback.onPlaybackStatusChanged(State.STATE_ENDED);
+                        break;
+                }
             }
         }
 

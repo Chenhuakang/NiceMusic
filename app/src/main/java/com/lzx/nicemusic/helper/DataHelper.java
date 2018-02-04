@@ -1,5 +1,7 @@
 package com.lzx.nicemusic.helper;
 
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

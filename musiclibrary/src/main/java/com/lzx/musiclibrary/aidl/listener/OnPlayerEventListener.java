@@ -7,22 +7,18 @@ import com.lzx.musiclibrary.aidl.model.MusicInfo;
  * @date 2018/2/3
  */
 
-public abstract class OnPlayerEventListener extends IOnPlayerEventListener.Stub {
-    @Override
-    public abstract void onMusicChange(MusicInfo music);
+public interface OnPlayerEventListener {
+    void onMusicChange(MusicInfo music);
 
-    @Override
-    public abstract void onPlayerStart();
+    void onPlayerStart();
 
-    @Override
-    public abstract void onPlayerPause();
+    void onPlayerPause();
 
-    @Override
-    public abstract void onPlayerStop();
+    void onPlayerStop();
 
-    @Override
-    public abstract void onPlayCompletion();
+    void onPlayCompletion();
 
-    @Override
-    public abstract void onError(String errorMsg);
+    void onError(String errorMsg);
+
+    void onBuffering(boolean isFinishBuffer);
 }

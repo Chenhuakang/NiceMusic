@@ -1,6 +1,8 @@
 package com.lzx.nicemusic.module.area.presenter;
 
 
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
+
 import java.util.List;
 
 import io.reactivex.Observable;

@@ -1,5 +1,6 @@
 package com.lzx.nicemusic.module.area.presenter;
 
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.nicemusic.base.mvp.BaseContract;
 
 import java.util.List;

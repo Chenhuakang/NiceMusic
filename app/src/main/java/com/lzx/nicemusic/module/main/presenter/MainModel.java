@@ -1,6 +1,7 @@
 package com.lzx.nicemusic.module.main.presenter;
 
 import com.google.gson.Gson;
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.nicemusic.db.CacheManager;
 import com.lzx.nicemusic.helper.DataHelper;
 import com.lzx.nicemusic.network.RetrofitHelper;

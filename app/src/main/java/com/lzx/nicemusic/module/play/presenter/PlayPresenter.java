@@ -1,6 +1,7 @@
 package com.lzx.nicemusic.module.play.presenter;
 
 import com.google.gson.Gson;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
 import com.lzx.nicemusic.bean.SingerInfo;
 import com.lzx.nicemusic.network.RetrofitHelper;

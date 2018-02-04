@@ -17,6 +17,7 @@ import com.lzx.musiclibrary.playback.MediaPlayback;
 import com.lzx.musiclibrary.playback.Playback;
 import com.lzx.musiclibrary.playback.PlaybackManager;
 import com.lzx.musiclibrary.playback.QueueManager;
+import com.lzx.musiclibrary.playback.State;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -39,8 +40,7 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
     @Override
     public void onCreate() {
         super.onCreate();
-        mDelayedStopHandler = new DelayedStopHandler(this);
-        mQueueManager = new QueueManager(this);
+
     }
 
     @Nullable
@@ -52,14 +52,18 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
     }
 
     public void init(boolean isUseMediaPlayer) {
+        mDelayedStopHandler = new DelayedStopHandler(this);
+        mQueueManager = new QueueManager(this);
+
         playback = isUseMediaPlayer ? new MediaPlayback(this) : new ExoPlayback(this);
         mPlaybackManager = new PlaybackManager(playback, mQueueManager);
         mPlaybackManager.setServiceCallback(this);
-        mPlaybackManager.updatePlaybackState(null);
 
         mSession = new MediaSessionCompat(this, "MusicService");
         mSession.setCallback(mPlaybackManager.getMediaSessionCallback());
         mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        mPlaybackManager.updatePlaybackState(null);
 
         mBinder = new PlayControl(this, mQueueManager, mPlaybackManager);
     }
@@ -88,34 +92,12 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
     }
 
     @Override
-    public void onPlaybackStart() {
-        mSession.setActive(true);
-        mDelayedStopHandler.removeCallbacksAndMessages(null);
-        startService(new Intent(getApplicationContext(), MusicService.class));
-
-    }
-
-    @Override
-    public void onPlaybackPause() {
-
-    }
-
-    @Override
     public void onNotificationRequired() {
 
     }
 
     @Override
-    public void onPlaybackStop() {
-        mDelayedStopHandler.removeCallbacksAndMessages(null);
-        mDelayedStopHandler.sendEmptyMessageDelayed(0, STOP_DELAY);
-        stopForeground(true);
-
-    }
-
-    @Override
     public void onPlaybackError(String errorMsg) {
-        onPlaybackStop();
     }
 
     @Override
@@ -124,8 +106,18 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
     }
 
     @Override
-    public void onPlaybackStateUpdated(PlaybackStateCompat newState) {
+    public void onPlaybackStateUpdated(int state, PlaybackStateCompat newState) {
         mSession.setPlaybackState(newState);
+        if (state == State.STATE_PLAYING) {
+            mSession.setActive(true);
+            mDelayedStopHandler.removeCallbacksAndMessages(null);
+            startService(new Intent(getApplicationContext(), MusicService.class));
+        }
+        if (state == State.STATE_STOPPED || state == State.STATE_ERROR) {
+            mDelayedStopHandler.removeCallbacksAndMessages(null);
+            mDelayedStopHandler.sendEmptyMessageDelayed(0, STOP_DELAY);
+            stopForeground(true);
+        }
     }
 
     @Override

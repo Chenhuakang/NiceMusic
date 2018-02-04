@@ -11,7 +11,7 @@ public interface NotifyContract {
     /**
      * 统一通知播放状态改变
      */
-    public interface NotifyStatusChanged {
-        void notify(MusicInfo info, int index, int status);
+    interface NotifyStatusChanged {
+        void notify(MusicInfo info, int index, int status, String errorMsg);
     }
 }

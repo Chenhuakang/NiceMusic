@@ -51,9 +51,6 @@ public class PlaybackManager implements Playback.Callback {
         MusicInfo currentMusic = mQueueManager.getCurrentMusic();
         if (currentMusic != null) {
             mPlayback.play(currentMusic);
-            if (mServiceCallback != null) {
-                mServiceCallback.onPlaybackStart();
-            }
         }
     }
 
@@ -63,9 +60,6 @@ public class PlaybackManager implements Playback.Callback {
     public void handlePauseRequest() {
         if (mPlayback.isPlaying()) {
             mPlayback.pause();
-            if (mServiceCallback != null) {
-                mServiceCallback.onPlaybackPause();
-            }
         }
     }
 
@@ -76,28 +70,25 @@ public class PlaybackManager implements Playback.Callback {
      */
     public void handleStopRequest(String withError) {
         mPlayback.stop(true);
-        if (mServiceCallback != null) {
-            mServiceCallback.onPlaybackStop();
-        }
         updatePlaybackState(withError);
     }
 
     /**
-     * 播放/暂停
+     * 播放/暂停/切歌
      */
     public void handlePlayPauseRequest(boolean isSwitchMusic) {
         int state = mPlayback.getState();
-        if (state == PlaybackStateCompat.STATE_STOPPED || state == PlaybackStateCompat.STATE_NONE) {
+        if (state == State.STATE_STOPPED || state == State.STATE_NONE) {
             handlePlayRequest();
-        } else if (state == PlaybackStateCompat.STATE_BUFFERING) {
+        } else if (state == State.STATE_BUFFERING) {
             handleStopRequest(null);
-        } else if (state == PlaybackStateCompat.STATE_PLAYING) {
+        } else if (state == State.STATE_PLAYING) {
             if (!isSwitchMusic) {
                 handlePauseRequest();
             } else {
                 handlePlayRequest();
             }
-        } else if (state == PlaybackStateCompat.STATE_PAUSED) {
+        } else if (state == State.STATE_PAUSED) {
             handlePlayRequest();
         }
     }
@@ -191,6 +182,11 @@ public class PlaybackManager implements Playback.Callback {
         }
     }
 
+    /**
+     * 播放状态更新回调
+     *
+     * @param state
+     */
     @Override
     public void onPlaybackStatusChanged(int state) {
         updatePlaybackState(null);
@@ -216,20 +212,20 @@ public class PlaybackManager implements Playback.Callback {
         if (mPlayback != null && mPlayback.isConnected()) {
             position = mPlayback.getCurrentStreamPosition();
         }
-        //noinspection ResourceType
+
         PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
                 .setActions(getAvailableActions());
 
+        //获取播放状态
         int state = mPlayback.getState();
-
-        // If there is an error message, send it to the playback state:
+        //如果是播放失败
         if (error != null) {
-            // Error states are really only supposed to be used for errors that cause playback to
-            // stop unexpectedly and persist until the user takes action to fix it.
+            //设置错误信息
             stateBuilder.setErrorMessage(error);
-            state = PlaybackStateCompat.STATE_ERROR;
+            state = State.STATE_ERROR;
+            mServiceCallback.onPlaybackError(error);
         }
-        //noinspection ResourceType
+        //设置播放状态
         stateBuilder.setState(state, position, 1.0f, SystemClock.elapsedRealtime());
         // Set the activeQueueItemId if the current index is valid.
         MusicInfo currentMusic = mQueueManager.getCurrentMusic();
@@ -237,12 +233,10 @@ public class PlaybackManager implements Playback.Callback {
             stateBuilder.setActiveQueueItemId(currentMusic.trackNumber);
         }
         if (mServiceCallback != null) {
-            mServiceCallback.onPlaybackStateUpdated(stateBuilder.build());
-            mServiceCallback.onPlaybackError(error);
-        }
-        //播放/暂停状态就通知通知栏更新
-        if (state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_PAUSED) {
-            if (mServiceCallback != null) {
+            //回调状态更新
+            mServiceCallback.onPlaybackStateUpdated(state, stateBuilder.build());
+            //播放/暂停状态就通知通知栏更新
+            if (state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_PAUSED) {
                 mServiceCallback.onNotificationRequired();
             }
         }
@@ -400,11 +394,11 @@ public class PlaybackManager implements Playback.Callback {
 
 
     public interface PlaybackServiceCallback {
-        void onPlaybackStart();
-
-        void onPlaybackPause();
-
-        void onPlaybackStop();
+//        void onPlaybackStart();
+//
+//        void onPlaybackPause();
+//
+//        void onPlaybackStop();
 
         void onPlaybackError(String errorMsg);
 
@@ -412,6 +406,6 @@ public class PlaybackManager implements Playback.Callback {
 
         void onNotificationRequired();
 
-        void onPlaybackStateUpdated(PlaybackStateCompat newState);
+        void onPlaybackStateUpdated(int state, PlaybackStateCompat newState);
     }
 }

@@ -2,6 +2,8 @@ package com.lzx.nicemusic.module.search.presenter;
 
 
 import com.google.gson.Gson;
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
 import com.lzx.nicemusic.db.SearchManager;
 import com.lzx.nicemusic.network.RetrofitHelper;

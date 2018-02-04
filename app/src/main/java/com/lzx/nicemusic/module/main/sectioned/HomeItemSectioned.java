@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.module.play.PlayingDetailActivity;
 import com.lzx.nicemusic.utils.FormatUtil;

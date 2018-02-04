@@ -9,6 +9,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.jakewharton.rxbinding2.widget.RxTextView;
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;

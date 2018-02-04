@@ -4,6 +4,8 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
 import com.lzx.nicemusic.db.CacheManager;
 import com.lzx.nicemusic.helper.DataHelper;
