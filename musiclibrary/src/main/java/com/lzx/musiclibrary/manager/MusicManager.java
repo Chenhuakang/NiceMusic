@@ -16,6 +16,7 @@ import com.lzx.musiclibrary.aidl.listener.IOnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.listener.IPlayControl;
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.playback.State;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -545,6 +546,42 @@ public class MusicManager implements IPlayControl {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * 判断当前的音乐是不是正在播放的音乐
+     */
+    public static boolean isCurrMusicIsPlayingMusic(MusicInfo currMusic) {
+        MusicInfo playingMusic = MusicManager.get().getCurrPlayingMusic();
+        return playingMusic != null && currMusic.musicId.equals(playingMusic.musicId);
+    }
+
+    /**
+     * 是否在暂停
+     */
+    public static boolean isPaused() {
+        return MusicManager.get().getStatus() == State.STATE_PAUSED;
+    }
+
+    /**
+     * 是否正在播放
+     */
+    public static boolean isPlaying() {
+        return MusicManager.get().getStatus() == State.STATE_PLAYING;
+    }
+
+    /**
+     * 当前的音乐是否在播放
+     */
+    public static boolean isCurrMusicIsPlaying(MusicInfo currMusic) {
+        return isCurrMusicIsPlayingMusic(currMusic) && isPlaying();
+    }
+
+    /**
+     * 当前音乐是否在暂停
+     */
+    public static boolean isCurrMusicIsPaused(MusicInfo currMusic) {
+        return isCurrMusicIsPlayingMusic(currMusic) && isPaused();
     }
 
     @Override

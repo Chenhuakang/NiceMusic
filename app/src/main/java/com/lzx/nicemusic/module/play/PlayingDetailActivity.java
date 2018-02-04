@@ -1,12 +1,17 @@
 package com.lzx.nicemusic.module.play;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -22,6 +27,7 @@ import com.lzx.nicemusic.bean.SingerInfo;
 import com.lzx.nicemusic.helper.PlayHelper;
 import com.lzx.nicemusic.module.play.presenter.PlayContract;
 import com.lzx.nicemusic.module.play.presenter.PlayPresenter;
+import com.lzx.nicemusic.utils.DisplayUtil;
 import com.lzx.nicemusic.utils.FormatUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.OuterLayerImageView;
@@ -30,16 +36,10 @@ import com.lzx.nicemusic.widget.OuterLayerImageView;
  * Created by xian on 2018/1/21.
  */
 @CreatePresenter(PlayPresenter.class)
-public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, PlayPresenter> implements PlayContract.View, View.OnClickListener, OnPlayerEventListener {
+public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, PlayPresenter> implements PlayContract.View, OnPlayerEventListener {
 
-    private TextView mMusicName, mNickname, mAlbumName, mCountry, mSingerDesc, mStartTime, mTotalTime;
-    private OuterLayerImageView mMusicCover;
-    private ImageView mAvatar, mBtnMusicList, mBtnPlayMode, mBtnPlayPause, mBtnPre, mBtnNext;
-    private Button mBtnAllMusic;
-    private SeekBar mSeekBar;
     private MusicInfo mMusicInfo;
-
-    private TimerTaskManager mTimerTaskManager;
+    private PlayingUIController mUIController;
 
     public static void launch(Context context, MusicInfo info) {
         Intent intent = new Intent(context, PlayingDetailActivity.class);
@@ -55,109 +55,16 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
     @Override
     protected void init(Bundle savedInstanceState) {
         mMusicInfo = getIntent().getParcelableExtra("MusicInfo");
-        mMusicName = findViewById(R.id.music_name);
-        mMusicCover = findViewById(R.id.music_cover);
-        mAvatar = findViewById(R.id.avatar);
-        mNickname = findViewById(R.id.nickname);
-        mAlbumName = findViewById(R.id.album_name);
-        mCountry = findViewById(R.id.country);
-        mBtnAllMusic = findViewById(R.id.btn_all_music);
-        mSingerDesc = findViewById(R.id.singer_desc);
-        mBtnMusicList = findViewById(R.id.btn_music_list);
-        mBtnPlayMode = findViewById(R.id.btn_play_mode);
-        mBtnPlayPause = findViewById(R.id.btn_play_pause);
-        mBtnPre = findViewById(R.id.btn_pre);
-        mBtnNext = findViewById(R.id.btn_next);
-        mSeekBar = findViewById(R.id.seekBar);
-        mStartTime = findViewById(R.id.start_time);
-        mTotalTime = findViewById(R.id.total_time);
 
-        mBtnAllMusic.setOnClickListener(this);
-        mBtnMusicList.setOnClickListener(this);
-        mBtnPlayMode.setOnClickListener(this);
-        mBtnPlayPause.setOnClickListener(this);
-        mBtnPre.setOnClickListener(this);
-        mBtnNext.setOnClickListener(this);
+        mUIController = new PlayingUIController(this, mMusicInfo);
+        mUIController.initViews();
+        mUIController.initialization();
 
-        mMusicName.setText(mMusicInfo.musicTitle);
-        GlideUtil.loadImageByUrl(this, mMusicInfo.musicCover, mMusicCover);
-        getPresenter().requestSingerInfo(mMusicInfo.artistId);
-
-        mTimerTaskManager = new TimerTaskManager();
-        mTimerTaskManager.setUpdateProgressTask(this::updateProgress);
         MusicManager.get().addPlayerEventListener(this);
-
-        mSeekBar.setMax((int) mMusicInfo.musicDuration);
-        mTotalTime.setText(FormatUtil.formatMusicTime(mMusicInfo.musicDuration));
-
-        if (MusicManager.get().getStatus() == State.STATE_PAUSED) {
-            if (mMusicInfo.musicId.equals(MusicManager.get().getCurrPlayingMusic().musicId)) {
-                mStartTime.setText(FormatUtil.formatMusicTime(MusicManager.get().getProgress()));
-                mSeekBar.setProgress((int) MusicManager.get().getProgress());
-                mBtnPlayPause.setImageResource(R.drawable.notify_btn_dark_play_normal);
-            }
-        }else if (MusicManager.get().getStatus() == State.STATE_PLAYING){
-            if (mMusicInfo.musicId.equals(MusicManager.get().getCurrPlayingMusic().musicId)) {
-                mStartTime.setText(FormatUtil.formatMusicTime(MusicManager.get().getProgress()));
-                mSeekBar.setProgress((int) MusicManager.get().getProgress());
-
-                mTimerTaskManager.scheduleSeekBarUpdate();
-                mBtnPlayPause.setImageResource(R.drawable.notify_btn_dark_pause_normal);
-            }
-        }
-
-        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                MusicManager.get().seekTo(seekBar.getProgress());
-            }
-        });
     }
 
     @Override
     public void onSingerInfoSuccess(SingerInfo singerInfo) {
-        GlideUtil.loadImageByUrl(this, singerInfo.getAvatar(), mAvatar);
-        mNickname.setText(mMusicInfo.musicArtist);
-        mAlbumName.setText(mMusicInfo.albumTitle);
-        mCountry.setText(singerInfo.getCountry());
-        mSingerDesc.setText(singerInfo.getIntro());
-    }
-
-    private void updateProgress() {
-        long progress = MusicManager.get().getProgress();
-        mSeekBar.setProgress((int) progress);
-        mStartTime.setText(FormatUtil.formatMusicTime(progress));
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_all_music:
-                break;
-            case R.id.btn_music_list:
-                break;
-            case R.id.btn_play_mode:
-                break;
-            case R.id.btn_play_pause:
-                PlayHelper.playMusic(this, mMusicInfo);
-                break;
-            case R.id.btn_pre:
-                MusicManager.get().playPre();
-                break;
-            case R.id.btn_next:
-                MusicManager.get().playNext();
-                break;
-        }
     }
 
     @Override
@@ -167,33 +74,27 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
 
     @Override
     public void onPlayerStart() {
-        mTimerTaskManager.scheduleSeekBarUpdate();
-        mBtnPlayPause.setImageResource(R.drawable.notify_btn_dark_pause_normal);
+        mUIController.onPlayerStart();
     }
 
     @Override
     public void onPlayerPause() {
-        mTimerTaskManager.stopSeekBarUpdate();
-        mBtnPlayPause.setImageResource(R.drawable.notify_btn_dark_play_normal);
+        mUIController.onPlayerPause();
     }
 
     @Override
     public void onPlayerStop() {
-        mTimerTaskManager.stopSeekBarUpdate();
-        mBtnPlayPause.setImageResource(R.drawable.notify_btn_dark_play_normal);
+        mUIController.onPlayerPause();
     }
 
     @Override
     public void onPlayCompletion() {
-
-        mTimerTaskManager.stopSeekBarUpdate();
-        mBtnPlayPause.setImageResource(R.drawable.notify_btn_dark_play_normal);
+        mUIController.onPlayCompletion();
     }
 
     @Override
     public void onError(String errorMsg) {
-        mTimerTaskManager.stopSeekBarUpdate();
-        mBtnPlayPause.setImageResource(R.drawable.notify_btn_dark_play_normal);
+        mUIController.onPlayCompletion();
     }
 
     @Override
@@ -202,9 +103,18 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
     }
 
     @Override
+    public void onBackPressed() {
+        if (mUIController.isPlayListVisible()) {
+            mUIController.hidePlayListLayout();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        mTimerTaskManager.onRemoveUpdateProgressTask();
+        mUIController.onDestroy();
         MusicManager.get().removePlayerEventListener(this);
     }
 }

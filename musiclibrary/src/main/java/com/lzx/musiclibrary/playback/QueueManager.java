@@ -120,8 +120,9 @@ public class QueueManager {
     public MusicInfo getCurrentMusic() {
         if (!QueueHelper.isIndexPlayable(mCurrentIndex, mPlayingQueue)) {
             return null;
+        } else {
+            return mPlayingQueue.get(mCurrentIndex);
         }
-        return mPlayingQueue.get(mCurrentIndex);
     }
 
     public void setCurrentMusic(int currentIndex) {
