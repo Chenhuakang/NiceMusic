@@ -113,7 +113,7 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
             mDelayedStopHandler.removeCallbacksAndMessages(null);
             startService(new Intent(getApplicationContext(), MusicService.class));
         }
-        if (state == State.STATE_STOPPED || state == State.STATE_ERROR) {
+        if ( state == State.STATE_ERROR) {
             mDelayedStopHandler.removeCallbacksAndMessages(null);
             mDelayedStopHandler.sendEmptyMessageDelayed(0, STOP_DELAY);
             stopForeground(true);

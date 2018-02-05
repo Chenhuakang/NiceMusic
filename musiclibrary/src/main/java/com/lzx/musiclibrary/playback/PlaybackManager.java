@@ -78,7 +78,7 @@ public class PlaybackManager implements Playback.Callback {
      */
     public void handlePlayPauseRequest(boolean isSwitchMusic) {
         int state = mPlayback.getState();
-        if (state == State.STATE_STOPPED || state == State.STATE_NONE) {
+        if (state == State.STATE_NONE) {
             handlePlayRequest();
         } else if (state == State.STATE_BUFFERING) {
             handleStopRequest(null);
@@ -223,7 +223,9 @@ public class PlaybackManager implements Playback.Callback {
             //设置错误信息
             stateBuilder.setErrorMessage(error);
             state = State.STATE_ERROR;
-            mServiceCallback.onPlaybackError(error);
+            if (mServiceCallback != null) {
+                mServiceCallback.onPlaybackError(error);
+            }
         }
         //设置播放状态
         stateBuilder.setState(state, position, 1.0f, SystemClock.elapsedRealtime());

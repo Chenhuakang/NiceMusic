@@ -20,8 +20,6 @@ interface IOnPlayerEventListener {
          */
         void onPlayerPause();
 
-        void onPlayerStop();
-
         void onBuffering(boolean isFinishBuffer);
 
         /**

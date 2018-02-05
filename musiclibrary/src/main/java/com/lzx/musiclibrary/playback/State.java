@@ -11,7 +11,6 @@ public class State {
     public final static int STATE_PLAYING = 3;
     public final static int STATE_PAUSED = 4;
     public final static int STATE_ENDED = 5;
-    public final static int STATE_STOPPED = 6;
-    public final static int STATE_NONE = 7;
-    public final static int STATE_ERROR = 8;
+    public final static int STATE_NONE = 6;
+    public final static int STATE_ERROR = 7;
 }

@@ -37,14 +37,15 @@ public class SplashPresenter extends BasePresenter<SplashContract.View> implemen
             }
             return true;
         })
-        .flatMap(aBoolean -> mMainModel.loadMainData())
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(mainDataList1 -> mView.requestMainDataSuccess(false),
-                throwable -> {
-                    LogUtil.i("Error#requestMusicList = " + throwable.getMessage());
-                    Toast.makeText(mContext, "数据解析出错", Toast.LENGTH_SHORT).show();
-                });
+                .flatMap(aBoolean -> mMainModel.loadMainData())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(mainDataList1 -> mView.requestMainDataSuccess(false),
+                        throwable -> {
+                            mView.requestMainDataSuccess(true);
+                            LogUtil.i("Error#requestMusicList = " + throwable.getMessage());
+                            Toast.makeText(mContext, "数据解析出错", Toast.LENGTH_SHORT).show();
+                        });
         addSubscribe(subscriber);
     }
 }

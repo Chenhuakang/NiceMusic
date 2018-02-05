@@ -51,7 +51,7 @@ public class PlayControl extends IPlayControl.Stub implements PlaybackManager.Pl
                         try {
                             switch (status) {
                                 case State.STATE_IDLE:
-                                    listener.onPlayerStop();
+                                    listener.onPlayCompletion();
                                     break;
                                 case State.STATE_BUFFERING:
                                     listener.onBuffering(true);
@@ -66,9 +66,7 @@ public class PlayControl extends IPlayControl.Stub implements PlaybackManager.Pl
                                 case State.STATE_ENDED:
                                     listener.onPlayCompletion();
                                     break;
-                                case State.STATE_STOPPED:
-                                    listener.onPlayerStop();
-                                    break;
+
                                 case State.STATE_ERROR:
                                     listener.onError("");
                                     break;
@@ -98,7 +96,11 @@ public class PlayControl extends IPlayControl.Stub implements PlaybackManager.Pl
 
     @Override
     public void onPlaybackCompletion() {
-
+        try {
+            mNotifyStatusChanged.notify(getCurrPlayingMusic(), getCurrPlayingIndex(), State.STATE_ENDED, null);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

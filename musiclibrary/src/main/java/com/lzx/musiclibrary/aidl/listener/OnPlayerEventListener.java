@@ -14,8 +14,6 @@ public interface OnPlayerEventListener {
 
     void onPlayerPause();
 
-    void onPlayerStop();
-
     void onPlayCompletion();
 
     void onError(String errorMsg);

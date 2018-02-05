@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.design.widget.AppBarLayout;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -22,6 +22,7 @@ import com.lzx.nicemusic.module.area.AreaActivity;
 import com.lzx.nicemusic.module.main.presenter.MainContract;
 import com.lzx.nicemusic.module.main.presenter.MainPresenter;
 import com.lzx.nicemusic.module.main.sectioned.HomeItemSectioned;
+import com.lzx.nicemusic.module.main.sectioned.MainItemSectioned;
 import com.lzx.nicemusic.module.search.SearchActivity;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
@@ -50,34 +51,35 @@ public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresent
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        mAppBarLayout = findViewById(R.id.app_bar);
-        mToolbar = findViewById(R.id.toolbar);
+//        mAppBarLayout = findViewById(R.id.app_bar);
+//        mToolbar = findViewById(R.id.toolbar);
         mRecyclerView = findViewById(R.id.recycle_view);
-        mSearchView = findViewById(R.id.search_view);
-
-        mToolbar.setTitle("");
-        setSupportActionBar(mToolbar);
-
-        initSearchView();
-
+//        mSearchView = findViewById(R.id.search_view);
+//
+//        mToolbar.setTitle("");
+//        setSupportActionBar(mToolbar);
+//
+//        initSearchView();
+//
         mSectionedAdapter = new SectionedRecyclerViewAdapter();
-        GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
-        mLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                switch (mSectionedAdapter.getSectionItemViewType(position)) {
-                    case SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER:
-                        return 2;
-                    case SectionedRecyclerViewAdapter.VIEW_TYPE_FOOTER:
-                        return 2;
-                    default:
-                        return 1;
-                }
-            }
-        });
-        mRecyclerView.setLayoutManager(mLayoutManager);
+//        GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
+//        mLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+//            @Override
+//            public int getSpanSize(int position) {
+//                switch (mSectionedAdapter.getSectionItemViewType(position)) {
+//                    case SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER:
+//                        return 2;
+//                    case SectionedRecyclerViewAdapter.VIEW_TYPE_FOOTER:
+//                        return 2;
+//                    default:
+//                        return 1;
+//                }
+//            }
+//        });
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mSectionedAdapter);
-        getPresenter().requestMusicList();
+        mSectionedAdapter.addSection(new MainItemSectioned(this));
+//        getPresenter().requestMusicList();
 
 
     }
@@ -131,11 +133,11 @@ public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresent
 
     @Override
     public void onBackPressed() {
-        if (mSearchView.isSearchOpen()) {
-            mSearchView.closeSearch();
-        } else {
-            super.onBackPressed();
-        }
+//        if (mSearchView.isSearchOpen()) {
+//            mSearchView.closeSearch();
+//        } else {
+//            super.onBackPressed();
+//        }
     }
 
     @Override

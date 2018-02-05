@@ -33,7 +33,7 @@ public class MusicManager implements IPlayControl {
     private static final int MSG_MUSIC_CHANGE = 0;
     private static final int MSG_PLAYER_START = 1;
     private static final int MSG_PLAYER_PAUSE = 2;
-    private static final int MSG_PLAYER_STOP = 3;
+
     private static final int MSG_PLAY_COMPLETION = 4;
     private static final int MSG_PLAYER_ERROR = 5;
     private static final int MSG_BUFFERING = 6;
@@ -117,10 +117,7 @@ public class MusicManager implements IPlayControl {
             mClientHandler.obtainMessage(MSG_PLAYER_PAUSE).sendToTarget();
         }
 
-        @Override
-        public void onPlayerStop() {
-            mClientHandler.obtainMessage(MSG_PLAYER_STOP).sendToTarget();
-        }
+
 
         @Override
         public void onPlayCompletion() {
@@ -161,9 +158,7 @@ public class MusicManager implements IPlayControl {
                 case MSG_PLAYER_PAUSE:
                     manager.notifyPlayerEventChange(MSG_PLAYER_PAUSE, null, "", false);
                     break;
-                case MSG_PLAYER_STOP:
-                    manager.notifyPlayerEventChange(MSG_PLAYER_STOP, null, "", false);
-                    break;
+
                 case MSG_PLAY_COMPLETION:
                     manager.notifyPlayerEventChange(MSG_PLAY_COMPLETION, null, "", false);
                     break;
@@ -214,9 +209,7 @@ public class MusicManager implements IPlayControl {
                 case MSG_PLAYER_PAUSE:
                     listener.onPlayerPause();
                     break;
-                case MSG_PLAYER_STOP:
-                    listener.onPlayerStop();
-                    break;
+
                 case MSG_PLAY_COMPLETION:
                     listener.onPlayCompletion();
                     break;
