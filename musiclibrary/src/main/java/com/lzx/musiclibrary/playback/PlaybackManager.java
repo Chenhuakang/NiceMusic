@@ -78,7 +78,7 @@ public class PlaybackManager implements Playback.Callback {
      */
     public void handlePlayPauseRequest(boolean isSwitchMusic) {
         int state = mPlayback.getState();
-        if (state == State.STATE_NONE) {
+        if (state == State.STATE_IDLE || state == State.STATE_NONE) {
             handlePlayRequest();
         } else if (state == State.STATE_BUFFERING) {
             handleStopRequest(null);

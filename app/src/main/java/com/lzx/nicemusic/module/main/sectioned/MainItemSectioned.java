@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.module.songlist.SongListActivity;
+import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.OuterLayerImageView;
 
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters;
@@ -34,6 +35,20 @@ public class MainItemSectioned extends StatelessSection {
             "网络歌曲榜"
     };
 
+    private Integer[] songCoverArray = new Integer[]{
+            R.drawable.image_song_list,
+            R.drawable.image_korea,
+            R.drawable.image_japan,
+            R.drawable.image_mainland,
+            R.drawable.image_occident,
+            R.drawable.image_hongkong,
+            R.drawable.image_europe,
+            R.drawable.image_classic,
+            R.drawable.image_love_song,
+            R.drawable.image_television,
+            R.drawable.image_internet
+    };
+
     public MainItemSectioned(Context context) {
         super(new SectionParameters.Builder(R.layout.section_main_song_list).build());
         mContext = context;
@@ -55,6 +70,7 @@ public class MainItemSectioned extends StatelessSection {
         ItemHolder holder = (ItemHolder) viewHolder;
         String title = songListArray[position];
         holder.mAlbumTitle.setText(title);
+        GlideUtil.loadImageByUrl(mContext, songCoverArray[position], holder.mAlbumCover);
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(mContext, SongListActivity.class);
             intent.putExtra("title", title);

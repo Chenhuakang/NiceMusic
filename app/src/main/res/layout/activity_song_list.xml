@@ -1,101 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.scwang.smartrefresh.layout.SmartRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/refreshLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:srlEnableRefresh="false">
+    android:fitsSystemWindows="true">
 
-    <FrameLayout
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-        <android.support.design.widget.CoordinatorLayout
-            android:id="@+id/main_content"
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:fitsSystemWindows="true">
 
-            <android.support.design.widget.AppBarLayout
-                android:id="@+id/app_bar_layout"
+            <android.support.design.widget.CollapsingToolbarLayout
+                android:id="@+id/collapsing_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fitsSystemWindows="true">
+                android:layout_height="250dp"
+                android:fitsSystemWindows="true"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:contentScrim="?attr/colorPrimary"
+                app:expandedTitleTextAppearance="@style/CollapsingToolbarTitleStyle.About"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-                <android.support.design.widget.CollapsingToolbarLayout
-                    android:id="@+id/collapsing_toolbar"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="226dp"
+                    android:layout_height="250dp"
+                    android:background="@color/window_background"
                     android:fitsSystemWindows="true"
-                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                    app:contentScrim="?attr/colorPrimary"
-                    app:expandedTitleTextAppearance="@style/CollapsingToolbarTitleStyle.About"
-                    app:layout_scrollFlags="scroll|exitUntilCollapsed">
+                    android:gravity="center">
 
-                    <FrameLayout
+                    <com.lzx.nicemusic.widget.OuterLayerImageView
+                        android:id="@+id/album_cover"
                         android:layout_width="match_parent"
-                        android:layout_height="226dp"
-                        android:background="@color/window_background"
-                        android:fitsSystemWindows="true"
-                        android:gravity="center">
-
-                        <ImageView
-                            android:id="@+id/album_cover"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:adjustViewBounds="true"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/image_korea"
-                            />
+                        android:layout_height="match_parent"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerCrop" />
 
 
-                    </FrameLayout>
+                </FrameLayout>
 
-                    <android.support.v7.widget.Toolbar
-                        android:id="@+id/toolbar"
-                        android:layout_width="match_parent"
-                        android:layout_height="?attr/actionBarSize"
-                        android:minHeight="?attr/actionBarSize"
-                        app:layout_collapseMode="pin"
-                        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-
-                    </android.support.v7.widget.Toolbar>
-
-                </android.support.design.widget.CollapsingToolbarLayout>
-
-                <View
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="1px"
-                    android:background="#cccccc"/>
+                    android:layout_height="?attr/actionBarSize"
+                    android:minHeight="?attr/actionBarSize"
+                    app:layout_collapseMode="pin"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-            </android.support.design.widget.AppBarLayout>
+                </android.support.v7.widget.Toolbar>
 
+            </android.support.design.widget.CollapsingToolbarLayout>
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/recycle_view"
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:overScrollMode="never"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+                android:layout_height="1px"
+                android:background="#cccccc" />
 
-        </android.support.design.widget.CoordinatorLayout>
+        </android.support.design.widget.AppBarLayout>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="190dp"
-            android:src="@drawable/ic_play_arrow"
-            app:backgroundTint="@color/colorPrimary"
-            app:elevation="4dp"
-            app:layout_anchor="@id/app_bar_layout"
-            app:layout_anchorGravity="bottom|right|end"
-            app:pressedTranslationZ="4dp"
-            app:rippleColor="@color/colorPrimaryDark"/>
-    </FrameLayout>
-</com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycle_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="220dp"
+        android:src="@drawable/ic_play_arrow"
+        app:backgroundTint="@color/colorPrimary"
+        app:elevation="4dp"
+        app:layout_anchor="@id/app_bar_layout"
+        app:layout_anchorGravity="bottom|right|end"
+        app:pressedTranslationZ="4dp"
+        app:rippleColor="@color/colorPrimaryDark" />
+</FrameLayout>

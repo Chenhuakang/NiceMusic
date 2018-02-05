@@ -2,11 +2,13 @@ package com.lzx.nicemusic.module.songlist;
 
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,20 +16,23 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
+import com.lzx.nicemusic.module.songlist.adapter.SongListAdapter;
 import com.lzx.nicemusic.module.songlist.presenter.SongListContract;
 import com.lzx.nicemusic.module.songlist.presenter.SongListPresenter;
-import com.lzx.nicemusic.module.songlist.sectioned.SongListSectioned;
 import com.lzx.nicemusic.utils.DisplayUtil;
-import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.lzx.nicemusic.utils.GlideUtil;
+import com.lzx.nicemusic.widget.OuterLayerImageView;
 
 import java.util.List;
 
-import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
 /**
  * 歌单列表
@@ -38,14 +43,14 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapt
 @CreatePresenter(SongListPresenter.class)
 public class SongListActivity extends BaseMvpActivity<SongListContract.View, SongListPresenter> implements SongListContract.View {
 
-    private SmartRefreshLayout mSmartRefreshLayout;
     private CoordinatorLayout mCoordinatorLayout;
     private AppBarLayout mAppBarLayout;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private Toolbar mToolbar;
     private RecyclerView mRecyclerView;
     private FloatingActionButton mFloatingActionButton;
-    private SectionedRecyclerViewAdapter mAdapter;
+    private OuterLayerImageView mAlbumCover;
+    private SongListAdapter mAdapter;
     private String title;
 
     @Override
@@ -55,13 +60,13 @@ public class SongListActivity extends BaseMvpActivity<SongListContract.View, Son
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        mSmartRefreshLayout = findViewById(R.id.refreshLayout);
         mCoordinatorLayout = findViewById(R.id.main_content);
         mAppBarLayout = findViewById(R.id.app_bar_layout);
         mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         mToolbar = findViewById(R.id.toolbar);
         mRecyclerView = findViewById(R.id.recycle_view);
         mFloatingActionButton = findViewById(R.id.fab);
+        mAlbumCover = findViewById(R.id.album_cover);
 
         title = getIntent().getStringExtra("title");
 
@@ -69,6 +74,8 @@ public class SongListActivity extends BaseMvpActivity<SongListContract.View, Son
         initRecyclerView();
         initFloatingActionButton();
         initSmartRefreshLayout();
+        initAlbumCover();
+
         mAppBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> setViewsTranslation(verticalOffset));
 
         getPresenter().requestSongList(title);
@@ -89,30 +96,22 @@ public class SongListActivity extends BaseMvpActivity<SongListContract.View, Son
 
     private void initRecyclerView() {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new SectionedRecyclerViewAdapter();
+        mAdapter = new SongListAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
     }
 
     private void initFloatingActionButton() {
-        mFloatingActionButton.setClickable(false);
-        mFloatingActionButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#B3B3B3")));
+        mFloatingActionButton.setClickable(true);
+        mFloatingActionButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimary)));
         mFloatingActionButton.setTranslationY(-DisplayUtil.dip2px(this, 32));
-        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
+        mFloatingActionButton.setOnClickListener(v -> {
+            List<MusicInfo> musicInfos = mAdapter.getMusicInfos();
+            MusicManager.get().playMusic(musicInfos, 0);
         });
     }
 
     private void initSmartRefreshLayout() {
-        mSmartRefreshLayout.setEnableAutoLoadmore(false);
-        mSmartRefreshLayout.setEnableRefresh(false);
-        mSmartRefreshLayout.setEnableLoadmore(true);
-        mSmartRefreshLayout.setOnLoadmoreListener(refreshlayout -> {
-            getPresenter().loadMoreSongList(title);
-            refreshlayout.finishLoadmore();
-        });
+        mAdapter.setOnLoadMoreListener(() -> getPresenter().loadMoreSongList(title));
     }
 
     private void setViewsTranslation(int target) {
@@ -138,15 +137,26 @@ public class SongListActivity extends BaseMvpActivity<SongListContract.View, Son
         mFloatingActionButton.setClickable(false);
     }
 
+    private void initAlbumCover() {
+        GlideUtil.loadImageByUrl(this, getPresenter().getAlbumCover(title), mAlbumCover);
+    }
+
     @Override
     public void onGetSongListSuccess(List<MusicInfo> list) {
-        mAdapter.addSection(new SongListSectioned(this, list));
-        mAdapter.notifyDataSetChanged();
+        mAdapter.setMusicInfos(list, false);
+        mAdapter.setShowLoadMore(list.size() >= getPresenter().size);
     }
 
     @Override
     public void loadMoreSongListSuccess(List<MusicInfo> list) {
-        mAdapter.addSection(new SongListSectioned(this, list));
-        mAdapter.notifyDataSetChanged();
+        mAdapter.setMusicInfos(list, true);
+        mAdapter.setShowLoadMore(list.size() >= getPresenter().size);
+    }
+
+    @Override
+    public void loadFinishAllData() {
+        mAdapter.setShowLoadMore(false);
+        mAdapter.showLoadAllDataUI();
+        Toast.makeText(mContext, "没有更多了", Toast.LENGTH_SHORT).show();
     }
 }

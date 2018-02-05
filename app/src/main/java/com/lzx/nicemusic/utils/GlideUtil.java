@@ -19,6 +19,10 @@ public class GlideUtil {
         Glide.with(context).load(url).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
     }
 
+    public static void loadImageByUrl(Context context, int drawable, ImageView imageView) {
+        Glide.with(context).load(drawable).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
+    }
+
     public static void loadBlurImage(Context context, String url, ImageView imageView) {
         Glide.with(context).load(url).asBitmap()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
