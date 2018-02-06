@@ -9,6 +9,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.lzx.musiclibrary.PlayMode;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.utils.LogUtil;
 
 
 /**
@@ -149,6 +150,7 @@ public class PlaybackManager implements Playback.Callback {
             //列表循环
             case PlayMode.PLAY_IN_LIST_LOOP:
                 if (mQueueManager.skipQueuePosition(amount)) {
+                    LogUtil.i("下一首 = "+mQueueManager.getCurrentIndex());
                     handlePlayRequest();
                     mQueueManager.updateMetadata();
                 }
@@ -158,6 +160,7 @@ public class PlaybackManager implements Playback.Callback {
                 break;
         }
         if (mServiceCallback != null) {
+
             mServiceCallback.onPlaybackSwitch(mQueueManager.getCurrentMusic());
         }
     }

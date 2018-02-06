@@ -569,6 +569,11 @@ public class MusicManager implements IPlayControl {
         return MusicManager.get().getStatus() == State.STATE_PLAYING;
     }
 
+    public static boolean isIdea() {
+        return MusicManager.get().getStatus() == State.STATE_NONE ||
+                MusicManager.get().getStatus() == State.STATE_IDLE;
+    }
+
     /**
      * 当前的音乐是否在播放
      */

@@ -52,7 +52,6 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
 
     @Override
     public void onMusicSwitch(MusicInfo music) {
-        LogUtil.i("切歌 = " + music.musicTitle);
         mUIController.updateUI(music);
     }
 

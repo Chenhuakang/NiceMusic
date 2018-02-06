@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import com.lzx.musiclibrary.TimerTaskManager;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.module.play.sectioned.DialogMusicListSectioned;
 import com.lzx.nicemusic.utils.DisplayUtil;
@@ -41,6 +43,7 @@ public class PlayingUIController implements View.OnClickListener {
     private RelativeLayout mPlayListLayout;
     private TextView mBtnPlayMode, mBtnDismiss;
     private RecyclerView mRecyclerView;
+    private View mPlayDarkBg;
     private SectionedRecyclerViewAdapter mRecyclerViewAdapter;
 
     private RelativeLayout.LayoutParams params;
@@ -48,6 +51,7 @@ public class PlayingUIController implements View.OnClickListener {
 
     private ObjectAnimator mCoverAnim;
     private ObjectAnimator mPlayListAnim;
+    private ObjectAnimator mPlayDrakBgAnim;
     private long currentPlayTime = 0;
     private TimerTaskManager mTimerTaskManager;
     private MusicInfo mMusicInfo;
@@ -79,6 +83,7 @@ public class PlayingUIController implements View.OnClickListener {
         mBtnPlayTime = mActivity.findViewById(R.id.btn_play_time);
         mBtnPre = mActivity.findViewById(R.id.btn_pre);
         mBtnNext = mActivity.findViewById(R.id.btn_next);
+        mPlayDarkBg = mActivity.findViewById(R.id.play_dark_bg);
 
         mBtnMusicList.setOnClickListener(this);
         mBtnPlayTime.setOnClickListener(this);
@@ -87,6 +92,7 @@ public class PlayingUIController implements View.OnClickListener {
         mBtnPlayPause.setOnClickListener(this);
         mBtnPlayMode.setOnClickListener(this);
         mBtnDismiss.setOnClickListener(this);
+        mPlayDarkBg.setOnClickListener(this);
 
         initMusicCoverAnim();
     }
@@ -100,13 +106,16 @@ public class PlayingUIController implements View.OnClickListener {
         if (MusicManager.isCurrMusicIsPlayingMusic(mMusicInfo)) {
             mStartTime.setText(FormatUtil.formatMusicTime(MusicManager.get().getProgress()));
             mSeekBar.setProgress((int) MusicManager.get().getProgress());
-
             if (MusicManager.isPaused()) {
                 mBtnPlayPause.setImageResource(R.drawable.notify_btn_dark_play_normal);
-            } else if (MusicManager.isPlaying()) {
+            }
+            if (MusicManager.isPlaying() || MusicManager.isIdea()) {
                 mBtnPlayPause.setImageResource(R.drawable.notify_btn_dark_pause_normal);
                 mTimerTaskManager.scheduleSeekBarUpdate();
                 startCoverAnim();
+            }
+            if (MusicManager.isIdea()){
+                MusicManager.get().playMusicByInfo(mMusicInfo);
             }
         } else {
             MusicManager.get().playMusicByInfo(mMusicInfo);
@@ -154,8 +163,6 @@ public class PlayingUIController implements View.OnClickListener {
     /**
      * 转圈动画
      */
-
-
     private void initMusicCoverAnim() {
         mCoverAnim = ObjectAnimator.ofFloat(mMusicCover, "rotation", 0, 359);
         mCoverAnim.setDuration(20000);
@@ -197,6 +204,8 @@ public class PlayingUIController implements View.OnClickListener {
                 super.onAnimationStart(animation);
                 if (isShow) {
                     mPlayListLayout.setVisibility(View.VISIBLE);
+                } else {
+                    playDarkBgAnim(false, 0.6f, 0.0f);
                 }
             }
 
@@ -205,10 +214,41 @@ public class PlayingUIController implements View.OnClickListener {
                 super.onAnimationEnd(animation);
                 if (!isShow) {
                     mPlayListLayout.setVisibility(View.GONE);
+                } else {
+                    playDarkBgAnim(true, 0.0f, 0.6f);
                 }
             }
         });
         mPlayListAnim.start();
+    }
+
+    /**
+     * 背后阴影动画
+     */
+    private void playDarkBgAnim(boolean isShow, float from, float to) {
+        mPlayDrakBgAnim = ObjectAnimator.ofFloat(mPlayDarkBg, "alpha", from, to);
+        mPlayDrakBgAnim.setInterpolator(new LinearInterpolator());
+        mPlayDrakBgAnim.setDuration(300);
+        mPlayDrakBgAnim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                if (isShow) {
+                    mPlayDarkBg.setClickable(true);
+                    mPlayDarkBg.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                if (!isShow) {
+                    mPlayDarkBg.setClickable(false);
+                    mPlayDarkBg.setVisibility(View.GONE);
+                }
+            }
+        });
+        mPlayDrakBgAnim.start();
     }
 
     /**
@@ -261,8 +301,9 @@ public class PlayingUIController implements View.OnClickListener {
 
     void onDestroy() {
         pauseCoverAnim();
-        //    mCoverAnim = null;
+        mCoverAnim = null;
         mPlayListAnim = null;
+        mPlayDrakBgAnim = null;
         mTimerTaskManager.onRemoveUpdateProgressTask();
     }
 
@@ -286,6 +327,9 @@ public class PlayingUIController implements View.OnClickListener {
             case R.id.btn_play_mode:
                 break;
             case R.id.btn_dismiss:
+                hidePlayListLayout();
+                break;
+            case R.id.play_dark_bg:
                 hidePlayListLayout();
                 break;
         }

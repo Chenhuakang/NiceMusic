@@ -8,6 +8,7 @@ import com.lzx.musiclibrary.AlbumArtCache;
 import com.lzx.musiclibrary.PlayMode;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.helper.QueueHelper;
+import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -183,10 +184,9 @@ public class QueueManager {
      * @param musicId 音乐id
      * @return
      */
-    public boolean setCurrentQueueItem(String musicId, boolean isSwitchMusic) {
+    public void setCurrentQueueItem(String musicId, boolean isSwitchMusic) {
         int index = QueueHelper.getMusicIndexOnQueue(mPlayingQueue, musicId);
         setCurrentQueueIndex(index, isSwitchMusic);
-        return index >= 0;
     }
 
     /**

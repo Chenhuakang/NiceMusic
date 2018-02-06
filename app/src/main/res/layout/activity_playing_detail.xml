@@ -177,6 +177,14 @@
 
     </RelativeLayout>
 
+    <View
+        android:id="@+id/play_dark_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="start|top"
+        android:background="#000"
+        android:visibility="gone" />
+
     <RelativeLayout
         android:id="@+id/play_list_layout"
         android:layout_width="match_parent"
