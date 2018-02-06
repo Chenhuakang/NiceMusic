@@ -41,12 +41,19 @@ public abstract class LoadMoreAdapter<T> extends RecyclerView.Adapter<BaseViewHo
     }
 
     public void setDataList(List<T> dataList) {
-        mDataList = dataList;
+        mDataList.clear();
+        mDataList.addAll(dataList);
         if (mDataList.size() <= 3) {
             setShowLoadMore(false);
         } else {
             setShowLoadMore(true);
         }
+        notifyDataSetChanged();
+    }
+
+    public void addDataList(List<T> dataList){
+        mDataList.addAll(dataList);
+        notifyDataSetChanged();
     }
 
     public List<T> getDataList() {

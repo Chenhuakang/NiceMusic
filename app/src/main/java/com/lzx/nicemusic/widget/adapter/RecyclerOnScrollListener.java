@@ -3,6 +3,8 @@ package com.lzx.nicemusic.widget.adapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.lzx.musiclibrary.utils.LogUtil;
+
 /**
  * Created by xian on 2018/2/5.
  */
@@ -30,6 +32,8 @@ public abstract class RecyclerOnScrollListener extends RecyclerView.OnScrollList
         super.onScrolled(recyclerView, dx, dy);
 
         if (shouldLoading) {
+            boolean isSlideToBottom = isSlideToBottom(recyclerView);
+            LogUtil.i("isSlideToBottom = " + isSlideToBottom);
             if (isSlideToBottom(recyclerView)) {
                 currentPage++;
                 onLoadMore(currentPage);
@@ -39,8 +43,9 @@ public abstract class RecyclerOnScrollListener extends RecyclerView.OnScrollList
     }
 
     private boolean isSlideToBottom(RecyclerView recyclerView) {
-        if (recyclerView == null) return false;
-        if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
+        if (recyclerView == null) {
+            return false;
+        } else if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
             LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
             int visibleItemCount = recyclerView.getChildCount();
             int totalItemCount = manager.getItemCount();
@@ -53,8 +58,9 @@ public abstract class RecyclerOnScrollListener extends RecyclerView.OnScrollList
                 }
             }
             return !loading && (visibleItemCount > 0) && (lastCompletelyVisiableItemPosition >= totalItemCount - 1);
+        } else {
+            return false;
         }
-        return false;
     }
 
     public void setCanLoading(boolean loading) {

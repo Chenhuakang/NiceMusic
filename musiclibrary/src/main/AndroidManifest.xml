@@ -5,7 +5,7 @@
     <application>
         <service android:name="com.lzx.musiclibrary.MusicService" />
         <provider
-            android:name=".db.MusicContentProvider"
+            android:name="com.lzx.nicemusic.db.MusicContentProvider"
             android:authorities="com.lzx.musiclibrary.db.provider"
             android:exported="false" />
     </application>

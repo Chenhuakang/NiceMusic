@@ -18,7 +18,6 @@ import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
-import com.lzx.nicemusic.module.area.AreaActivity;
 import com.lzx.nicemusic.module.main.presenter.MainContract;
 import com.lzx.nicemusic.module.main.presenter.MainPresenter;
 import com.lzx.nicemusic.module.main.sectioned.HomeItemSectioned;
@@ -51,37 +50,13 @@ public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresent
 
     @Override
     protected void init(Bundle savedInstanceState) {
-//        mAppBarLayout = findViewById(R.id.app_bar);
-//        mToolbar = findViewById(R.id.toolbar);
         mRecyclerView = findViewById(R.id.recycle_view);
-//        mSearchView = findViewById(R.id.search_view);
-//
-//        mToolbar.setTitle("");
-//        setSupportActionBar(mToolbar);
-//
-//        initSearchView();
-//
+
         mSectionedAdapter = new SectionedRecyclerViewAdapter();
-//        GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
-//        mLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-//            @Override
-//            public int getSpanSize(int position) {
-//                switch (mSectionedAdapter.getSectionItemViewType(position)) {
-//                    case SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER:
-//                        return 2;
-//                    case SectionedRecyclerViewAdapter.VIEW_TYPE_FOOTER:
-//                        return 2;
-//                    default:
-//                        return 1;
-//                }
-//            }
-//        });
+
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mSectionedAdapter);
         mSectionedAdapter.addSection(new MainItemSectioned(this));
-//        getPresenter().requestMusicList();
-
-
     }
 
 
@@ -131,14 +106,6 @@ public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresent
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    public void onBackPressed() {
-//        if (mSearchView.isSearchOpen()) {
-//            mSearchView.closeSearch();
-//        } else {
-//            super.onBackPressed();
-//        }
-    }
 
     @Override
     public void requestMainDataSuccess(ConcurrentMap<String, List<MusicInfo>> map, List<Map.Entry<String, String>> types) {
@@ -165,8 +132,7 @@ public class MainActivity extends BaseMvpActivity<MainContract.View, MainPresent
             case R.id.btn_other:
                 break;
             case R.id.btn_area:
-                intent = new Intent(this, AreaActivity.class);
-                startActivity(intent);
+
                 break;
         }
     }

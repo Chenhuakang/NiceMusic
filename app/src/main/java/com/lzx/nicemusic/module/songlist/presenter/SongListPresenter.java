@@ -1,20 +1,19 @@
 package com.lzx.nicemusic.module.songlist.presenter;
 
-import android.widget.Toast;
-
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
 import com.lzx.nicemusic.helper.DataHelper;
 import com.lzx.nicemusic.network.RetrofitHelper;
 
+import org.json.JSONObject;
+
 import java.util.List;
 
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.ResponseBody;
 
 /**
  * @author lzx
@@ -31,14 +30,37 @@ public class SongListPresenter extends BasePresenter<SongListContract.View> impl
     public void requestSongList(String title) {
         int type = getListType(title);
         RetrofitHelper.getMusicApi().requestMusicList(type, size, offset)
-                .map(DataHelper::fetchJSONFromUrl)
-                .subscribeOn(Schedulers.newThread())
+                .map(responseBody -> {
+                    List<MusicInfo> list = DataHelper.fetchJSONFromUrl(responseBody);
+                    //请求播放链接
+                    Observable.fromIterable(list)
+                            .forEach(info ->
+                                    RetrofitHelper.getMusicApi().playMusic(info.musicId)
+                                            .map(responseUrlBody -> {
+                                                String json = responseUrlBody.string();
+                                                json = json.substring(1, json.length() - 2);
+                                                JSONObject jsonObject = new JSONObject(json);
+                                                JSONObject bitrate = jsonObject.getJSONObject("bitrate");
+                                                return bitrate.getString("file_link");
+                                            })
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(url -> {
+                                                info.musicUrl = url;
+                                                list.add(info);
+                                            }, throwable -> {
+                                                LogUtil.i("1error = " + throwable.getMessage());
+                                            })
+                            );
+                    return list;
+                })
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(list -> {
                     isMore = list.size() >= size;
                     mView.onGetSongListSuccess(list);
                 }, throwable -> {
-
+                    LogUtil.i("error = " + throwable.getMessage());
                 });
     }
 
@@ -48,14 +70,37 @@ public class SongListPresenter extends BasePresenter<SongListContract.View> impl
             offset += 10;
             int type = getListType(title);
             RetrofitHelper.getMusicApi().requestMusicList(type, size, offset)
-                    .map(DataHelper::fetchJSONFromUrl)
-                    .subscribeOn(Schedulers.newThread())
+                    .map(responseBody -> {
+                        List<MusicInfo> list = DataHelper.fetchJSONFromUrl(responseBody);
+                        Observable.fromIterable(list)
+                                .forEach(info ->
+                                        RetrofitHelper.getMusicApi().playMusic(info.musicId)
+                                                .map(responseUrlBody -> {
+                                                    String json = responseUrlBody.string();
+                                                    json = json.substring(1, json.length() - 2);
+                                                    JSONObject jsonObject = new JSONObject(json);
+                                                    JSONObject bitrate = jsonObject.getJSONObject("bitrate");
+                                                    return bitrate.getString("file_link");
+                                                })
+                                                .subscribeOn(Schedulers.io())
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribe(url -> {
+                                                    info.musicUrl = url;
+                                                    list.add(info);
+                                                    LogUtil.i("title = " + info.musicTitle + " url = " + info.musicUrl);
+                                                }, throwable -> {
+                                                    LogUtil.i("1error = " + throwable.getMessage());
+                                                })
+                                );
+                        return list;
+                    })
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(list -> {
                         isMore = list.size() >= size;
                         mView.loadMoreSongListSuccess(list);
                     }, throwable -> {
-                        mView.loadFinishAllData();
+                        LogUtil.i("error = " + throwable.getMessage());
                     });
         } else {
             mView.loadFinishAllData();

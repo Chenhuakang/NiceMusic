@@ -5,6 +5,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 
 import com.lzx.musiclibrary.AlbumArtCache;
+import com.lzx.musiclibrary.PlayMode;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.helper.QueueHelper;
 
@@ -24,12 +25,14 @@ public class QueueManager {
     private int mCurrentIndex;
     private MetadataUpdateListener mListener;
     private final ConcurrentMap<String, MusicInfo> mMusicListById;
+    private PlayMode mPlayMode;
 
-    public QueueManager(MetadataUpdateListener listener) {
+    public QueueManager(MetadataUpdateListener listener, PlayMode playMode) {
         mPlayingQueue = Collections.synchronizedList(new ArrayList<MusicInfo>());
         mMusicListById = new ConcurrentHashMap<>();
         mCurrentIndex = 0;
         mListener = listener;
+        mPlayMode = playMode;
     }
 
     /**
@@ -202,26 +205,42 @@ public class QueueManager {
      * 得到上一首音乐信息
      */
     public MusicInfo getPreMusicInfo() {
-        int index;
-        if (mCurrentIndex - 1 < 0) {
-            index = 0;
-        } else {
-            index = mCurrentIndex - 1;
-        }
-        return mPlayingQueue.get(index);
+        return getNextOrPreMusicInfo(-1);
     }
 
     /**
      * 得到下一首音乐信息
      */
     public MusicInfo getNextMusicInfo() {
-        int index;
-        if (mCurrentIndex + 1 > mPlayingQueue.size() - 1) {
-            index = mPlayingQueue.size() - 1;
-        } else {
-            index = mCurrentIndex + 1;
+        return getNextOrPreMusicInfo(1);
+    }
+
+    private MusicInfo getNextOrPreMusicInfo(int amount) {
+        MusicInfo info = null;
+        switch (mPlayMode.getCurrPlayMode()) {
+            //单曲循环
+            case PlayMode.PLAY_IN_SINGLE_LOOP:
+                info = getCurrentMusic();
+                break;
+            //随机播放
+            case PlayMode.PLAY_IN_RANDOM:
+                //0到size-1的随机数
+                int random = (int) (Math.random() * getCurrentQueueSize() - 1);
+                if (skipQueuePosition(random)) {
+                    info = getCurrentMusic();
+                }
+                break;
+            //列表循环
+            case PlayMode.PLAY_IN_LIST_LOOP:
+                if (skipQueuePosition(amount)) {
+                    info = getCurrentMusic();
+                }
+                break;
+            default:
+                info = null;
+                break;
         }
-        return mPlayingQueue.get(index);
+        return info;
     }
 
     /**

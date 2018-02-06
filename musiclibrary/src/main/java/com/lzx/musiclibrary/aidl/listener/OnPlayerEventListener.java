@@ -8,7 +8,7 @@ import com.lzx.musiclibrary.aidl.model.MusicInfo;
  */
 
 public interface OnPlayerEventListener {
-    void onMusicChange(MusicInfo music);
+    void onMusicSwitch(MusicInfo music);
 
     void onPlayerStart();
 

@@ -1,4 +1,4 @@
-package com.lzx.musiclibrary.db;
+package com.lzx.nicemusic.db;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -14,13 +14,13 @@ import android.support.annotation.Nullable;
  * Created by xian on 2018/1/22.
  */
 
-public class MusicContentProvider extends ContentProvider implements DbConstants {
+public class MusicContentProvider extends ContentProvider {
 
     public static final String AUTHORITY = "com.lzx.musiclibrary.db.provider";
-    public static final Uri PLAYING_MUSIC_LIST_URI = Uri.parse("content://" + AUTHORITY + "/playing_music_list");
-    public static final Uri FAVORITE_MUSIC_LIST_URI = Uri.parse("content://" + AUTHORITY + "/favorite_music_list");
-    public static final int PLAYING_MUSIC_LIST_CODE = 0;
-    public static final int FAVORITE_MUSIC_LIST_CODE = 1;
+    public static final Uri SONG_LIST_URI = Uri.parse("content://" + AUTHORITY + "/songs_list");
+    public static final Uri FAVORITES_URI = Uri.parse("content://" + AUTHORITY + "/favorites");
+    public static final int SONG_LIST_CODE = 0;
+    public static final int FAVORITES_CODE = 1;
 
     private DbHelper mDbHelper;
     private SQLiteDatabase mDb;
@@ -32,8 +32,8 @@ public class MusicContentProvider extends ContentProvider implements DbConstants
         mContext = getContext();
         mDbHelper = new DbHelper(mContext);
         mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        mUriMatcher.addURI(AUTHORITY, "playing_music_list", PLAYING_MUSIC_LIST_CODE);
-        mUriMatcher.addURI(AUTHORITY, "favorite_music_list", FAVORITE_MUSIC_LIST_CODE);
+        mUriMatcher.addURI(AUTHORITY, "songs_list", SONG_LIST_CODE);
+        mUriMatcher.addURI(AUTHORITY, "favorites", FAVORITES_CODE);
         mDb = mDbHelper.getWritableDatabase();
         return true;
     }
@@ -41,11 +41,11 @@ public class MusicContentProvider extends ContentProvider implements DbConstants
     private String getTableName(Uri uri) {
         String tableName = null;
         switch (mUriMatcher.match(uri)) {
-            case PLAYING_MUSIC_LIST_CODE:
-                tableName = TABLE_PLAYING_MUSIC_LIST;
+            case SONG_LIST_CODE:
+                tableName = DbConstants.TABLE_SONG_LIST;
                 break;
-            case FAVORITE_MUSIC_LIST_CODE:
-                tableName = TABLE_FAVORITE_MUSIC;
+            case FAVORITES_CODE:
+                tableName = DbConstants.TABLE_FAVORITES;
                 break;
             default:
                 break;

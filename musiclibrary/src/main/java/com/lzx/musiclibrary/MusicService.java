@@ -35,28 +35,30 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
     private MediaSessionCompat mSession;
     private DelayedStopHandler mDelayedStopHandler;
     private Playback playback;
+    private PlayMode mPlayMode;
     private Binder mBinder;
 
     @Override
     public void onCreate() {
         super.onCreate();
-
+        mPlayMode = new PlayMode();
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         boolean isUseMediaPlayer = intent.getBooleanExtra("isUseMediaPlayer", false);
-        init(isUseMediaPlayer);
+        boolean isAutoPlayNext = intent.getBooleanExtra("isAutoPlayNext", true);
+        init(isUseMediaPlayer, isAutoPlayNext);
         return mBinder;
     }
 
-    public void init(boolean isUseMediaPlayer) {
+    public void init(boolean isUseMediaPlayer, boolean isAutoPlayNext) {
         mDelayedStopHandler = new DelayedStopHandler(this);
-        mQueueManager = new QueueManager(this);
+        mQueueManager = new QueueManager(this,mPlayMode);
 
         playback = isUseMediaPlayer ? new MediaPlayback(this) : new ExoPlayback(this);
-        mPlaybackManager = new PlaybackManager(playback, mQueueManager);
+        mPlaybackManager = new PlaybackManager(playback, mQueueManager, mPlayMode, isAutoPlayNext);
         mPlaybackManager.setServiceCallback(this);
 
         mSession = new MediaSessionCompat(this, "MusicService");
@@ -65,7 +67,7 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
 
         mPlaybackManager.updatePlaybackState(null);
 
-        mBinder = new PlayControl(this, mQueueManager, mPlaybackManager);
+        mBinder = new PlayControl(this, mQueueManager, mPlaybackManager, mPlayMode);
     }
 
     @Override
@@ -97,6 +99,11 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
     }
 
     @Override
+    public void onPlaybackSwitch(MusicInfo info) {
+
+    }
+
+    @Override
     public void onPlaybackError(String errorMsg) {
     }
 
@@ -113,7 +120,7 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
             mDelayedStopHandler.removeCallbacksAndMessages(null);
             startService(new Intent(getApplicationContext(), MusicService.class));
         }
-        if ( state == State.STATE_ERROR) {
+        if (state == State.STATE_ERROR) {
             mDelayedStopHandler.removeCallbacksAndMessages(null);
             mDelayedStopHandler.sendEmptyMessageDelayed(0, STOP_DELAY);
             stopForeground(true);

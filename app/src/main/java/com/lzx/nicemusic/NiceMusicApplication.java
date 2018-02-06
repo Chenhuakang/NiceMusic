@@ -21,7 +21,10 @@ public class NiceMusicApplication extends Application {
         sContext = this;
         SpUtil.getInstance().init(this);
         CrashHandler.getInstance().init(this);
-        MusicManager.get().setContext(this).bindService();
+        MusicManager.
+                get().
+                setContext(this).
+                bindService();
     }
 
     public static Context getContext() {

@@ -5,11 +5,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
- * Created by xian on 2018/1/14.
+ * Created by xian on 2018/1/22.
  */
 
 public class DbHelper extends SQLiteOpenHelper {
-    private static final String name = "nickmusic";
+    private static final String name = "music_db";
     private static final int version = 7;
     private static volatile DbHelper instance;
 
@@ -17,19 +17,32 @@ public class DbHelper extends SQLiteOpenHelper {
         super(context, name, null, version);
     }
 
-    private final String TABLE_CACHE = "create table "
-            + CacheManager.niceMusicCache + " ( "
-            + CacheManager.niceMusicKey + " text not null primary key, "
-            + CacheManager.niceMusicValue + " text);";
+    /**
+     * 播放列表
+     */
+    private final String CREATE_TABLE_SONG_LIST = "create table "
+            + DbConstants.TABLE_SONG_LIST + " ( "
+            + DbConstants.MUSIC_ID + " text, "
+            + DbConstants.MUSIC_TITLE + " text, "
+            + DbConstants.ALBUM_TITLE + " text, "
+            + DbConstants.DURATION + " text, "
+            + DbConstants.ARTIST + " text);";
 
-    private final String TABLE_SEARCH_HISTORY = "create table "
-            + SearchManager.searchHistory + " ( "
-            + SearchManager.searchTitle + " text);";
+    /**
+     * 我的歌单
+     */
+    private final String CREATE_TABLE_FAVORITS = "create table "
+            + DbConstants.TABLE_FAVORITES + " ( "
+            + DbConstants.MUSIC_ID + " text, "
+            + DbConstants.MUSIC_TITLE + " text, "
+            + DbConstants.ALBUM_TITLE + " text, "
+            + DbConstants.DURATION + " text, "
+            + DbConstants.ARTIST + " text);";
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(TABLE_CACHE);
-        db.execSQL(TABLE_SEARCH_HISTORY);
+        db.execSQL(CREATE_TABLE_SONG_LIST);
+        db.execSQL(CREATE_TABLE_FAVORITS);
     }
 
     @Override

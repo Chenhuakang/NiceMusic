@@ -1,7 +1,6 @@
 package com.lzx.nicemusic.module.songlist.adapter;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,14 +9,10 @@ import android.widget.TextView;
 
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.nicemusic.R;
-import com.lzx.nicemusic.module.play.PlayingDetailActivity;
 import com.lzx.nicemusic.utils.FormatUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.adapter.BaseViewHolder;
 import com.lzx.nicemusic.widget.adapter.LoadMoreAdapter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by xian on 2018/2/5.
@@ -26,24 +21,16 @@ import java.util.List;
 public class SongListAdapter extends LoadMoreAdapter<MusicInfo> {
 
     private Context mContext;
-    private List<MusicInfo> mMusicInfos;
+
+    private OnItemClickListener mItemClickListener;
 
     public SongListAdapter(Context context) {
         super(context);
         mContext = context;
-        mMusicInfos = new ArrayList<>();
     }
 
-    public void setMusicInfos(List<MusicInfo> musicInfos, boolean isLoadMore) {
-        if (!isLoadMore) {
-            mMusicInfos.clear();
-        }
-        mMusicInfos.addAll(musicInfos);
-        notifyDataSetChanged();
-    }
-
-    public List<MusicInfo> getMusicInfos() {
-        return mMusicInfos;
+    public void setOnItemClickListener(OnItemClickListener itemClickListener) {
+        mItemClickListener = itemClickListener;
     }
 
     @Override
@@ -55,13 +42,21 @@ public class SongListAdapter extends LoadMoreAdapter<MusicInfo> {
     @Override
     protected void BindViewHolder(BaseViewHolder viewHolder, int position) {
         ItemHolder holder = (ItemHolder) viewHolder;
-        MusicInfo musicInfo = mMusicInfos.get(position);
+        MusicInfo musicInfo = mDataList.get(position);
         holder.mSongNum.setText(String.valueOf((position + 1)));
         holder.mMusicName.setText(musicInfo.musicTitle);
         holder.mMusicTime.setText(FormatUtil.formatMusicTime(musicInfo.musicDuration));
         holder.mMusicTitle.setText(musicInfo.albumArtist + " · " + musicInfo.albumTitle);
         GlideUtil.loadImageByUrl(mContext, musicInfo.musicCover, holder.mMusicCover);
-        holder.itemView.setOnClickListener(view -> PlayingDetailActivity.launch(mContext, musicInfo));
+        holder.itemView.setOnClickListener(view -> {
+            if (mItemClickListener != null) {
+                mItemClickListener.onItemClick(musicInfo, position);
+            }
+        });
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(MusicInfo musicInfo, int position);
     }
 
     @Override
@@ -71,14 +66,14 @@ public class SongListAdapter extends LoadMoreAdapter<MusicInfo> {
 
     @Override
     public int getItemCount() {
-        return mMusicInfos.size();
+        return mDataList.size();
     }
 
     class ItemHolder extends BaseViewHolder {
         ImageView mMusicCover;
         TextView mSongNum, mMusicName, mMusicTitle, mMusicTime;
 
-        public ItemHolder(View itemView) {
+        ItemHolder(View itemView) {
             super(itemView, mContext, false);
             mMusicCover = $(R.id.music_cover);
             mMusicName = $(R.id.music_name);

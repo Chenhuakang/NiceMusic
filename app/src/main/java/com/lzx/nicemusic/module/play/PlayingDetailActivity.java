@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
@@ -50,8 +51,9 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
     }
 
     @Override
-    public void onMusicChange(MusicInfo music) {
-
+    public void onMusicSwitch(MusicInfo music) {
+        LogUtil.i("切歌 = " + music.musicTitle);
+        mUIController.updateUI(music);
     }
 
     @Override

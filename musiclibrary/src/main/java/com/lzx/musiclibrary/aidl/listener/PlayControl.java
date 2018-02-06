@@ -27,15 +27,17 @@ public class PlayControl extends IPlayControl.Stub implements PlaybackManager.Pl
 
     private RemoteCallbackList<IOnPlayerEventListener> mRemoteCallbackList;
     private NotifyContract.NotifyStatusChanged mNotifyStatusChanged;
+    private NotifyContract.NotifyMusicSwitch mNotifyMusicSwitch;
 
-    public PlayControl(Context context, QueueManager queueManager, PlaybackManager playbackManager) {
+    public PlayControl(Context context, QueueManager queueManager, PlaybackManager playbackManager, PlayMode playMode) {
         mQueueManager = queueManager;
         mPlaybackManager = playbackManager;
         mContext = context;
         mPlaybackManager.setServiceCallback(this);
 
-        mPlayMode = new PlayMode();
+        mPlayMode = playMode;
         mNotifyStatusChanged = new NotifyStatusChange();
+        mNotifyMusicSwitch = new NotifyMusicSwitch();
         mRemoteCallbackList = new RemoteCallbackList<>();
     }
 
@@ -66,7 +68,6 @@ public class PlayControl extends IPlayControl.Stub implements PlaybackManager.Pl
                                 case State.STATE_ENDED:
                                     listener.onPlayCompletion();
                                     break;
-
                                 case State.STATE_ERROR:
                                     listener.onError("");
                                     break;
@@ -84,6 +85,31 @@ public class PlayControl extends IPlayControl.Stub implements PlaybackManager.Pl
         }
     }
 
+    private class NotifyMusicSwitch implements NotifyContract.NotifyMusicSwitch {
+
+        @Override
+        public void notify(MusicInfo info) {
+            synchronized (NotifyMusicSwitch.class) {
+                final int N = mRemoteCallbackList.beginBroadcast();
+                for (int i = 0; i < N; i++) {
+                    IOnPlayerEventListener listener = mRemoteCallbackList.getBroadcastItem(i);
+                    if (listener != null) {
+                        try {
+                            listener.onMusicSwitch(info);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                mRemoteCallbackList.finishBroadcast();
+            }
+        }
+    }
+
+    @Override
+    public void onPlaybackSwitch(MusicInfo info) {
+        mNotifyMusicSwitch.notify(info);
+    }
 
     @Override
     public void onPlaybackError(String errorMsg) {

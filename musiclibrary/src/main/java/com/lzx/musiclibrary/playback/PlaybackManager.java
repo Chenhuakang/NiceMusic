@@ -9,7 +9,6 @@ import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.lzx.musiclibrary.PlayMode;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
-import com.lzx.musiclibrary.helper.QueueHelper;
 
 
 /**
@@ -23,13 +22,16 @@ public class PlaybackManager implements Playback.Callback {
     private PlaybackServiceCallback mServiceCallback;
     private MediaSessionCallback mMediaSessionCallback;
     private PlayMode mPlayMode;
+    //是否自动播放下一首
+    private boolean isAutoPlayNext = true;
 
-    public PlaybackManager(Playback playback, QueueManager queueManager) {
+    public PlaybackManager(Playback playback, QueueManager queueManager, PlayMode playMode, boolean isAutoPlayNext) {
         mPlayback = playback;
         mPlayback.setCallback(this);
         mQueueManager = queueManager;
+        this.isAutoPlayNext = isAutoPlayNext;
         mMediaSessionCallback = new MediaSessionCallback();
-        mPlayMode = new PlayMode();
+        mPlayMode = playMode;
     }
 
     public void setServiceCallback(PlaybackServiceCallback serviceCallback) {
@@ -80,8 +82,6 @@ public class PlaybackManager implements Playback.Callback {
         int state = mPlayback.getState();
         if (state == State.STATE_IDLE || state == State.STATE_NONE) {
             handlePlayRequest();
-        } else if (state == State.STATE_BUFFERING) {
-            handleStopRequest(null);
         } else if (state == State.STATE_PLAYING) {
             if (!isSwitchMusic) {
                 handlePauseRequest();
@@ -114,7 +114,9 @@ public class PlaybackManager implements Playback.Callback {
         if (mServiceCallback != null) {
             mServiceCallback.onPlaybackCompletion();
         }
-        playNextOrPre(1);
+        if (isAutoPlayNext) {
+            playNextOrPre(1);
+        }
     }
 
     /**
@@ -124,17 +126,6 @@ public class PlaybackManager implements Playback.Callback {
      */
     public void playNextOrPre(int amount) {
         switch (mPlayMode.getCurrPlayMode()) {
-            //顺序播放
-            case PlayMode.PLAY_IN_ORDER:
-                if (QueueHelper.isIndexPlayable(mQueueManager.getCurrentIndex(), mQueueManager.getPlayingQueue())) {
-                    if (mQueueManager.skipQueuePosition(amount)) {
-                        handlePlayRequest();
-                        mQueueManager.updateMetadata();
-                    }
-                } else {
-                    handleStopRequest(null);
-                }
-                break;
             //单曲循环
             case PlayMode.PLAY_IN_SINGLE_LOOP:
                 if (mQueueManager.skipQueuePosition(0)) {
@@ -166,20 +157,13 @@ public class PlaybackManager implements Playback.Callback {
                 handleStopRequest(null);
                 break;
         }
+        if (mServiceCallback != null) {
+            mServiceCallback.onPlaybackSwitch(mQueueManager.getCurrentMusic());
+        }
     }
 
     public boolean hasNextOrPre() {
-        switch (mPlayMode.getCurrPlayMode()) {
-            //顺序播放
-            case PlayMode.PLAY_IN_ORDER:
-                return QueueHelper.isIndexPlayable(mQueueManager.getCurrentIndex(), mQueueManager.getPlayingQueue());
-            case PlayMode.PLAY_IN_SINGLE_LOOP:  //单曲循环
-            case PlayMode.PLAY_IN_RANDOM:  //随机播放
-            case PlayMode.PLAY_IN_LIST_LOOP:   //列表循环
-                return true;
-            default:
-                return false;
-        }
+        return mQueueManager.getCurrentQueueSize() > 1;
     }
 
     /**
@@ -238,7 +222,7 @@ public class PlaybackManager implements Playback.Callback {
             //回调状态更新
             mServiceCallback.onPlaybackStateUpdated(state, stateBuilder.build());
             //播放/暂停状态就通知通知栏更新
-            if (state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_PAUSED) {
+            if (state == State.STATE_PLAYING || state == State.STATE_PAUSED) {
                 mServiceCallback.onNotificationRequired();
             }
         }
@@ -396,11 +380,8 @@ public class PlaybackManager implements Playback.Callback {
 
 
     public interface PlaybackServiceCallback {
-//        void onPlaybackStart();
-//
-//        void onPlaybackPause();
-//
-//        void onPlaybackStop();
+
+        void onPlaybackSwitch(MusicInfo info);
 
         void onPlaybackError(String errorMsg);
 

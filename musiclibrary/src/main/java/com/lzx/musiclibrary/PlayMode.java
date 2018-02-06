@@ -9,10 +9,7 @@ import com.lzx.musiclibrary.utils.SPUtils;
  */
 
 public class PlayMode {
-    /**
-     * 顺序播放
-     */
-    public static final int PLAY_IN_ORDER = 0;
+
 
     /**
      * 单曲循环
@@ -29,10 +26,10 @@ public class PlayMode {
      */
     public static final int PLAY_IN_LIST_LOOP = 3;
 
-    private int currPlayMode = PLAY_IN_ORDER;
+    private int currPlayMode = PLAY_IN_LIST_LOOP;
 
     public int getCurrPlayMode(Context context) {
-        currPlayMode = (int) SPUtils.get(context, "music_key_play_model", PLAY_IN_ORDER);
+        currPlayMode = (int) SPUtils.get(context, "music_key_play_model", PLAY_IN_LIST_LOOP);
         return currPlayMode;
     }
 

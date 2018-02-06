@@ -14,4 +14,11 @@ public interface NotifyContract {
     interface NotifyStatusChanged {
         void notify(MusicInfo info, int index, int status, String errorMsg);
     }
+
+    /**
+     * 切歌
+     */
+    interface NotifyMusicSwitch {
+        void notify(MusicInfo info);
+    }
 }

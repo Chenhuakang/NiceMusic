@@ -1,12 +1,13 @@
 package com.lzx.nicemusic.module.play.sectioned;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
-import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.nicemusic.R;
+import com.lzx.nicemusic.db.DbManager;
 
 import java.util.List;
 
@@ -19,11 +20,15 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 
 public class DialogMusicListSectioned extends StatelessSection {
 
+    private Context mContext;
+    private DbManager mDbManager;
     private List<MusicInfo> mMusicInfos;
 
-    public DialogMusicListSectioned() {
+    public DialogMusicListSectioned(Context context) {
         super(new SectionParameters.Builder(R.layout.section_dialog_item).build());
-        mMusicInfos = MusicManager.get().getPlayList();
+        mContext = context;
+        mDbManager = new DbManager(context);
+        mDbManager.AsyQueryPlayList().subscribe(list -> mMusicInfos = list);
     }
 
     @Override

@@ -17,6 +17,7 @@ import com.lzx.musiclibrary.aidl.listener.IPlayControl;
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.playback.State;
+import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -40,6 +41,7 @@ public class MusicManager implements IPlayControl {
 
     private Context mContext;
     private boolean isUseMediaPlayer;
+    private boolean isAutoPlayNext = true;
     private IPlayControl control;
     private ClientHandler mClientHandler;
     private CopyOnWriteArrayList<OnPlayerEventListener> mPlayerEventListeners = new CopyOnWriteArrayList<>();
@@ -67,9 +69,15 @@ public class MusicManager implements IPlayControl {
         return this;
     }
 
+    public MusicManager setAutoPlayNext(boolean autoPlayNext) {
+        isAutoPlayNext = autoPlayNext;
+        return this;
+    }
+
     public void bindService() {
         Intent intent = new Intent(mContext, MusicService.class);
         intent.putExtra("isUseMediaPlayer", isUseMediaPlayer);
+        intent.putExtra("isAutoPlayNext", isAutoPlayNext);
         mContext.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -79,6 +87,7 @@ public class MusicManager implements IPlayControl {
             control = IPlayControl.Stub.asInterface(iBinder);
             try {
                 control.registerPlayerEventListener(mOnPlayerEventListener);
+                LogUtil.i("--onServiceConnected--");
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -86,7 +95,7 @@ public class MusicManager implements IPlayControl {
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-
+            LogUtil.i("--onServiceDisconnected--");
         }
     };
 
@@ -103,7 +112,7 @@ public class MusicManager implements IPlayControl {
 
     private IOnPlayerEventListener mOnPlayerEventListener = new IOnPlayerEventListener.Stub() {
         @Override
-        public void onMusicChange(MusicInfo music) {
+        public void onMusicSwitch(MusicInfo music) {
             mClientHandler.obtainMessage(MSG_MUSIC_CHANGE, music).sendToTarget();
         }
 
@@ -116,8 +125,6 @@ public class MusicManager implements IPlayControl {
         public void onPlayerPause() {
             mClientHandler.obtainMessage(MSG_PLAYER_PAUSE).sendToTarget();
         }
-
-
 
         @Override
         public void onPlayCompletion() {
@@ -201,7 +208,7 @@ public class MusicManager implements IPlayControl {
         for (OnPlayerEventListener listener : mPlayerEventListeners) {
             switch (msg) {
                 case MSG_MUSIC_CHANGE:
-                    listener.onMusicChange(info);
+                    listener.onMusicSwitch(info);
                     break;
                 case MSG_PLAYER_START:
                     listener.onPlayerStart();
@@ -209,7 +216,6 @@ public class MusicManager implements IPlayControl {
                 case MSG_PLAYER_PAUSE:
                     listener.onPlayerPause();
                     break;
-
                 case MSG_PLAY_COMPLETION:
                     listener.onPlayCompletion();
                     break;

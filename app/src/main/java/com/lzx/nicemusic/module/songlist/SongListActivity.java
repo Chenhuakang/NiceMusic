@@ -2,7 +2,6 @@ package com.lzx.nicemusic.module.songlist;
 
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -13,21 +12,20 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
-import com.lzx.musiclibrary.manager.MusicManager;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
+import com.lzx.nicemusic.db.DbManager;
+import com.lzx.nicemusic.module.play.PlayingDetailActivity;
 import com.lzx.nicemusic.module.songlist.adapter.SongListAdapter;
 import com.lzx.nicemusic.module.songlist.presenter.SongListContract;
 import com.lzx.nicemusic.module.songlist.presenter.SongListPresenter;
-import com.lzx.nicemusic.utils.DisplayUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.OuterLayerImageView;
 
@@ -52,6 +50,7 @@ public class SongListActivity extends BaseMvpActivity<SongListContract.View, Son
     private OuterLayerImageView mAlbumCover;
     private SongListAdapter mAdapter;
     private String title;
+    private DbManager mDbManager;
 
     @Override
     protected int getLayoutId() {
@@ -67,6 +66,8 @@ public class SongListActivity extends BaseMvpActivity<SongListContract.View, Son
         mRecyclerView = findViewById(R.id.recycle_view);
         mFloatingActionButton = findViewById(R.id.fab);
         mAlbumCover = findViewById(R.id.album_cover);
+
+        mDbManager = new DbManager(this);
 
         title = getIntent().getStringExtra("title");
 
@@ -98,15 +99,27 @@ public class SongListActivity extends BaseMvpActivity<SongListContract.View, Son
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new SongListAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
+        mAdapter.setOnItemClickListener((musicInfo, position) -> {
+            mDbManager.AsySavePlayList(mAdapter.getDataList())
+                    .subscribe(aBoolean -> {
+                        PlayingDetailActivity.launch(SongListActivity.this, musicInfo);
+                    }, throwable -> {
+                        Toast.makeText(mContext, "播放失败", Toast.LENGTH_SHORT).show();
+                    });
+        });
     }
 
     private void initFloatingActionButton() {
         mFloatingActionButton.setClickable(true);
         mFloatingActionButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimary)));
-        mFloatingActionButton.setTranslationY(-DisplayUtil.dip2px(this, 32));
         mFloatingActionButton.setOnClickListener(v -> {
-            List<MusicInfo> musicInfos = mAdapter.getMusicInfos();
-            MusicManager.get().playMusic(musicInfos, 0);
+            mDbManager.AsySavePlayList(mAdapter.getDataList())
+                    .subscribe(aBoolean -> {
+                        PlayingDetailActivity.launch(SongListActivity.this, mAdapter.getDataList().get(0));
+                    }, throwable -> {
+                        LogUtil.i("error = " + throwable.getMessage());
+                        Toast.makeText(mContext, "播放失败", Toast.LENGTH_SHORT).show();
+                    });
         });
     }
 
@@ -143,13 +156,13 @@ public class SongListActivity extends BaseMvpActivity<SongListContract.View, Son
 
     @Override
     public void onGetSongListSuccess(List<MusicInfo> list) {
-        mAdapter.setMusicInfos(list, false);
+        mAdapter.setDataList(list);
         mAdapter.setShowLoadMore(list.size() >= getPresenter().size);
     }
 
     @Override
     public void loadMoreSongListSuccess(List<MusicInfo> list) {
-        mAdapter.setMusicInfos(list, true);
+        mAdapter.addDataList(list);
         mAdapter.setShowLoadMore(list.size() >= getPresenter().size);
     }
 

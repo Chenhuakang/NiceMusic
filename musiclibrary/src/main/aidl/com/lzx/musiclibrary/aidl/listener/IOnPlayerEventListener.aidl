@@ -8,7 +8,7 @@ interface IOnPlayerEventListener {
         /**
          * 切换歌曲
          */
-        void onMusicChange(out MusicInfo music);
+        void onMusicSwitch(out MusicInfo music);
 
         /**
          * 继续播放

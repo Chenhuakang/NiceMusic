@@ -18,9 +18,7 @@ import android.widget.TextView;
 import com.lzx.musiclibrary.TimerTaskManager;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
-import com.lzx.musiclibrary.playback.State;
 import com.lzx.nicemusic.R;
-import com.lzx.nicemusic.helper.PlayHelper;
 import com.lzx.nicemusic.module.play.sectioned.DialogMusicListSectioned;
 import com.lzx.nicemusic.utils.DisplayUtil;
 import com.lzx.nicemusic.utils.FormatUtil;
@@ -89,29 +87,29 @@ public class PlayingUIController implements View.OnClickListener {
         mBtnPlayPause.setOnClickListener(this);
         mBtnPlayMode.setOnClickListener(this);
         mBtnDismiss.setOnClickListener(this);
+
+        initMusicCoverAnim();
     }
 
     /**
      * 初始化UI
      */
     void initialization() {
-        mMusicName.setText(mMusicInfo.musicTitle);
-        mSongerName.setText(mMusicInfo.musicArtist);
-        GlideUtil.loadImageByUrl(mContext, mMusicInfo.musicCover, mMusicCover);
-        GlideUtil.loadBlurImage(mContext, mMusicInfo.musicCover, mMusicBg);
-
-        mSeekBar.setMax((int) mMusicInfo.musicDuration);
-        mTotalTime.setText(FormatUtil.formatMusicTime(mMusicInfo.musicDuration));
+        updateUI(mMusicInfo);
 
         if (MusicManager.isCurrMusicIsPlayingMusic(mMusicInfo)) {
             mStartTime.setText(FormatUtil.formatMusicTime(MusicManager.get().getProgress()));
             mSeekBar.setProgress((int) MusicManager.get().getProgress());
+
             if (MusicManager.isPaused()) {
                 mBtnPlayPause.setImageResource(R.drawable.notify_btn_dark_play_normal);
             } else if (MusicManager.isPlaying()) {
                 mBtnPlayPause.setImageResource(R.drawable.notify_btn_dark_pause_normal);
                 mTimerTaskManager.scheduleSeekBarUpdate();
+                startCoverAnim();
             }
+        } else {
+            MusicManager.get().playMusicByInfo(mMusicInfo);
         }
 
         phoneHeight = DisplayUtil.getPhoneHeight(mContext);
@@ -120,7 +118,7 @@ public class PlayingUIController implements View.OnClickListener {
         mRecyclerViewAdapter = new SectionedRecyclerViewAdapter();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
-        mRecyclerViewAdapter.addSection(new DialogMusicListSectioned());
+        mRecyclerViewAdapter.addSection(new DialogMusicListSectioned(mContext));
 
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -139,12 +137,25 @@ public class PlayingUIController implements View.OnClickListener {
             }
         });
 
-        initMusicCoverAnim();
+
+    }
+
+    public void updateUI(MusicInfo info) {
+        resetCoverAnim();
+        mMusicName.setText(info.musicTitle);
+        mSongerName.setText(info.musicArtist);
+        GlideUtil.loadImageByUrl(mContext, info.musicCover, mMusicCover);
+        GlideUtil.loadBlurImage(mContext, info.musicCover, mMusicBg);
+        mSeekBar.setProgress(0);
+        mSeekBar.setMax((int) info.musicDuration);
+        mTotalTime.setText(FormatUtil.formatMusicTime(info.musicDuration));
     }
 
     /**
      * 转圈动画
      */
+
+
     private void initMusicCoverAnim() {
         mCoverAnim = ObjectAnimator.ofFloat(mMusicCover, "rotation", 0, 359);
         mCoverAnim.setDuration(20000);
@@ -166,6 +177,11 @@ public class PlayingUIController implements View.OnClickListener {
     private void pauseCoverAnim() {
         currentPlayTime = mCoverAnim.getCurrentPlayTime();
         mCoverAnim.cancel();
+    }
+
+    private void resetCoverAnim() {
+        pauseCoverAnim();
+        mMusicCover.setRotation(0);
     }
 
     /**
@@ -245,7 +261,7 @@ public class PlayingUIController implements View.OnClickListener {
 
     void onDestroy() {
         pauseCoverAnim();
-        mCoverAnim = null;
+        //    mCoverAnim = null;
         mPlayListAnim = null;
         mTimerTaskManager.onRemoveUpdateProgressTask();
     }
@@ -259,7 +275,7 @@ public class PlayingUIController implements View.OnClickListener {
             case R.id.btn_play_time:
                 break;
             case R.id.btn_play_pause:
-                PlayHelper.playMusic(mContext, mMusicInfo);
+                MusicManager.get().playMusicByInfo(mMusicInfo);
                 break;
             case R.id.btn_pre:
                 MusicManager.get().playPre();
