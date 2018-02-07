@@ -103,7 +103,9 @@ public class SongListActivity extends BaseMvpActivity<SongListContract.View, Son
         mAdapter.setOnItemClickListener((musicInfo, position) -> {
             mDbManager.AsySavePlayList(mAdapter.getDataList())
                     .subscribe(aBoolean -> {
-                        MusicManager.get().setPlayListWithIndex(mAdapter.getDataList(), position);
+                        if (!MusicManager.isCurrMusicIsPlayingMusic(mAdapter.getDataList().get(position))) {
+                            MusicManager.get().playMusic(mAdapter.getDataList(), position, true);
+                        }
                         PlayingDetailActivity.launch(SongListActivity.this, musicInfo);
                     }, throwable -> {
                         Toast.makeText(mContext, "播放失败", Toast.LENGTH_SHORT).show();
@@ -117,7 +119,9 @@ public class SongListActivity extends BaseMvpActivity<SongListContract.View, Son
         mFloatingActionButton.setOnClickListener(v -> {
             mDbManager.AsySavePlayList(mAdapter.getDataList())
                     .subscribe(aBoolean -> {
-                        MusicManager.get().setPlayList(mAdapter.getDataList());
+                        if (!MusicManager.isCurrMusicIsPlayingMusic(mAdapter.getDataList().get(0))) {
+                            MusicManager.get().playMusic(mAdapter.getDataList(), 0);
+                        }
                         PlayingDetailActivity.launch(SongListActivity.this, mAdapter.getDataList().get(0));
                     }, throwable -> {
                         LogUtil.i("error = " + throwable.getMessage());

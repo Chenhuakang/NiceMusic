@@ -37,11 +37,11 @@ public class MainItemSectioned extends StatelessSection {
 
     private Integer[] songCoverArray = new Integer[]{
             R.drawable.image_song_list,
-            R.drawable.image_korea,
-            R.drawable.image_japan,
-            R.drawable.image_mainland,
-            R.drawable.image_occident,
-            R.drawable.image_hongkong,
+            R.drawable.image_new_song,
+            R.drawable.image_hot_song,
+            R.drawable.image_rock,
+            R.drawable.image_jazz,
+            R.drawable.image_popular,
             R.drawable.image_europe,
             R.drawable.image_classic,
             R.drawable.image_love_song,

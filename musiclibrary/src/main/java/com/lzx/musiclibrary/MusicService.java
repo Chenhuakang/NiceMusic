@@ -81,8 +81,8 @@ public class MusicService extends Service implements QueueManager.MetadataUpdate
     }
 
     @Override
-    public void onCurrentQueueIndexUpdated(int queueIndex, boolean isSwitchMusic) {
-        mPlaybackManager.handlePlayPauseRequest(isSwitchMusic);
+    public void onCurrentQueueIndexUpdated(int queueIndex,boolean isJustPlay,  boolean isSwitchMusic) {
+        mPlaybackManager.handlePlayPauseRequest(isJustPlay,isSwitchMusic);
     }
 
     /**

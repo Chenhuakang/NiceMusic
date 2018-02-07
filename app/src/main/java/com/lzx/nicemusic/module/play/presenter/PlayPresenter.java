@@ -9,6 +9,7 @@ import com.lzx.nicemusic.network.RetrofitHelper;
 import org.json.JSONObject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -19,7 +20,7 @@ import io.reactivex.schedulers.Schedulers;
 public class PlayPresenter extends BasePresenter<PlayContract.View> implements PlayContract.Presenter<PlayContract.View> {
     @Override
     public void requestSingerInfo(String uid) {
-        RetrofitHelper.getMusicApi().requestArtistInfo(uid)
+        Disposable subscriber =  RetrofitHelper.getMusicApi().requestArtistInfo(uid)
                 .map(responseBody -> {
                     String json = responseBody.string();
                     json = json.substring(1, json.length() - 2);
@@ -29,5 +30,6 @@ public class PlayPresenter extends BasePresenter<PlayContract.View> implements P
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(singerInfo -> mView.onSingerInfoSuccess(singerInfo), throwable -> LogUtil.i("throwable = " + throwable.getMessage()));
+        addSubscribe(subscriber);
     }
 }

@@ -230,36 +230,48 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
+    public void playMusic(List<MusicInfo> list, int index, boolean isJustPlay) {
+        if (control != null) {
+            try {
+                control.playMusic(list, index, isJustPlay);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void playMusic(List<MusicInfo> list, int index) {
+        playMusic(list, index, false);
+    }
+
+    @Override
+    public void playMusicByInfo(MusicInfo info, boolean isJustPlay) {
         if (control != null) {
             try {
-                control.playMusic(list, index);
+                control.playMusicByInfo(info, isJustPlay);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    @Override
     public void playMusicByInfo(MusicInfo info) {
+        playMusicByInfo(info, false);
+    }
+
+    @Override
+    public void playMusicByIndex(int index, boolean isJustPlay) {
         if (control != null) {
             try {
-                control.playMusicByInfo(info);
+                control.playMusicByIndex(index, isJustPlay);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    @Override
     public void playMusicByIndex(int index) {
-        if (control != null) {
-            try {
-                control.playMusicByIndex(index);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
+        playMusicByIndex(index, false);
     }
 
     @Override
@@ -552,7 +564,13 @@ public class MusicManager implements IPlayControl {
      */
     public static boolean isCurrMusicIsPlayingMusic(MusicInfo currMusic) {
         MusicInfo playingMusic = MusicManager.get().getCurrPlayingMusic();
-        return playingMusic != null && currMusic.musicId.equals(playingMusic.musicId);
+        boolean result;
+        if (playingMusic == null) {
+            result = false;
+        } else {
+            result = currMusic.musicId.equals(playingMusic.musicId);
+        }
+        return result;
     }
 
     /**

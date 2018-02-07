@@ -8,7 +8,6 @@ import com.lzx.musiclibrary.AlbumArtCache;
 import com.lzx.musiclibrary.PlayMode;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.helper.QueueHelper;
-import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -184,9 +183,10 @@ public class QueueManager {
      * @param musicId 音乐id
      * @return
      */
-    public void setCurrentQueueItem(String musicId, boolean isSwitchMusic) {
+    public void setCurrentQueueItem(String musicId, boolean isJustPlay,boolean isSwitchMusic) {
         int index = QueueHelper.getMusicIndexOnQueue(mPlayingQueue, musicId);
-        setCurrentQueueIndex(index, isSwitchMusic);
+
+        setCurrentQueueIndex(index,isJustPlay, isSwitchMusic);
     }
 
     /**
@@ -194,10 +194,10 @@ public class QueueManager {
      *
      * @param index 队列下标
      */
-    private void setCurrentQueueIndex(int index, boolean isSwitchMusic) {
+    private void setCurrentQueueIndex(int index,boolean isJustPlay, boolean isSwitchMusic) {
         if (index >= 0 && index < mPlayingQueue.size()) {
             mCurrentIndex = index;
-            mListener.onCurrentQueueIndexUpdated(mCurrentIndex, isSwitchMusic);
+            mListener.onCurrentQueueIndexUpdated(mCurrentIndex, isJustPlay,isSwitchMusic);
         }
     }
 
@@ -289,7 +289,7 @@ public class QueueManager {
 
         void onMetadataRetrieveError();
 
-        void onCurrentQueueIndexUpdated(int queueIndex, boolean isSwitchMusic);
+        void onCurrentQueueIndexUpdated(int queueIndex,boolean isJustPlay, boolean isSwitchMusic);
 
         void onQueueUpdated(List<MediaSessionCompat.QueueItem> newQueue, List<MusicInfo> playingQueue);
     }

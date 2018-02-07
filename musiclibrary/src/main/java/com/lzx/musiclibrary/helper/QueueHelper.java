@@ -5,6 +5,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.playback.QueueManager;
+import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -120,6 +121,7 @@ public class QueueHelper {
     public static boolean isNeedToSwitchMusic(QueueManager queueManager, MusicInfo info) {
         String playingMusicId = queueManager.getCurrentMusic().musicId;
         String currMusicId = info.musicId;
+        LogUtil.i("playingMusicId = " + playingMusicId + "  currMusicId = " + currMusicId);
         return !playingMusicId.equals(currMusicId);
     }
 

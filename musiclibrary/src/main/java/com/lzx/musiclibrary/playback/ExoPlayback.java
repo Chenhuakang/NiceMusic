@@ -91,7 +91,6 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
      */
     private void releaseResources(boolean releasePlayer) {
         // Stops and releases player (if requested and available).
-        LogUtil.i("releaseResources   releasePlayer = " + releasePlayer);
         if (releasePlayer && mExoPlayer != null) {
             mExoPlayer.release();
             mExoPlayer.removeListener(mEventListener);

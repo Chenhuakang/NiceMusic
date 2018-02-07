@@ -13,6 +13,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -28,32 +29,7 @@ public class SongListPresenter extends BasePresenter<SongListContract.View> impl
 
     @Override
     public void requestSongList(String title) {
-        int type = getListType(title);
-        RetrofitHelper.getMusicApi().requestMusicList(type, size, offset)
-                .map(responseBody -> {
-                    List<MusicInfo> list = DataHelper.fetchJSONFromUrl(responseBody);
-                    //请求播放链接
-                    Observable.fromIterable(list)
-                            .forEach(info ->
-                                    RetrofitHelper.getMusicApi().playMusic(info.musicId)
-                                            .map(responseUrlBody -> {
-                                                String json = responseUrlBody.string();
-                                                json = json.substring(1, json.length() - 2);
-                                                JSONObject jsonObject = new JSONObject(json);
-                                                JSONObject bitrate = jsonObject.getJSONObject("bitrate");
-                                                return bitrate.getString("file_link");
-                                            })
-                                            .subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe(url -> {
-                                                info.musicUrl = url;
-                                                list.add(info);
-                                            }, throwable -> {
-                                                LogUtil.i("1error = " + throwable.getMessage());
-                                            })
-                            );
-                    return list;
-                })
+        Disposable subscriber = getSongList(title)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(list -> {
@@ -62,38 +38,14 @@ public class SongListPresenter extends BasePresenter<SongListContract.View> impl
                 }, throwable -> {
                     LogUtil.i("error = " + throwable.getMessage());
                 });
+        addSubscribe(subscriber);
     }
 
     @Override
     public void loadMoreSongList(String title) {
         if (isMore) {
             offset += 10;
-            int type = getListType(title);
-            RetrofitHelper.getMusicApi().requestMusicList(type, size, offset)
-                    .map(responseBody -> {
-                        List<MusicInfo> list = DataHelper.fetchJSONFromUrl(responseBody);
-                        Observable.fromIterable(list)
-                                .forEach(info ->
-                                        RetrofitHelper.getMusicApi().playMusic(info.musicId)
-                                                .map(responseUrlBody -> {
-                                                    String json = responseUrlBody.string();
-                                                    json = json.substring(1, json.length() - 2);
-                                                    JSONObject jsonObject = new JSONObject(json);
-                                                    JSONObject bitrate = jsonObject.getJSONObject("bitrate");
-                                                    return bitrate.getString("file_link");
-                                                })
-                                                .subscribeOn(Schedulers.io())
-                                                .observeOn(AndroidSchedulers.mainThread())
-                                                .subscribe(url -> {
-                                                    info.musicUrl = url;
-                                                    list.add(info);
-                                                    LogUtil.i("title = " + info.musicTitle + " url = " + info.musicUrl);
-                                                }, throwable -> {
-                                                    LogUtil.i("1error = " + throwable.getMessage());
-                                                })
-                                );
-                        return list;
-                    })
+            Disposable subscriber = getSongList(title)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(list -> {
@@ -102,19 +54,47 @@ public class SongListPresenter extends BasePresenter<SongListContract.View> impl
                     }, throwable -> {
                         LogUtil.i("error = " + throwable.getMessage());
                     });
+            addSubscribe(subscriber);
         } else {
             mView.loadFinishAllData();
         }
     }
 
+    private Observable<List<MusicInfo>> getSongList(String title) {
+        int type = getListType(title);
+        return RetrofitHelper.getMusicApi().requestMusicList(type, size, offset)
+                .map(responseBody -> {
+                    List<MusicInfo> list = DataHelper.fetchJSONFromUrl(responseBody);
+                    for (MusicInfo info : list) {
+                        RetrofitHelper.getMusicApi().playMusic(info.musicId)
+                                .map(responseUrlBody -> {
+                                    String json = responseUrlBody.string();
+                                    json = json.substring(1, json.length() - 2);
+                                    JSONObject jsonObject = new JSONObject(json);
+                                    JSONObject bitrate = jsonObject.getJSONObject("bitrate");
+                                    return bitrate.getString("file_link");
+                                })
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(url -> {
+                                    info.musicUrl = url;
+                                    list.add(info);
+                                }, throwable -> {
+                                    LogUtil.i("1error = " + throwable.getMessage());
+                                });
+                    }
+                    return list;
+                });
+    }
+
 
     private Integer[] songCoverArray = new Integer[]{
             R.drawable.image_song_list,
-            R.drawable.image_korea,
-            R.drawable.image_japan,
-            R.drawable.image_mainland,
-            R.drawable.image_occident,
-            R.drawable.image_hongkong,
+            R.drawable.image_new_song,
+            R.drawable.image_hot_song,
+            R.drawable.image_rock,
+            R.drawable.image_jazz,
+            R.drawable.image_popular,
             R.drawable.image_europe,
             R.drawable.image_classic,
             R.drawable.image_love_song,

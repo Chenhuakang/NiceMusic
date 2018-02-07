@@ -8,13 +8,13 @@ interface IPlayControl {
 
 
     //播放，并设置播放列表
-     void playMusic(in List<MusicInfo> list, int index);
+     void playMusic(in List<MusicInfo> list, int index ,boolean isJustPlay);
 
     //根据音乐信息播放
-     void playMusicByInfo(in MusicInfo info);
+     void playMusicByInfo(in MusicInfo info,boolean isJustPlay);
 
     //根据索引播放
-    void playMusicByIndex(int index);
+    void playMusicByIndex(int index,boolean isJustPlay);
 
     //定时播放
     void playMusicAutoStopWhen(in List<MusicInfo> list, int index, int time);

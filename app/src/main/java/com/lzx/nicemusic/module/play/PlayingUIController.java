@@ -9,7 +9,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 import com.lzx.musiclibrary.TimerTaskManager;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
-import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.module.play.sectioned.DialogMusicListSectioned;
 import com.lzx.nicemusic.utils.DisplayUtil;
@@ -108,17 +106,11 @@ public class PlayingUIController implements View.OnClickListener {
             mSeekBar.setProgress((int) MusicManager.get().getProgress());
             if (MusicManager.isPaused()) {
                 mBtnPlayPause.setImageResource(R.drawable.notify_btn_dark_play_normal);
-            }
-            if (MusicManager.isPlaying() || MusicManager.isIdea()) {
+            } else if (MusicManager.isPlaying()) {
                 mBtnPlayPause.setImageResource(R.drawable.notify_btn_dark_pause_normal);
                 mTimerTaskManager.scheduleSeekBarUpdate();
                 startCoverAnim();
             }
-            if (MusicManager.isIdea()){
-                MusicManager.get().playMusicByInfo(mMusicInfo);
-            }
-        } else {
-            MusicManager.get().playMusicByInfo(mMusicInfo);
         }
 
         phoneHeight = DisplayUtil.getPhoneHeight(mContext);

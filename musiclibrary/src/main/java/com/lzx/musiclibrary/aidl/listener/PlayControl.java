@@ -144,25 +144,25 @@ public class PlayControl extends IPlayControl.Stub implements PlaybackManager.Pl
     }
 
     @Override
-    public void playMusic(List<MusicInfo> list, int index) throws RemoteException {
+    public void playMusic(List<MusicInfo> list, int index,boolean isJustPlay) throws RemoteException {
         if (!QueueHelper.isIndexPlayable(index, list)) {
             return;
         }
         mQueueManager.setCurrentQueue(list, index);
-        mQueueManager.setCurrentQueueItem(list.get(index).musicId, QueueHelper.isNeedToSwitchMusic(mQueueManager, list, index));
+        mQueueManager.setCurrentQueueItem(list.get(index).musicId,isJustPlay, QueueHelper.isNeedToSwitchMusic(mQueueManager, list, index));
     }
 
     @Override
-    public void playMusicByInfo(MusicInfo info) throws RemoteException {
+    public void playMusicByInfo(MusicInfo info,boolean isJustPlay) throws RemoteException {
         if (info == null) {
             return;
         }
         mQueueManager.addQueueItem(info);
-        mQueueManager.setCurrentQueueItem(info.musicId, QueueHelper.isNeedToSwitchMusic(mQueueManager, info));
+        mQueueManager.setCurrentQueueItem(info.musicId, isJustPlay,QueueHelper.isNeedToSwitchMusic(mQueueManager, info));
     }
 
     @Override
-    public void playMusicByIndex(int index) throws RemoteException {
+    public void playMusicByIndex(int index,boolean isJustPlay) throws RemoteException {
         if (mQueueManager.getPlayingQueue().size() == 0) {
             return;
         }
@@ -170,7 +170,7 @@ public class PlayControl extends IPlayControl.Stub implements PlaybackManager.Pl
             return;
         }
         MusicInfo playInfo = mQueueManager.getPlayingQueue().get(index);
-        mQueueManager.setCurrentQueueItem(playInfo.musicId, QueueHelper.isNeedToSwitchMusic(mQueueManager, playInfo));
+        mQueueManager.setCurrentQueueItem(playInfo.musicId,isJustPlay, QueueHelper.isNeedToSwitchMusic(mQueueManager, playInfo));
     }
 
     @Override
