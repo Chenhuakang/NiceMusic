@@ -1,4 +1,4 @@
-package com.lzx.musiclibrary.playback;
+package com.lzx.musiclibrary.constans;
 
 /**
  * @author lzx

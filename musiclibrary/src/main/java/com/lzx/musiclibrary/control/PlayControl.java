@@ -1,16 +1,19 @@
-package com.lzx.musiclibrary.aidl.listener;
+package com.lzx.musiclibrary.control;
 
 import android.content.Context;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
-import android.support.v4.media.session.PlaybackStateCompat;
 
-import com.lzx.musiclibrary.PlayMode;
+import com.lzx.musiclibrary.aidl.listener.IOnPlayerEventListener;
+import com.lzx.musiclibrary.aidl.listener.IPlayControl;
+import com.lzx.musiclibrary.aidl.listener.NotifyContract;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.constans.PlayMode;
+import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.helper.QueueHelper;
-import com.lzx.musiclibrary.playback.PlaybackManager;
-import com.lzx.musiclibrary.playback.QueueManager;
-import com.lzx.musiclibrary.playback.State;
+import com.lzx.musiclibrary.playback.player.ExoPlayback;
+import com.lzx.musiclibrary.playback.player.MediaPlayback;
+import com.lzx.musiclibrary.playback.player.Playback;
 
 import java.util.List;
 
@@ -18,33 +21,36 @@ import java.util.List;
  * Created by xian on 2018/1/28.
  */
 
-public class PlayControl extends IPlayControl.Stub implements PlaybackManager.PlaybackServiceCallback {
+public class PlayControl extends IPlayControl.Stub {
 
-    private QueueManager mQueueManager;
-    private PlaybackManager mPlaybackManager;
     private PlayMode mPlayMode;
     private Context mContext;
+    private PlayController mController;
+    private Playback playback;
 
     private RemoteCallbackList<IOnPlayerEventListener> mRemoteCallbackList;
     private NotifyContract.NotifyStatusChanged mNotifyStatusChanged;
     private NotifyContract.NotifyMusicSwitch mNotifyMusicSwitch;
 
-    public PlayControl(Context context, QueueManager queueManager, PlaybackManager playbackManager, PlayMode playMode) {
-        mQueueManager = queueManager;
-        mPlaybackManager = playbackManager;
+    public PlayControl(Context context, boolean isUseMediaPlayer, boolean isAutoPlayNext) {
         mContext = context;
-        mPlaybackManager.setServiceCallback(this);
 
-        mPlayMode = playMode;
         mNotifyStatusChanged = new NotifyStatusChange();
         mNotifyMusicSwitch = new NotifyMusicSwitch();
         mRemoteCallbackList = new RemoteCallbackList<>();
+
+        mPlayMode = new PlayMode();
+        playback = isUseMediaPlayer ? new MediaPlayback(context) : new ExoPlayback(context);
+        mController = new PlayController(
+                mContext, mPlayMode, playback, mNotifyStatusChanged, mNotifyMusicSwitch, isAutoPlayNext
+        );
     }
 
     private class NotifyStatusChange implements NotifyContract.NotifyStatusChanged {
 
         @Override
         public void notify(MusicInfo info, int index, int status, String errorMsg) {
+
             synchronized (NotifyStatusChange.class) {
                 final int N = mRemoteCallbackList.beginBroadcast();
                 for (int i = 0; i < N; i++) {
@@ -106,71 +112,33 @@ public class PlayControl extends IPlayControl.Stub implements PlaybackManager.Pl
         }
     }
 
-    @Override
-    public void onPlaybackSwitch(MusicInfo info) {
-        mNotifyMusicSwitch.notify(info);
+    public Playback getPlayback() {
+        return playback;
+    }
+
+    public void releaseMediaSession() {
+        mController.releaseMediaSession();
     }
 
     @Override
-    public void onPlaybackError(String errorMsg) {
-        try {
-            mNotifyStatusChanged.notify(getCurrPlayingMusic(), getCurrPlayingIndex(), State.STATE_ERROR, errorMsg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onPlaybackCompletion() {
-        try {
-            mNotifyStatusChanged.notify(getCurrPlayingMusic(), getCurrPlayingIndex(), State.STATE_ENDED, null);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onNotificationRequired() {
-
-    }
-
-    @Override
-    public void onPlaybackStateUpdated(int state, PlaybackStateCompat newState) {
-        try {
-            mNotifyStatusChanged.notify(getCurrPlayingMusic(), getCurrPlayingIndex(), state, null);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void playMusic(List<MusicInfo> list, int index,boolean isJustPlay) throws RemoteException {
+    public void playMusic(List<MusicInfo> list, int index, boolean isJustPlay) throws RemoteException {
         if (!QueueHelper.isIndexPlayable(index, list)) {
             return;
         }
-        mQueueManager.setCurrentQueue(list, index);
-        mQueueManager.setCurrentQueueItem(list.get(index).musicId,isJustPlay, QueueHelper.isNeedToSwitchMusic(mQueueManager, list, index));
+        mController.playMusic(list, index, isJustPlay);
     }
 
     @Override
-    public void playMusicByInfo(MusicInfo info,boolean isJustPlay) throws RemoteException {
+    public void playMusicByInfo(MusicInfo info, boolean isJustPlay) throws RemoteException {
         if (info == null) {
             return;
         }
-        mQueueManager.addQueueItem(info);
-        mQueueManager.setCurrentQueueItem(info.musicId, isJustPlay,QueueHelper.isNeedToSwitchMusic(mQueueManager, info));
+        mController.playMusicByInfo(info, isJustPlay);
     }
 
     @Override
-    public void playMusicByIndex(int index,boolean isJustPlay) throws RemoteException {
-        if (mQueueManager.getPlayingQueue().size() == 0) {
-            return;
-        }
-        if (!QueueHelper.isIndexPlayable(index, mQueueManager.getPlayingQueue())) {
-            return;
-        }
-        MusicInfo playInfo = mQueueManager.getPlayingQueue().get(index);
-        mQueueManager.setCurrentQueueItem(playInfo.musicId,isJustPlay, QueueHelper.isNeedToSwitchMusic(mQueueManager, playInfo));
+    public void playMusicByIndex(int index, boolean isJustPlay) throws RemoteException {
+        mController.playMusicByIndex(index, isJustPlay);
     }
 
     @Override
@@ -195,82 +163,87 @@ public class PlayControl extends IPlayControl.Stub implements PlaybackManager.Pl
 
     @Override
     public int getCurrPlayingIndex() throws RemoteException {
-        return mQueueManager.getCurrentIndex();
+        return mController.getCurrPlayingIndex();
     }
 
     @Override
     public void pauseMusic() throws RemoteException {
-        mPlaybackManager.handlePauseRequest();
+        mController.pauseMusic();
     }
 
     @Override
     public void resumeMusic() throws RemoteException {
-        mPlaybackManager.handlePlayRequest();
+        mController.resumeMusic();
     }
 
     @Override
     public void stopMusic() throws RemoteException {
-        mPlaybackManager.handleStopRequest("");
+        mController.stopMusic();
     }
 
     @Override
     public void setPlayList(List<MusicInfo> list) throws RemoteException {
-        mQueueManager.setCurrentQueue(list);
+        mController.setPlayList(list);
     }
 
     @Override
     public void setPlayListWithIndex(List<MusicInfo> list, int index) throws RemoteException {
-        mQueueManager.setCurrentQueue(list, index);
+        mController.setPlayListWithIndex(list, index);
     }
 
     @Override
     public List<MusicInfo> getPlayList() throws RemoteException {
-        return mQueueManager.getPlayingQueue();
+        return mController.getPlayList();
+    }
+
+    @Override
+    public void deleteMusicInfoOnPlayList(MusicInfo info) throws RemoteException {
+        mController.deleteMusicInfoOnPlayList(info);
     }
 
     @Override
     public int getStatus() throws RemoteException {
-        return mPlaybackManager.getPlayback().getState();
+        return mController.getState();
     }
 
     @Override
     public void playNext() throws RemoteException {
-        mPlaybackManager.playNextOrPre(1);
+        mController.playNext();
     }
 
     @Override
     public void playPre() throws RemoteException {
-        mPlaybackManager.playNextOrPre(-1);
+        mController.playPre();
     }
 
     @Override
     public boolean hasPre() throws RemoteException {
-        return mPlaybackManager.hasNextOrPre();
+        return mController.hasPre();
     }
 
     @Override
     public boolean hasNext() throws RemoteException {
-        return mPlaybackManager.hasNextOrPre();
+        return mController.hasNext();
     }
 
     @Override
     public MusicInfo getPreMusic() throws RemoteException {
-        return mQueueManager.getPreMusicInfo();
+        return mController.getPreMusic();
     }
 
     @Override
     public MusicInfo getNextMusic() throws RemoteException {
-        return mQueueManager.getNextMusicInfo();
+        return mController.getNextMusic();
     }
 
     @Override
     public MusicInfo getCurrPlayingMusic() throws RemoteException {
-        return mQueueManager.getCurrentMusic();
+        return mController.getCurrPlayingMusic();
     }
 
     @Override
     public void setCurrMusic(int index) throws RemoteException {
-        mQueueManager.setCurrentMusic(index);
+        mController.setCurrMusic(index);
     }
 
     @Override
@@ -285,12 +258,12 @@ public class PlayControl extends IPlayControl.Stub implements PlaybackManager.Pl
 
     @Override
     public long getProgress() throws RemoteException {
-        return mPlaybackManager.getPlayback().getCurrentStreamPosition();
+        return mController.getProgress();
     }
 
     @Override
     public void seekTo(int position) throws RemoteException {
-        mPlaybackManager.getPlayback().seekTo(position);
+        mController.seekTo(position);
     }
 
     @Override

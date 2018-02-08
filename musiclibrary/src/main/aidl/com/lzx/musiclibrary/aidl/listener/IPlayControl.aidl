@@ -6,7 +6,6 @@ import com.lzx.musiclibrary.aidl.listener.IOnPlayerEventListener;
 
 interface IPlayControl {
 
-
     //播放，并设置播放列表
      void playMusic(in List<MusicInfo> list, int index ,boolean isJustPlay);
 
@@ -48,6 +47,9 @@ interface IPlayControl {
 
     //得到播放列表
     List<MusicInfo> getPlayList();
+
+    //从播放列表中删除一条信息
+    void deleteMusicInfoOnPlayList(in MusicInfo info);
 
     //获取播放状态
     int getStatus();

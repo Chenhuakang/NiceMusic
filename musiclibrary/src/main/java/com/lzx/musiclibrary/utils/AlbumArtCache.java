@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lzx.musiclibrary;
+package com.lzx.musiclibrary.utils;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;

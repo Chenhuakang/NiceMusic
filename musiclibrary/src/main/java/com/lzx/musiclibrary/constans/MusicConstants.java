@@ -1,4 +1,4 @@
-package com.lzx.musiclibrary;
+package com.lzx.musiclibrary.constans;
 
 /**
  * Created by xian on 2018/1/20.

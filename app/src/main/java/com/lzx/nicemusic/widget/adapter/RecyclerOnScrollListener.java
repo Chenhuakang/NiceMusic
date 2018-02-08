@@ -3,8 +3,6 @@ package com.lzx.nicemusic.widget.adapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.lzx.musiclibrary.utils.LogUtil;
-
 /**
  * Created by xian on 2018/2/5.
  */
@@ -32,8 +30,6 @@ public abstract class RecyclerOnScrollListener extends RecyclerView.OnScrollList
         super.onScrolled(recyclerView, dx, dy);
 
         if (shouldLoading) {
-            boolean isSlideToBottom = isSlideToBottom(recyclerView);
-            LogUtil.i("isSlideToBottom = " + isSlideToBottom);
             if (isSlideToBottom(recyclerView)) {
                 currentPage++;
                 onLoadMore(currentPage);

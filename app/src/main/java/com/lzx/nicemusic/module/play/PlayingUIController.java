@@ -14,10 +14,11 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.lzx.musiclibrary.TimerTaskManager;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
+import com.lzx.musiclibrary.manager.TimerTaskManager;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.module.play.sectioned.DialogMusicListSectioned;
 import com.lzx.nicemusic.utils.DisplayUtil;
@@ -43,6 +44,7 @@ public class PlayingUIController implements View.OnClickListener {
     private RecyclerView mRecyclerView;
     private View mPlayDarkBg;
     private SectionedRecyclerViewAdapter mRecyclerViewAdapter;
+    private DialogMusicListSectioned mSectioned;
 
     private RelativeLayout.LayoutParams params;
     private int phoneHeight;
@@ -119,7 +121,24 @@ public class PlayingUIController implements View.OnClickListener {
         mRecyclerViewAdapter = new SectionedRecyclerViewAdapter();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
-        mRecyclerViewAdapter.addSection(new DialogMusicListSectioned(mContext));
+        mSectioned = new DialogMusicListSectioned(mContext);
+        mRecyclerViewAdapter.addSection(mSectioned);
+        mSectioned.setOnDeleteClickListener((info, position) -> {
+            mSectioned.getDbManager().AsyDeleteInfoInPlayList(info)
+                    .subscribe(aBoolean -> {
+                        mRecyclerViewAdapter.notifyItemRemovedFromSection(mSectioned, position);
+                        MusicManager.get().deleteMusicInfoOnPlayList(info);
+
+                    }, throwable -> {
+                        Toast.makeText(mActivity, "删除失败", Toast.LENGTH_SHORT).show();
+                    });
+        });
+        mSectioned.setNotifyListener(msg -> {
+            if (msg == MusicManager.MSG_PLAYER_START || msg == MusicManager.MSG_PLAYER_PAUSE) {
+                mRecyclerViewAdapter.notifyDataSetChanged();
+            }
+        });
+        MusicManager.get().addStateObservable(mSectioned);
 
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -137,11 +156,9 @@ public class PlayingUIController implements View.OnClickListener {
                 MusicManager.get().seekTo(seekBar.getProgress());
             }
         });
-
-
     }
 
-    public void updateUI(MusicInfo info) {
+    void updateUI(MusicInfo info) {
         resetCoverAnim();
         mMusicName.setText(info.musicTitle);
         mSongerName.setText(info.musicArtist);

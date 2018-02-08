@@ -1,13 +1,13 @@
-package com.lzx.musiclibrary.playback;
+package com.lzx.musiclibrary.manager;
 
 import android.graphics.Bitmap;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 
-import com.lzx.musiclibrary.AlbumArtCache;
-import com.lzx.musiclibrary.PlayMode;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.constans.PlayMode;
 import com.lzx.musiclibrary.helper.QueueHelper;
+import com.lzx.musiclibrary.utils.AlbumArtCache;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,6 +33,10 @@ public class QueueManager {
         mCurrentIndex = 0;
         mListener = listener;
         mPlayMode = playMode;
+    }
+
+    public void setListener(MetadataUpdateListener listener) {
+        mListener = listener;
     }
 
     /**
@@ -74,7 +78,9 @@ public class QueueManager {
 
         //通知播放列表更新了
         List<MediaSessionCompat.QueueItem> queueItems = QueueHelper.getQueueItems(mMusicListById);
-        mListener.onQueueUpdated(queueItems, mPlayingQueue);
+        if (mListener != null) {
+            mListener.onQueueUpdated(queueItems, mPlayingQueue);
+        }
     }
 
     /**
@@ -100,7 +106,28 @@ public class QueueManager {
         mMusicListById.put(info.musicId, info);
         //通知播放列表更新了
         List<MediaSessionCompat.QueueItem> queueItems = QueueHelper.getQueueItems(mMusicListById);
-        mListener.onQueueUpdated(queueItems, mPlayingQueue);
+        if (mListener != null) {
+            mListener.onQueueUpdated(queueItems, mPlayingQueue);
+        }
+    }
+
+    public void deleteQueueItem(MusicInfo info) {
+        if (mPlayingQueue.size() == 0 || mMusicListById.size() == 0) {
+            return;
+        }
+        if (!mPlayingQueue.contains(info) || !mMusicListById.containsKey(info.musicId)) {
+            return;
+        }
+        //更改下标为下一首
+        skipQueuePosition(1);
+        mPlayingQueue.remove(info);
+        mMusicListById.remove(info.musicId, info);
+        List<MediaSessionCompat.QueueItem> queueItems = QueueHelper.getQueueItems(mMusicListById);
+        if (mListener != null) {
+            mListener.onQueueUpdated(queueItems, mPlayingQueue);
+            //播放下一首
+            mListener.onCurrentQueueIndexUpdated(mCurrentIndex, true, true);
+        }
     }
 
     /**
@@ -183,10 +210,10 @@ public class QueueManager {
      * @param musicId 音乐id
      * @return
      */
-    public void setCurrentQueueItem(String musicId, boolean isJustPlay,boolean isSwitchMusic) {
+    public void setCurrentQueueItem(String musicId, boolean isJustPlay, boolean isSwitchMusic) {
         int index = QueueHelper.getMusicIndexOnQueue(mPlayingQueue, musicId);
 
-        setCurrentQueueIndex(index,isJustPlay, isSwitchMusic);
+        setCurrentQueueIndex(index, isJustPlay, isSwitchMusic);
     }
 
     /**
@@ -194,10 +221,12 @@ public class QueueManager {
      *
      * @param index 队列下标
      */
-    private void setCurrentQueueIndex(int index,boolean isJustPlay, boolean isSwitchMusic) {
+    private void setCurrentQueueIndex(int index, boolean isJustPlay, boolean isSwitchMusic) {
         if (index >= 0 && index < mPlayingQueue.size()) {
             mCurrentIndex = index;
-            mListener.onCurrentQueueIndexUpdated(mCurrentIndex, isJustPlay,isSwitchMusic);
+            if (mListener != null) {
+                mListener.onCurrentQueueIndexUpdated(mCurrentIndex, isJustPlay, isSwitchMusic);
+            }
         }
     }
 
@@ -249,7 +278,9 @@ public class QueueManager {
     public void updateMetadata() {
         MusicInfo currentMusic = getCurrentMusic();
         if (currentMusic == null) {
-            mListener.onMetadataRetrieveError();
+            if (mListener != null) {
+                mListener.onMetadataRetrieveError();
+            }
             return;
         }
         final String musicId = currentMusic.musicId;
@@ -257,9 +288,9 @@ public class QueueManager {
         if (metadata == null) {
             throw new IllegalArgumentException("Invalid musicId " + musicId);
         }
-
-        mListener.onMetadataChanged(metadata);
-
+        if (mListener != null) {
+            mListener.onMetadataChanged(metadata);
+        }
         // Set the proper album artwork on the media session, so it can be shown in the
         // locked screen and in other places.
         if (metadata.musicCoverBitmap == null && !TextUtils.isEmpty(metadata.musicCover)) {
@@ -276,7 +307,9 @@ public class QueueManager {
                     }
                     String currentPlayingId = currentMusic.musicId;
                     if (musicId.equals(currentPlayingId)) {
-                        mListener.onMetadataChanged(QueueHelper.getMusicInfoById(mMusicListById, currentPlayingId));
+                        if (mListener != null) {
+                            mListener.onMetadataChanged(QueueHelper.getMusicInfoById(mMusicListById, currentPlayingId));
+                        }
                     }
                 }
             });
@@ -289,7 +322,7 @@ public class QueueManager {
 
         void onMetadataRetrieveError();
 
-        void onCurrentQueueIndexUpdated(int queueIndex,boolean isJustPlay, boolean isSwitchMusic);
+        void onCurrentQueueIndexUpdated(int queueIndex, boolean isJustPlay, boolean isSwitchMusic);
 
         void onQueueUpdated(List<MediaSessionCompat.QueueItem> newQueue, List<MusicInfo> playingQueue);
     }

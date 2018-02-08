@@ -16,11 +16,13 @@ import com.lzx.musiclibrary.aidl.listener.IOnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.listener.IPlayControl;
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
-import com.lzx.musiclibrary.playback.State;
+import com.lzx.musiclibrary.constans.State;
+import com.lzx.musiclibrary.playback.PlayStateObservable;
 import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.Observer;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
@@ -31,19 +33,19 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MusicManager implements IPlayControl {
 
-    private static final int MSG_MUSIC_CHANGE = 0;
-    private static final int MSG_PLAYER_START = 1;
-    private static final int MSG_PLAYER_PAUSE = 2;
-
-    private static final int MSG_PLAY_COMPLETION = 4;
-    private static final int MSG_PLAYER_ERROR = 5;
-    private static final int MSG_BUFFERING = 6;
+    public static final int MSG_MUSIC_CHANGE = 0;
+    public static final int MSG_PLAYER_START = 1;
+    public static final int MSG_PLAYER_PAUSE = 2;
+    public static final int MSG_PLAY_COMPLETION = 3;
+    public static final int MSG_PLAYER_ERROR = 4;
+    public static final int MSG_BUFFERING = 5;
 
     private Context mContext;
     private boolean isUseMediaPlayer;
     private boolean isAutoPlayNext = true;
     private IPlayControl control;
     private ClientHandler mClientHandler;
+    private PlayStateObservable mStateObservable;
     private CopyOnWriteArrayList<OnPlayerEventListener> mPlayerEventListeners = new CopyOnWriteArrayList<>();
 
     public static MusicManager get() {
@@ -57,6 +59,7 @@ public class MusicManager implements IPlayControl {
 
     MusicManager() {
         mClientHandler = new ClientHandler(this);
+        mStateObservable = new PlayStateObservable();
     }
 
     public MusicManager setContext(Context context) {
@@ -110,6 +113,24 @@ public class MusicManager implements IPlayControl {
         mContext.unbindService(mServiceConnection);
     }
 
+    public void addStateObservable(Observer o) {
+        if (mStateObservable != null) {
+            mStateObservable.addObserver(o);
+        }
+    }
+
+    public void deleteStateObservable(Observer o) {
+        if (mStateObservable != null) {
+            mStateObservable.deleteObserver(o);
+        }
+    }
+
+    public void clearStateObservable() {
+        if (mStateObservable != null) {
+            mStateObservable.deleteObservers();
+        }
+    }
+
     private IOnPlayerEventListener mOnPlayerEventListener = new IOnPlayerEventListener.Stub() {
         @Override
         public void onMusicSwitch(MusicInfo music) {
@@ -158,24 +179,29 @@ public class MusicManager implements IPlayControl {
                 case MSG_MUSIC_CHANGE:
                     MusicInfo musicInfo = (MusicInfo) msg.obj;
                     manager.notifyPlayerEventChange(MSG_MUSIC_CHANGE, musicInfo, "", false);
+                    manager.mStateObservable.stateChangeNotifyObservers(MSG_MUSIC_CHANGE);
                     break;
                 case MSG_PLAYER_START:
                     manager.notifyPlayerEventChange(MSG_PLAYER_START, null, "", false);
+                    manager.mStateObservable.stateChangeNotifyObservers(MSG_PLAYER_START);
                     break;
                 case MSG_PLAYER_PAUSE:
                     manager.notifyPlayerEventChange(MSG_PLAYER_PAUSE, null, "", false);
+                    manager.mStateObservable.stateChangeNotifyObservers(MSG_PLAYER_START);
                     break;
-
                 case MSG_PLAY_COMPLETION:
                     manager.notifyPlayerEventChange(MSG_PLAY_COMPLETION, null, "", false);
+                    manager.mStateObservable.stateChangeNotifyObservers(MSG_PLAYER_START);
                     break;
                 case MSG_PLAYER_ERROR:
                     String errMsg = (String) msg.obj;
                     manager.notifyPlayerEventChange(MSG_PLAYER_ERROR, null, errMsg, false);
+                    manager.mStateObservable.stateChangeNotifyObservers(MSG_PLAYER_START);
                     break;
                 case MSG_BUFFERING:
                     boolean isFinishBuffer = (boolean) msg.obj;
                     manager.notifyPlayerEventChange(MSG_BUFFERING, null, "", isFinishBuffer);
+                    manager.mStateObservable.stateChangeNotifyObservers(MSG_PLAYER_START);
                     break;
                 default:
                     super.handleMessage(msg);
@@ -395,6 +421,17 @@ public class MusicManager implements IPlayControl {
             }
         }
         return null;
+    }
+
+    @Override
+    public void deleteMusicInfoOnPlayList(MusicInfo info) throws RemoteException {
+        if (control != null) {
+            try {
+                  control.deleteMusicInfoOnPlayList(info);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

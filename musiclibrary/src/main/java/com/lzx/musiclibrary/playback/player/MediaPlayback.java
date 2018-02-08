@@ -1,4 +1,4 @@
-package com.lzx.musiclibrary.playback;
+package com.lzx.musiclibrary.playback.player;
 
 import android.content.Context;
 import android.media.MediaPlayer;

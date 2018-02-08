@@ -1,4 +1,4 @@
-package com.lzx.musiclibrary;
+package com.lzx.musiclibrary.manager;
 
 import android.os.Handler;
 

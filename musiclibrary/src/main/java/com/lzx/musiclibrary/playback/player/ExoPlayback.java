@@ -1,4 +1,4 @@
-package com.lzx.musiclibrary.playback;
+package com.lzx.musiclibrary.playback.player;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -29,7 +29,7 @@ import com.google.android.exoplayer2.util.Util;
 import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.manager.FocusAndLockManager;
-import com.lzx.musiclibrary.utils.LogUtil;
+import com.lzx.musiclibrary.constans.State;
 
 import static com.google.android.exoplayer2.C.CONTENT_TYPE_MUSIC;
 import static com.google.android.exoplayer2.C.USAGE_MEDIA;

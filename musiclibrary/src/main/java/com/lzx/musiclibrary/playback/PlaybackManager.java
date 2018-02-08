@@ -7,8 +7,11 @@ import android.support.annotation.NonNull;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
-import com.lzx.musiclibrary.PlayMode;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.constans.PlayMode;
+import com.lzx.musiclibrary.constans.State;
+import com.lzx.musiclibrary.manager.QueueManager;
+import com.lzx.musiclibrary.playback.player.Playback;
 
 
 /**
@@ -90,6 +93,8 @@ public class PlaybackManager implements Playback.Callback {
                     handlePauseRequest();
                 } else {
                     handlePlayRequest();
+                    //通知切歌
+                    notifyPlaybackSwitch();
                 }
             } else if (state == State.STATE_PAUSED) {
                 handlePlayRequest();
@@ -161,6 +166,11 @@ public class PlaybackManager implements Playback.Callback {
                 handleStopRequest(null);
                 break;
         }
+        //通知切歌
+        notifyPlaybackSwitch();
+    }
+
+    private void notifyPlaybackSwitch(){
         if (mServiceCallback != null) {
             mServiceCallback.onPlaybackSwitch(mQueueManager.getCurrentMusic());
         }
