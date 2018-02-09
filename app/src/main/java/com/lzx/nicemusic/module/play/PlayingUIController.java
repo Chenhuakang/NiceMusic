@@ -127,8 +127,8 @@ public class PlayingUIController implements View.OnClickListener {
             mSectioned.getDbManager().AsyDeleteInfoInPlayList(info)
                     .subscribe(aBoolean -> {
                         mRecyclerViewAdapter.notifyItemRemovedFromSection(mSectioned, position);
-                        MusicManager.get().deleteMusicInfoOnPlayList(info);
 
+                       // MusicManager.get().deleteMusicInfoOnPlayList(info);
                     }, throwable -> {
                         Toast.makeText(mActivity, "删除失败", Toast.LENGTH_SHORT).show();
                     });

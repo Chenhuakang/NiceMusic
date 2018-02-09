@@ -119,7 +119,6 @@ public class QueueManager {
             return;
         }
         //更改下标为下一首
-        skipQueuePosition(1);
         mPlayingQueue.remove(info);
         mMusicListById.remove(info.musicId, info);
         List<MediaSessionCompat.QueueItem> queueItems = QueueHelper.getQueueItems(mMusicListById);
