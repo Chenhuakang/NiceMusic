@@ -197,8 +197,8 @@ public class PlayControl extends IPlayControl.Stub {
     }
 
     @Override
-    public void deleteMusicInfoOnPlayList(MusicInfo info) throws RemoteException {
-        mController.deleteMusicInfoOnPlayList(info);
+    public void deleteMusicInfoOnPlayList(MusicInfo info,boolean isNeedToPlayNext) throws RemoteException {
+        mController.deleteMusicInfoOnPlayList(info,isNeedToPlayNext);
     }
 
     @Override

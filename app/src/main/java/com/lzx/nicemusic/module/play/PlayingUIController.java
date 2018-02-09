@@ -3,6 +3,7 @@ package com.lzx.nicemusic.module.play;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,19 +15,22 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.manager.TimerTaskManager;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
-import com.lzx.nicemusic.module.play.sectioned.DialogMusicListSectioned;
+import com.lzx.nicemusic.bean.LrcAnalysisInfo;
+import com.lzx.nicemusic.bean.LrcInfo;
 import com.lzx.nicemusic.utils.DisplayUtil;
 import com.lzx.nicemusic.utils.FormatUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.OuterLayerImageView;
 
-import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by xian on 2018/2/4.
@@ -41,10 +45,12 @@ public class PlayingUIController implements View.OnClickListener {
     private ImageView mMusicCover;
     private RelativeLayout mPlayListLayout;
     private TextView mBtnPlayMode, mBtnDismiss;
+    private TextView mLyricsText;
+    private List<LrcAnalysisInfo> lrcList;
+
     private RecyclerView mRecyclerView;
     private View mPlayDarkBg;
-    private SectionedRecyclerViewAdapter mRecyclerViewAdapter;
-    private DialogMusicListSectioned mSectioned;
+    private DialogMusicListAdapter mDialogMusicListAdapter;
 
     private RelativeLayout.LayoutParams params;
     private int phoneHeight;
@@ -84,6 +90,7 @@ public class PlayingUIController implements View.OnClickListener {
         mBtnPre = mActivity.findViewById(R.id.btn_pre);
         mBtnNext = mActivity.findViewById(R.id.btn_next);
         mPlayDarkBg = mActivity.findViewById(R.id.play_dark_bg);
+        mLyricsText = mActivity.findViewById(R.id.lyrics_text);
 
         mBtnMusicList.setOnClickListener(this);
         mBtnPlayTime.setOnClickListener(this);
@@ -118,27 +125,11 @@ public class PlayingUIController implements View.OnClickListener {
         phoneHeight = DisplayUtil.getPhoneHeight(mContext);
         params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, phoneHeight / 2);
         mPlayListLayout.setLayoutParams(params);
-        mRecyclerViewAdapter = new SectionedRecyclerViewAdapter();
+        mDialogMusicListAdapter = new DialogMusicListAdapter(mContext);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mRecyclerView.setAdapter(mRecyclerViewAdapter);
-        mSectioned = new DialogMusicListSectioned(mContext);
-        mRecyclerViewAdapter.addSection(mSectioned);
-        mSectioned.setOnDeleteClickListener((info, position) -> {
-            mSectioned.getDbManager().AsyDeleteInfoInPlayList(info)
-                    .subscribe(aBoolean -> {
-                        mRecyclerViewAdapter.notifyItemRemovedFromSection(mSectioned, position);
+        mRecyclerView.setAdapter(mDialogMusicListAdapter);
 
-                       // MusicManager.get().deleteMusicInfoOnPlayList(info);
-                    }, throwable -> {
-                        Toast.makeText(mActivity, "删除失败", Toast.LENGTH_SHORT).show();
-                    });
-        });
-        mSectioned.setNotifyListener(msg -> {
-            if (msg == MusicManager.MSG_PLAYER_START || msg == MusicManager.MSG_PLAYER_PAUSE) {
-                mRecyclerViewAdapter.notifyDataSetChanged();
-            }
-        });
-        MusicManager.get().addStateObservable(mSectioned);
+        MusicManager.get().addStateObservable(mDialogMusicListAdapter);
 
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -288,6 +279,37 @@ public class PlayingUIController implements View.OnClickListener {
         long progress = MusicManager.get().getProgress();
         mSeekBar.setProgress((int) progress);
         mStartTime.setText(FormatUtil.formatMusicTime(progress));
+        if (lrcList != null && lrcList.size() > 0) {
+            mLyricsText.setText(getLrc(progress));
+        }
+    }
+
+    private String getLrc(long progress) {
+        String lrc = "";
+        for (int i = 0; i < lrcList.size(); i++) {
+            int index = i + 1;
+            if (index >= lrcList.size() - 1) {
+                index = lrcList.size() - 1;
+            }
+            if (progress >= lrcList.get(i).getTime() && progress < lrcList.get(index).getTime()) {
+                lrc = lrcList.get(i).getText();
+                break;
+            }
+        }
+        return lrc;
+    }
+
+    @SuppressLint("UseSparseArrays")
+    private Map<Long, String> lrcMap = new HashMap<>();
+
+    void initLrcView(LrcInfo info) {
+        mLyricsText.setVisibility(View.VISIBLE);
+        lrcList = LrcAnalysisInfo.parseLrcString(info.getLrcContent());
+        if (lrcList != null) {
+            for (LrcAnalysisInfo lrcAnalysisInfo : lrcList) {
+                lrcMap.put(lrcAnalysisInfo.getTime(), lrcAnalysisInfo.getText());
+            }
+        }
     }
 
     void onPlayerStart() {

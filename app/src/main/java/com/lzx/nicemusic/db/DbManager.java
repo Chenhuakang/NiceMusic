@@ -30,6 +30,7 @@ public class DbManager {
     public DbManager(Context context) {
         mContext = context;
         mResolver = mContext.getContentResolver();
+
     }
 
     /**

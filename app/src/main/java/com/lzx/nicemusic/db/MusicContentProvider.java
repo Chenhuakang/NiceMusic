@@ -16,7 +16,7 @@ import android.support.annotation.Nullable;
 
 public class MusicContentProvider extends ContentProvider {
 
-    public static final String AUTHORITY = "com.lzx.musiclibrary.db.provider";
+    public static final String AUTHORITY = "com.lzx.nicemusic.db.provider";
     public static final Uri SONG_LIST_URI = Uri.parse("content://" + AUTHORITY + "/songs_list");
     public static final Uri FAVORITES_URI = Uri.parse("content://" + AUTHORITY + "/favorites");
     public static final int SONG_LIST_CODE = 0;

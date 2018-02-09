@@ -2,16 +2,11 @@ package com.lzx.nicemusic.module.search.sectioned;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lzx.nicemusic.R;
-import com.lzx.nicemusic.module.search.presenter.SearchPresenter;
-import com.zhy.view.flowlayout.FlowLayout;
-import com.zhy.view.flowlayout.TagAdapter;
-import com.zhy.view.flowlayout.TagFlowLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +23,7 @@ public class SearchHistorySection extends StatelessSection {
     private Context mContext;
     private List<String> hotSearchs = new ArrayList<>();
     private List<String> historys = new ArrayList<>();
-    private TagFlowLayout.OnTagClickListener mOnTagClickListener;
+
     private View.OnClickListener mOnClickListener;
 
     public SearchHistorySection(Context context, List<String> hotSearchs,
@@ -56,21 +51,10 @@ public class SearchHistorySection extends StatelessSection {
 
     @Override
     public void onBindHeaderViewHolder(RecyclerView.ViewHolder viewHolder) {
-        HeaderHolder holder = (HeaderHolder) viewHolder;
-        holder.mFlowLayout.setAdapter(new TagAdapter<String>(hotSearchs) {
-            @Override
-            public View getView(FlowLayout parent, int position, String s) {
-                TextView tv = (TextView) LayoutInflater.from(parent.getContext()).inflate(R.layout.item_search_tag, holder.mFlowLayout, false);
-                tv.setText(s);
-                return tv;
-            }
-        });
-        holder.mFlowLayout.setOnTagClickListener(mOnTagClickListener);
+
     }
 
-    public void setOnTagClickListener(TagFlowLayout.OnTagClickListener onTagClickListener) {
-        mOnTagClickListener = onTagClickListener;
-    }
+
 
     @Override
     public RecyclerView.ViewHolder getItemViewHolder(View view) {
@@ -94,11 +78,11 @@ public class SearchHistorySection extends StatelessSection {
     }
 
     class HeaderHolder extends RecyclerView.ViewHolder {
-        TagFlowLayout mFlowLayout;
+
 
         public HeaderHolder(View itemView) {
             super(itemView);
-            mFlowLayout = itemView.findViewById(R.id.flow_layout);
+
         }
     }
 

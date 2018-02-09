@@ -44,7 +44,10 @@
             android:name=".module.songlist.SongListActivity"
             android:screenOrientation="portrait"/>
 
-
+        <provider
+            android:name="com.lzx.nicemusic.db.MusicContentProvider"
+            android:authorities="com.lzx.nicemusic.db.provider"
+            android:exported="false" />
     </application>
 
 </manifest>

@@ -102,14 +102,7 @@ public class SearchActivity extends BaseMvpActivity<SearchContract.View, SearchP
     @Override
     public void loadDefaultSearchDataSuccess(List<String> hotSearch, List<String> historys) {
         mSearchHistorySection = new SearchHistorySection(this, hotSearch, historys);
-        mSearchHistorySection.setOnTagClickListener((view, position, parent) -> {
-            String tag = hotSearch.get(position);
-            mEdSearch.setText(tag);
-            mEdSearch.setSelection(tag.length());
-            getPresenter().searchMusic(tag);
-            getPresenter().addHistory(tag);
-            return true;
-        });
+
         mSearchHistorySection.setOnClickListener(this);
         mSectionedRecyclerViewAdapter.addSection(SearchHistorySectionTag, mSearchHistorySection);
         mSectionedRecyclerViewAdapter.notifyDataSetChanged();

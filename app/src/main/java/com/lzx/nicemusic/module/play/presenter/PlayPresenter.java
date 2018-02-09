@@ -1,12 +1,11 @@
 package com.lzx.nicemusic.module.play.presenter;
 
-import com.google.gson.Gson;
-import com.lzx.musiclibrary.utils.LogUtil;
-import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
-import com.lzx.nicemusic.bean.SingerInfo;
-import com.lzx.nicemusic.network.RetrofitHelper;
+import android.widget.Toast;
 
-import org.json.JSONObject;
+import com.google.gson.Gson;
+import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
+import com.lzx.nicemusic.bean.LrcInfo;
+import com.lzx.nicemusic.network.RetrofitHelper;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -19,17 +18,16 @@ import io.reactivex.schedulers.Schedulers;
 
 public class PlayPresenter extends BasePresenter<PlayContract.View> implements PlayContract.Presenter<PlayContract.View> {
     @Override
-    public void requestSingerInfo(String uid) {
-        Disposable subscriber =  RetrofitHelper.getMusicApi().requestArtistInfo(uid)
-                .map(responseBody -> {
-                    String json = responseBody.string();
-                    json = json.substring(1, json.length() - 2);
-                    JSONObject jsonObject = new JSONObject(json);
-                    return new Gson().fromJson(jsonObject.toString(), SingerInfo.class);
-                })
+    public void getLrcInfo(String musicId) {
+        Disposable subscriber = RetrofitHelper.getMusicApi().requestMusicLry(musicId)
+                .map(responseBody -> new Gson().fromJson(responseBody.string(), LrcInfo.class))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(singerInfo -> mView.onSingerInfoSuccess(singerInfo), throwable -> LogUtil.i("throwable = " + throwable.getMessage()));
+                .subscribe(info -> {
+                    mView.onLrcInfoSuccess(info);
+                }, throwable -> {
+                    Toast.makeText(mContext, "获取歌词失败", Toast.LENGTH_SHORT).show();
+                });
         addSubscribe(subscriber);
     }
 }

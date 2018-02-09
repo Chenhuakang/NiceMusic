@@ -55,6 +55,9 @@ public class PlaybackManager implements Playback.Callback {
     public void handlePlayRequest() {
         MusicInfo currentMusic = mQueueManager.getCurrentMusic();
         if (currentMusic != null) {
+            //通知切歌
+            notifyPlaybackSwitch(currentMusic);
+            //播放
             mPlayback.play(currentMusic);
         }
     }
@@ -93,8 +96,6 @@ public class PlaybackManager implements Playback.Callback {
                     handlePauseRequest();
                 } else {
                     handlePlayRequest();
-                    //通知切歌
-                    notifyPlaybackSwitch();
                 }
             } else if (state == State.STATE_PAUSED) {
                 handlePlayRequest();
@@ -166,13 +167,11 @@ public class PlaybackManager implements Playback.Callback {
                 handleStopRequest(null);
                 break;
         }
-        //通知切歌
-        notifyPlaybackSwitch();
     }
 
-    private void notifyPlaybackSwitch(){
+    private void notifyPlaybackSwitch(MusicInfo info) {
         if (mServiceCallback != null) {
-            mServiceCallback.onPlaybackSwitch(mQueueManager.getCurrentMusic());
+            mServiceCallback.onPlaybackSwitch(info);
         }
     }
 

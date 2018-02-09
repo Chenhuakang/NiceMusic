@@ -27,6 +27,7 @@ import com.lzx.nicemusic.module.play.PlayingDetailActivity;
 import com.lzx.nicemusic.module.songlist.adapter.SongListAdapter;
 import com.lzx.nicemusic.module.songlist.presenter.SongListContract;
 import com.lzx.nicemusic.module.songlist.presenter.SongListPresenter;
+import com.lzx.nicemusic.utils.DisplayUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.OuterLayerImageView;
 
@@ -116,6 +117,7 @@ public class SongListActivity extends BaseMvpActivity<SongListContract.View, Son
     private void initFloatingActionButton() {
         mFloatingActionButton.setClickable(true);
         mFloatingActionButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimary)));
+        mFloatingActionButton.setTranslationY(-DisplayUtil.dip2px(this, 32));
         mFloatingActionButton.setOnClickListener(v -> {
             mDbManager.AsySavePlayList(mAdapter.getDataList())
                     .subscribe(aBoolean -> {

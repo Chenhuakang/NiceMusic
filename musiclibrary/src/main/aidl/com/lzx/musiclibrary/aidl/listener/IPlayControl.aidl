@@ -49,7 +49,7 @@ interface IPlayControl {
     List<MusicInfo> getPlayList();
 
     //从播放列表中删除一条信息
-    void deleteMusicInfoOnPlayList(in MusicInfo info);
+    void deleteMusicInfoOnPlayList(in MusicInfo info,boolean isNeedToPlayNext);
 
     //获取播放状态
     int getStatus();

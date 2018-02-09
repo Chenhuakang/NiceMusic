@@ -105,8 +105,8 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         return mQueueManager.getPlayingQueue();
     }
 
-    void deleteMusicInfoOnPlayList(MusicInfo info) {
-        mQueueManager.deleteQueueItem(info);
+    void deleteMusicInfoOnPlayList(MusicInfo info,boolean isNeedToPlayNext) {
+        mQueueManager.deleteQueueItem(info,isNeedToPlayNext);
     }
 
     int getState() {

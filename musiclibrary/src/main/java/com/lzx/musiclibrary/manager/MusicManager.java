@@ -424,10 +424,10 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public void deleteMusicInfoOnPlayList(MusicInfo info) throws RemoteException {
+    public void deleteMusicInfoOnPlayList(MusicInfo info,boolean isNeedToPlayNext) throws RemoteException {
         if (control != null) {
             try {
-                  control.deleteMusicInfoOnPlayList(info);
+                  control.deleteMusicInfoOnPlayList(info,isNeedToPlayNext);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }

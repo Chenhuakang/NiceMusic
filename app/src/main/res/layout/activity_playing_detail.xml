@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#82000000"
-    android:orientation="vertical">
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#82000000"
+                android:orientation="vertical">
 
     <com.lzx.nicemusic.widget.OuterLayerImageView
         android:id="@+id/music_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
-        android:scaleType="fitXY" />
+        android:scaleType="fitXY"/>
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="25dp"
         android:padding="12dp"
-        android:src="@drawable/ic_back" />
+        android:src="@drawable/ic_back"/>
 
     <TextView
         android:id="@+id/music_name"
@@ -30,13 +30,13 @@
         android:paddingTop="12dp"
         android:text="家里的卡时间到啦"
         android:textColor="@color/white"
-        android:textSize="15sp" />
+        android:textSize="15sp"/>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:layout_below="@id/music_name"
-        android:background="@color/white" />
+        android:background="@color/white"/>
 
     <TextView
         android:id="@+id/songer_name"
@@ -47,7 +47,7 @@
         android:layout_marginTop="12dp"
         android:text="梁君诺"
         android:textColor="@color/white"
-        android:textSize="16sp" />
+        android:textSize="16sp"/>
 
     <com.lzx.nicemusic.widget.CircleImageView
         android:id="@+id/music_cover"
@@ -57,8 +57,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="12dp"
         app:border_color="#3c000000"
-        app:border_width="5dp" />
-
+        app:border_width="5dp"/>
 
     <TextView
         android:id="@+id/lyrics_text"
@@ -69,10 +68,9 @@
         android:gravity="center"
         android:paddingLeft="12dp"
         android:paddingRight="12dp"
-        android:text="daslhadksjhdaksjdhaskjda"
         android:textColor="@color/white"
-        android:textSize="14sp" />
-
+        android:textSize="14sp"
+        android:visibility="invisible"/>
 
     <SeekBar
         android:id="@+id/seekBar"
@@ -90,7 +88,7 @@
         android:paddingRight="7dp"
         android:paddingStart="7dp"
         android:progressDrawable="@drawable/seekbar_progress"
-        android:thumb="@drawable/shape_round_primary" />
+        android:thumb="@drawable/shape_round_primary"/>
 
     <TextView
         android:id="@+id/start_time"
@@ -101,7 +99,7 @@
         android:layout_marginTop="30dp"
         android:text="00:00"
         android:textColor="@color/white"
-        android:textSize="12sp" />
+        android:textSize="12sp"/>
 
     <TextView
         android:id="@+id/total_time"
@@ -113,7 +111,7 @@
         android:layout_marginTop="30dp"
         android:text="00:00"
         android:textColor="@color/white"
-        android:textSize="12sp" />
+        android:textSize="12sp"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -123,7 +121,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1px"
-            android:background="@color/white" />
+            android:background="@color/white"/>
 
         <ImageView
             android:id="@+id/btn_music_list"
@@ -132,7 +130,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="16dp"
             android:src="@drawable/ic_music_list"
-            android:tint="@color/white" />
+            android:tint="@color/white"/>
 
         <ImageView
             android:id="@+id/btn_play_time"
@@ -143,7 +141,7 @@
             android:layout_marginRight="16dp"
             android:padding="5dp"
             android:src="@drawable/host_playmode_loop"
-            android:tint="@color/white" />
+            android:tint="@color/white"/>
 
         <ImageView
             android:id="@+id/btn_play_pause"
@@ -155,7 +153,7 @@
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
             android:src="@drawable/notify_btn_dark_play_normal"
-            android:tint="@color/white" />
+            android:tint="@color/white"/>
 
         <ImageView
             android:id="@+id/btn_pre"
@@ -164,7 +162,7 @@
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/btn_play_pause"
             android:src="@drawable/notify_btn_dark_prev_normal"
-            android:tint="@color/white" />
+            android:tint="@color/white"/>
 
         <ImageView
             android:id="@+id/btn_next"
@@ -173,7 +171,7 @@
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/btn_play_pause"
             android:src="@drawable/notify_btn_dark_next_normal"
-            android:tint="@color/white" />
+            android:tint="@color/white"/>
 
     </RelativeLayout>
 
@@ -183,7 +181,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start|top"
         android:background="#000"
-        android:visibility="gone" />
+        android:visibility="gone"/>
 
     <RelativeLayout
         android:id="@+id/play_list_layout"
@@ -203,28 +201,28 @@
             android:paddingLeft="8dp"
             android:text="顺序播放"
             android:textColor="@color/font_color"
-            android:textSize="13sp" />
+            android:textSize="13sp"/>
 
         <View
             android:id="@+id/line"
             android:layout_width="match_parent"
             android:layout_height="1px"
             android:layout_below="@+id/btn_play_mode"
-            android:background="#cccccc" />
+            android:background="#cccccc"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycle_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/line2"
-            android:layout_below="@+id/line" />
+            android:layout_below="@+id/line"/>
 
         <View
             android:id="@+id/line2"
             android:layout_width="match_parent"
             android:layout_height="1px"
             android:layout_above="@+id/btn_dismiss"
-            android:background="#cccccc" />
+            android:background="#cccccc"/>
 
         <TextView
             android:id="@+id/btn_dismiss"
@@ -234,7 +232,7 @@
             android:gravity="center"
             android:text="取消"
             android:textColor="@color/font_color"
-            android:textSize="13sp" />
+            android:textSize="13sp"/>
     </RelativeLayout>
 
 

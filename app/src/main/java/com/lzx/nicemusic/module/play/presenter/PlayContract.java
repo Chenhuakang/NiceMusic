@@ -1,7 +1,7 @@
 package com.lzx.nicemusic.module.play.presenter;
 
 import com.lzx.nicemusic.base.mvp.BaseContract;
-import com.lzx.nicemusic.bean.SingerInfo;
+import com.lzx.nicemusic.bean.LrcInfo;
 
 /**
  * @author lzx
@@ -10,10 +10,10 @@ import com.lzx.nicemusic.bean.SingerInfo;
 
 public interface PlayContract {
     interface View extends BaseContract.BaseView {
-        void onSingerInfoSuccess(SingerInfo singerInfo);
+        void onLrcInfoSuccess(LrcInfo info);
     }
 
     interface Presenter<T> extends BaseContract.BasePresenter<T> {
-        void requestSingerInfo(String uid);
+        void getLrcInfo(String musicId);
     }
 }

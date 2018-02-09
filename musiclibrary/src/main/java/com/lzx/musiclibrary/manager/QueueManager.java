@@ -111,21 +111,22 @@ public class QueueManager {
         }
     }
 
-    public void deleteQueueItem(MusicInfo info) {
+    public void deleteQueueItem(MusicInfo info,boolean isNeedToPlayNext) {
         if (mPlayingQueue.size() == 0 || mMusicListById.size() == 0) {
             return;
         }
         if (!mPlayingQueue.contains(info) || !mMusicListById.containsKey(info.musicId)) {
             return;
         }
-        //更改下标为下一首
         mPlayingQueue.remove(info);
         mMusicListById.remove(info.musicId, info);
         List<MediaSessionCompat.QueueItem> queueItems = QueueHelper.getQueueItems(mMusicListById);
         if (mListener != null) {
             mListener.onQueueUpdated(queueItems, mPlayingQueue);
             //播放下一首
-            mListener.onCurrentQueueIndexUpdated(mCurrentIndex, true, true);
+            if (isNeedToPlayNext) {
+                mListener.onCurrentQueueIndexUpdated(mCurrentIndex, false, true);
+            }
         }
     }
 
