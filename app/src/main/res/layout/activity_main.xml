@@ -1,80 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/white">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fitsSystemWindows="true">
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/title_layout"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/red"
-        app:cardElevation="2dp">
+        android:layout_height="wrap_content" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="25dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_centerHorizontal="true"
-                android:gravity="center"
-                android:text="NiceMusic"
-                android:textColor="@color/white"
-                android:textSize="16sp"/>
-        </RelativeLayout>
-
-    </android.support.v7.widget.CardView>
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycle_view"
+    <FrameLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/title_layout"
-        android:paddingBottom="55dp"
-        android:paddingTop="10dp"/>
-
-    <!-- <RelativeLayout
-         android:layout_width="match_parent"
-         android:layout_height="match_parent">
-
-         <android.support.design.widget.AppBarLayout
-             android:id="@+id/app_bar"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content">
-
-             <android.support.v7.widget.Toolbar
-                 android:id="@+id/toolbar"
-                 android:layout_width="match_parent"
-                 android:layout_height="?attr/actionBarSize"
-                 android:background="@color/colorPrimary"
-                 android:contentInsetStart="0dp"
-                 app:contentInsetStart="0dp"
-                 app:layout_scrollFlags="scroll|enterAlways"
-                 app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-             </android.support.v7.widget.Toolbar>
-
-
-         </android.support.design.widget.AppBarLayout>
-
-         <android.support.v7.widget.RecyclerView
-             android:id="@+id/recycle_view"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:layout_below="@+id/app_bar" />
-
-     </RelativeLayout>
-
-     <com.miguelcatalan.materialsearchview.MaterialSearchView
-         android:id="@+id/search_view"
-         android:layout_width="match_parent"
-         android:layout_marginTop="25dp"
-         android:layout_height="?attr/actionBarSize" />-->
+        android:fitsSystemWindows="true"
+        android:paddingBottom="55dp" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -87,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="1px"
             android:layout_marginLeft="62dp"
-            android:background="#cccccc"/>
+            android:background="#cccccc" />
 
         <TextView
             android:id="@+id/music_name"
@@ -98,9 +41,9 @@
             android:layout_marginTop="5dp"
             android:layout_toLeftOf="@+id/btn_play_pause"
             android:lines="1"
-            android:text="dlaksjdlad"
+            android:text="@string/app_name"
             android:textColor="@color/font_color"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/singer_name"
@@ -110,9 +53,9 @@
             android:layout_marginLeft="74dp"
             android:layout_toLeftOf="@+id/btn_play_pause"
             android:lines="1"
-            android:text="来打卡"
+            android:text="听你所想"
             android:textColor="#cccccc"
-            android:textSize="13sp"/>
+            android:textSize="12sp" />
 
         <ImageView
             android:id="@+id/btn_play_list"
@@ -122,7 +65,7 @@
             android:layout_below="@+id/line"
             android:layout_marginRight="12dp"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_play_list"/>
+            android:src="@drawable/ic_play_list" />
 
         <ImageView
             android:id="@+id/btn_play_pause"
@@ -136,13 +79,13 @@
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
             android:src="@drawable/notify_btn_dark_play_normal"
-            android:tint="@color/black"/>
+            android:tint="@color/black" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_alignParentBottom="true"
-            android:background="@color/red"/>
+            android:background="@color/red" />
 
     </RelativeLayout>
 
@@ -166,7 +109,7 @@
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
-            android:src="@mipmap/ic_launcher"/>
+            android:src="@mipmap/ic_launcher" />
 
     </android.support.v7.widget.CardView>
 

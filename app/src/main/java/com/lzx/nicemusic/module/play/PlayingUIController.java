@@ -16,6 +16,8 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.extractor.mp4.Track;
+import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.manager.TimerTaskManager;
@@ -123,7 +125,7 @@ public class PlayingUIController implements View.OnClickListener {
         }
 
         phoneHeight = DisplayUtil.getPhoneHeight(mContext);
-        params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, phoneHeight / 2);
+        params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, phoneHeight * 6 / 10);
         mPlayListLayout.setLayoutParams(params);
         mDialogMusicListAdapter = new DialogMusicListAdapter(mContext);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
@@ -255,14 +257,26 @@ public class PlayingUIController implements View.OnClickListener {
      * 显示播放列表
      */
     private void showPlayListLayout() {
-        initPlayListAnim(true, phoneHeight, params.height);
+        int index = -1;
+        List<MusicInfo> list = mDialogMusicListAdapter.getMusicInfos();
+        for (int i = 0; i < list.size(); i++) {
+            MusicInfo info = list.get(i);
+            if (MusicManager.isCurrMusicIsPlayingMusic(info)) {
+                index = i;
+                break;
+            }
+        }
+        if (index != -1) {
+            mRecyclerView.scrollToPosition(index);
+        }
+        initPlayListAnim(true, phoneHeight, phoneHeight * 4 / 10);
     }
 
     /**
      * 隐藏播放列表
      */
     void hidePlayListLayout() {
-        initPlayListAnim(false, params.height, phoneHeight);
+        initPlayListAnim(false, phoneHeight * 4 / 10, phoneHeight);
     }
 
     /**

@@ -7,6 +7,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,28 +21,39 @@ import com.lzx.musiclibrary.aidl.model.MusicInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
-import com.lzx.nicemusic.base.BaseMvpActivity;
+import com.lzx.nicemusic.base.BaseMvpFragment;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
 import com.lzx.nicemusic.db.DbManager;
+import com.lzx.nicemusic.MainActivity;
 import com.lzx.nicemusic.module.play.PlayingDetailActivity;
 import com.lzx.nicemusic.module.songlist.adapter.SongListAdapter;
 import com.lzx.nicemusic.module.songlist.presenter.SongListContract;
 import com.lzx.nicemusic.module.songlist.presenter.SongListPresenter;
 import com.lzx.nicemusic.utils.DisplayUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
+import com.lzx.nicemusic.utils.SystemBarHelper;
 import com.lzx.nicemusic.widget.OuterLayerImageView;
 
 import java.util.List;
 
-
 /**
- * 歌单列表
- *
- * @author lzx
- * @date 2018/2/5
+ * Created by xian on 2018/2/10.
  */
 @CreatePresenter(SongListPresenter.class)
-public class SongListActivity extends BaseMvpActivity<SongListContract.View, SongListPresenter> implements SongListContract.View {
+public class SongListFragment extends BaseMvpFragment<SongListContract.View, SongListPresenter> implements SongListContract.View {
+
+    public static Fragment newInstance(String title) {
+        SongListFragment fragment = new SongListFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("title", title);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_song_list;
+    }
 
     private CoordinatorLayout mCoordinatorLayout;
     private AppBarLayout mAppBarLayout;
@@ -55,23 +67,18 @@ public class SongListActivity extends BaseMvpActivity<SongListContract.View, Son
     private DbManager mDbManager;
 
     @Override
-    protected int getLayoutId() {
-        return R.layout.activity_song_list;
-    }
+    protected void init() {
+        mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_content);
+        mAppBarLayout = (AppBarLayout) findViewById(R.id.app_bar_layout);
+        mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycle_view);
+        mFloatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+        mAlbumCover = (OuterLayerImageView) findViewById(R.id.album_cover);
 
-    @Override
-    protected void init(Bundle savedInstanceState) {
-        mCoordinatorLayout = findViewById(R.id.main_content);
-        mAppBarLayout = findViewById(R.id.app_bar_layout);
-        mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
-        mToolbar = findViewById(R.id.toolbar);
-        mRecyclerView = findViewById(R.id.recycle_view);
-        mFloatingActionButton = findViewById(R.id.fab);
-        mAlbumCover = findViewById(R.id.album_cover);
+        mDbManager = new DbManager(getActivity());
 
-        mDbManager = new DbManager(this);
-
-        title = getIntent().getStringExtra("title");
+        title = getArguments().getString("title");
 
         initToolBar();
         initRecyclerView();
@@ -86,8 +93,8 @@ public class SongListActivity extends BaseMvpActivity<SongListContract.View, Son
 
     private void initToolBar() {
         mToolbar.setTitle(title);
-        setSupportActionBar(mToolbar);
-        ActionBar supportActionBar = getSupportActionBar();
+        ((MainActivity) getActivity()).setSupportActionBar(mToolbar);
+        ActionBar supportActionBar = ((MainActivity) getActivity()).getSupportActionBar();
         if (supportActionBar != null) {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
@@ -95,19 +102,20 @@ public class SongListActivity extends BaseMvpActivity<SongListContract.View, Son
         mCollapsingToolbarLayout.setExpandedTitleColor(Color.TRANSPARENT);
         //设置收缩后Toolbar上字体的颜色
         mCollapsingToolbarLayout.setCollapsedTitleTextColor(Color.WHITE);
+        SystemBarHelper.setHeightAndPadding(getActivity(), mToolbar);
     }
 
     private void initRecyclerView() {
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new SongListAdapter(this);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mAdapter = new SongListAdapter(getActivity());
         mRecyclerView.setAdapter(mAdapter);
+        MusicManager.get().addStateObservable(mAdapter);
         mAdapter.setOnItemClickListener((musicInfo, position) -> {
             mDbManager.AsySavePlayList(mAdapter.getDataList())
                     .subscribe(aBoolean -> {
                         if (!MusicManager.isCurrMusicIsPlayingMusic(mAdapter.getDataList().get(position))) {
                             MusicManager.get().playMusic(mAdapter.getDataList(), position, true);
                         }
-                        PlayingDetailActivity.launch(SongListActivity.this, musicInfo);
                     }, throwable -> {
                         Toast.makeText(mContext, "播放失败", Toast.LENGTH_SHORT).show();
                     });
@@ -116,17 +124,15 @@ public class SongListActivity extends BaseMvpActivity<SongListContract.View, Son
 
     private void initFloatingActionButton() {
         mFloatingActionButton.setClickable(true);
-        mFloatingActionButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimary)));
-        mFloatingActionButton.setTranslationY(-DisplayUtil.dip2px(this, 32));
+        mFloatingActionButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.colorPrimary)));
+        mFloatingActionButton.setTranslationY(-DisplayUtil.dip2px(getActivity(), 32));
         mFloatingActionButton.setOnClickListener(v -> {
             mDbManager.AsySavePlayList(mAdapter.getDataList())
                     .subscribe(aBoolean -> {
                         if (!MusicManager.isCurrMusicIsPlayingMusic(mAdapter.getDataList().get(0))) {
                             MusicManager.get().playMusic(mAdapter.getDataList(), 0);
                         }
-                        PlayingDetailActivity.launch(SongListActivity.this, mAdapter.getDataList().get(0));
                     }, throwable -> {
-                        LogUtil.i("error = " + throwable.getMessage());
                         Toast.makeText(mContext, "播放失败", Toast.LENGTH_SHORT).show();
                     });
         });
@@ -160,7 +166,7 @@ public class SongListActivity extends BaseMvpActivity<SongListContract.View, Son
     }
 
     private void initAlbumCover() {
-        GlideUtil.loadImageByUrl(this, getPresenter().getAlbumCover(title), mAlbumCover);
+        GlideUtil.loadImageByUrl(getActivity(), getPresenter().getAlbumCover(title), mAlbumCover);
     }
 
     @Override

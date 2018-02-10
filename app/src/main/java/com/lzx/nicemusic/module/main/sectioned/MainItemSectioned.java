@@ -1,13 +1,11 @@
 package com.lzx.nicemusic.module.main.sectioned;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
 import com.lzx.nicemusic.R;
-import com.lzx.nicemusic.module.songlist.SongListActivity;
 import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.OuterLayerImageView;
 
@@ -49,10 +47,15 @@ public class MainItemSectioned extends StatelessSection {
             R.drawable.image_internet
     };
 
+    private OnItemClickListener mOnItemClickListener;
+
     public MainItemSectioned(Context context) {
         super(new SectionParameters.Builder(R.layout.section_main_song_list).build());
         mContext = context;
+    }
 
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
     }
 
     @Override
@@ -72,10 +75,17 @@ public class MainItemSectioned extends StatelessSection {
         holder.mAlbumTitle.setText(title);
         GlideUtil.loadImageByUrl(mContext, songCoverArray[position], holder.mAlbumCover);
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(mContext, SongListActivity.class);
-            intent.putExtra("title", title);
-            mContext.startActivity(intent);
+//            Intent intent = new Intent(mContext, SongListActivity.class);
+//            intent.putExtra("title", title);
+//            mContext.startActivity(intent);
+            if (mOnItemClickListener != null) {
+                mOnItemClickListener.onItemClick(title);
+            }
         });
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(String title);
     }
 
     static class ItemHolder extends RecyclerView.ViewHolder {

@@ -8,17 +8,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.utils.FormatUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.adapter.BaseViewHolder;
 import com.lzx.nicemusic.widget.adapter.LoadMoreAdapter;
 
+import java.util.Observable;
+import java.util.Observer;
+
 /**
  * Created by xian on 2018/2/5.
  */
 
-public class SongListAdapter extends LoadMoreAdapter<MusicInfo> {
+public class SongListAdapter extends LoadMoreAdapter<MusicInfo> implements Observer {
 
     private Context mContext;
 
@@ -48,11 +52,26 @@ public class SongListAdapter extends LoadMoreAdapter<MusicInfo> {
         holder.mMusicTime.setText(FormatUtil.formatMusicTime(musicInfo.musicDuration));
         holder.mMusicTitle.setText(musicInfo.albumArtist + " · " + musicInfo.albumTitle);
         GlideUtil.loadImageByUrl(mContext, musicInfo.musicCover, holder.mMusicCover);
+        if (MusicManager.isCurrMusicIsPlayingMusic(musicInfo)) {
+            holder.mImgVolume.setVisibility(View.VISIBLE);
+            holder.mSongNum.setVisibility(View.INVISIBLE);
+        }else {
+            holder.mImgVolume.setVisibility(View.INVISIBLE);
+            holder.mSongNum.setVisibility(View.VISIBLE);
+        }
         holder.itemView.setOnClickListener(view -> {
             if (mItemClickListener != null) {
                 mItemClickListener.onItemClick(musicInfo, position);
             }
         });
+    }
+
+    @Override
+    public void update(Observable observable, Object arg) {
+        int msg = (int) arg;
+        if (msg == MusicManager.MSG_PLAYER_START || msg == MusicManager.MSG_PLAYER_PAUSE) {
+            notifyDataSetChanged();
+        }
     }
 
     public interface OnItemClickListener {
@@ -70,7 +89,7 @@ public class SongListAdapter extends LoadMoreAdapter<MusicInfo> {
     }
 
     class ItemHolder extends BaseViewHolder {
-        ImageView mMusicCover;
+        ImageView mMusicCover,mImgVolume;
         TextView mSongNum, mMusicName, mMusicTitle, mMusicTime;
 
         ItemHolder(View itemView) {
@@ -80,6 +99,7 @@ public class SongListAdapter extends LoadMoreAdapter<MusicInfo> {
             mMusicTitle = $(R.id.music_title);
             mMusicTime = $(R.id.music_time);
             mSongNum = $(R.id.song_num);
+            mImgVolume = $(R.id.img_volume);
         }
 
 

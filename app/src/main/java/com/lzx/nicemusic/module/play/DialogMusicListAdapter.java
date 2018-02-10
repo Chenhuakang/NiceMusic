@@ -19,6 +19,7 @@ import com.lzx.nicemusic.constans.Constans;
 import com.lzx.nicemusic.db.DbManager;
 import com.lzx.nicemusic.widget.adapter.BaseViewHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -42,6 +43,9 @@ public class DialogMusicListAdapter extends RecyclerView.Adapter<DialogMusicList
         mDbManager.AsyQueryPlayList().subscribe(list -> mMusicInfos = list);
     }
 
+    public List<MusicInfo> getMusicInfos() {
+        return mMusicInfos==null?new ArrayList<>():mMusicInfos;
+    }
 
     @Override
     public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {

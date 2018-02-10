@@ -57,7 +57,7 @@ public class DialogMusicListSectioned extends StatelessSection implements Observ
     public void onBindItemViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         ItemHolder holder = (ItemHolder) viewHolder;
         MusicInfo info = mMusicInfos.get(position);
-        holder.mMusicTitle.setText(info.musicTitle + "(" + info.albumTitle + ")" + " - " + info.albumArtist);
+        holder.mMusicTitle.setText(info.musicTitle + "(" + info.albumTitle + ")" + " - " + info.musicArtist);
         AnimationDrawable animationDrawable = (AnimationDrawable) holder.mImageAnim.getDrawable();
         if (MusicManager.isCurrMusicIsPlayingMusic(info)) {
             holder.mMusicTitle.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));

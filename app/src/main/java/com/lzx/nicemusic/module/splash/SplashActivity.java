@@ -7,7 +7,7 @@ import android.widget.ImageView;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
-import com.lzx.nicemusic.module.main.MainActivity;
+import com.lzx.nicemusic.MainActivity;
 import com.lzx.nicemusic.module.splash.presenter.SplashContract;
 import com.lzx.nicemusic.module.splash.presenter.SplashPresenter;
 import com.lzx.nicemusic.utils.SystemBarHelper;
