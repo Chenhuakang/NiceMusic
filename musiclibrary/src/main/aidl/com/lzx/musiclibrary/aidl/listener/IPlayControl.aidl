@@ -3,6 +3,7 @@ package com.lzx.musiclibrary.aidl.listener;
 
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.aidl.listener.IOnPlayerEventListener;
+import com.lzx.musiclibrary.IMediaNotification;
 
 interface IPlayControl {
 
@@ -96,4 +97,8 @@ interface IPlayControl {
     void registerPlayerEventListener(IOnPlayerEventListener listener);
 
     void unregisterPlayerEventListener(IOnPlayerEventListener listener);
+
+    void registerMediaNotification(IMediaNotification notification);
+
+    void unregisterMediaNotification(IMediaNotification notification);
 }

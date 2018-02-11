@@ -37,7 +37,7 @@
 
         <activity
             android:name=".module.play.PlayingDetailActivity"
-            android:launchMode="singleTask"
+
             android:screenOrientation="portrait"/>
 
         <provider

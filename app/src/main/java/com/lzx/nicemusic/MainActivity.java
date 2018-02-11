@@ -94,7 +94,6 @@ public class MainActivity extends BaseMvpActivity implements View.OnClickListene
                 }
                 break;
             case R.id.music_cover:
-            case R.id.lyrics_text:
             case R.id.music_name:
                 if (info != null) {
                     PlayingDetailActivity.launch(this, info);

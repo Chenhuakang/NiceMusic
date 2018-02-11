@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 
+import com.lzx.musiclibrary.IMediaNotification;
 import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.aidl.listener.IOnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.listener.IPlayControl;
@@ -30,6 +31,7 @@ public class PlayControl extends IPlayControl.Stub {
     private Playback playback;
 
     private RemoteCallbackList<IOnPlayerEventListener> mRemoteCallbackList;
+    private RemoteCallbackList<IMediaNotification> mMediaNotificationList;
     private NotifyContract.NotifyStatusChanged mNotifyStatusChanged;
     private NotifyContract.NotifyMusicSwitch mNotifyMusicSwitch;
 
@@ -39,6 +41,7 @@ public class PlayControl extends IPlayControl.Stub {
         mNotifyStatusChanged = new NotifyStatusChange();
         mNotifyMusicSwitch = new NotifyMusicSwitch();
         mRemoteCallbackList = new RemoteCallbackList<>();
+        mMediaNotificationList = new RemoteCallbackList<>();
 
         mPlayMode = new PlayMode();
         playback = isUseMediaPlayer ? new MediaPlayback(context) : new ExoPlayback(context);
@@ -281,5 +284,19 @@ public class PlayControl extends IPlayControl.Stub {
     @Override
     public void unregisterPlayerEventListener(IOnPlayerEventListener listener) throws RemoteException {
         mRemoteCallbackList.unregister(listener);
+    }
+
+    @Override
+    public void registerMediaNotification(IMediaNotification notification) throws RemoteException {
+        if (notification != null) {
+            mMediaNotificationList.register(notification);
+        }
+    }
+
+    @Override
+    public void unregisterMediaNotification(IMediaNotification notification) throws RemoteException {
+        if (notification != null) {
+            mMediaNotificationList.unregister(notification);
+        }
     }
 }

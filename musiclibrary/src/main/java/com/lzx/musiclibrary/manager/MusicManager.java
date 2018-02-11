@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
 
+import com.lzx.musiclibrary.IMediaNotification;
 import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.aidl.listener.IOnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.listener.IPlayControl;
@@ -43,6 +44,7 @@ public class MusicManager implements IPlayControl {
     private Context mContext;
     private boolean isUseMediaPlayer;
     private boolean isAutoPlayNext = true;
+    private IMediaNotification mIMediaNotification;
     private IPlayControl control;
     private ClientHandler mClientHandler;
     private PlayStateObservable mStateObservable;
@@ -77,6 +79,11 @@ public class MusicManager implements IPlayControl {
         return this;
     }
 
+    public MusicManager setMediaNotification(IMediaNotification IMediaNotification) {
+        mIMediaNotification = IMediaNotification;
+        return this;
+    }
+
     public void bindService() {
         Intent intent = new Intent(mContext, MusicService.class);
         intent.putExtra("isUseMediaPlayer", isUseMediaPlayer);
@@ -90,6 +97,9 @@ public class MusicManager implements IPlayControl {
             control = IPlayControl.Stub.asInterface(iBinder);
             try {
                 control.registerPlayerEventListener(mOnPlayerEventListener);
+                if (mIMediaNotification != null) {
+                    control.registerMediaNotification(mIMediaNotification);
+                }
                 LogUtil.i("--onServiceConnected--");
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -427,7 +437,7 @@ public class MusicManager implements IPlayControl {
     public void deleteSongInfoOnPlayList(SongInfo info, boolean isNeedToPlayNext) throws RemoteException {
         if (control != null) {
             try {
-                  control.deleteSongInfoOnPlayList(info,isNeedToPlayNext);
+                control.deleteSongInfoOnPlayList(info, isNeedToPlayNext);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -650,6 +660,16 @@ public class MusicManager implements IPlayControl {
 
     @Override
     public void unregisterPlayerEventListener(IOnPlayerEventListener listener) {
+
+    }
+
+    @Override
+    public void registerMediaNotification(IMediaNotification notification) throws RemoteException {
+
+    }
+
+    @Override
+    public void unregisterMediaNotification(IMediaNotification notification) throws RemoteException {
 
     }
 
