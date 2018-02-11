@@ -15,7 +15,7 @@ import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.aidl.listener.IOnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.listener.IPlayControl;
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.playback.PlayStateObservable;
 import com.lzx.musiclibrary.utils.LogUtil;
@@ -133,7 +133,7 @@ public class MusicManager implements IPlayControl {
 
     private IOnPlayerEventListener mOnPlayerEventListener = new IOnPlayerEventListener.Stub() {
         @Override
-        public void onMusicSwitch(MusicInfo music) {
+        public void onMusicSwitch(SongInfo music) {
             mClientHandler.obtainMessage(MSG_MUSIC_CHANGE, music).sendToTarget();
         }
 
@@ -177,7 +177,7 @@ public class MusicManager implements IPlayControl {
             MusicManager manager = mWeakReference.get();
             switch (msg.what) {
                 case MSG_MUSIC_CHANGE:
-                    MusicInfo musicInfo = (MusicInfo) msg.obj;
+                    SongInfo musicInfo = (SongInfo) msg.obj;
                     manager.notifyPlayerEventChange(MSG_MUSIC_CHANGE, musicInfo, "", false);
                     manager.mStateObservable.stateChangeNotifyObservers(MSG_MUSIC_CHANGE);
                     break;
@@ -230,7 +230,7 @@ public class MusicManager implements IPlayControl {
         mPlayerEventListeners.clear();
     }
 
-    private void notifyPlayerEventChange(int msg, MusicInfo info, String errorMsg, boolean isFinishBuffer) {
+    private void notifyPlayerEventChange(int msg, SongInfo info, String errorMsg, boolean isFinishBuffer) {
         for (OnPlayerEventListener listener : mPlayerEventListeners) {
             switch (msg) {
                 case MSG_MUSIC_CHANGE:
@@ -256,7 +256,7 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public void playMusic(List<MusicInfo> list, int index, boolean isJustPlay) {
+    public void playMusic(List<SongInfo> list, int index, boolean isJustPlay) {
         if (control != null) {
             try {
                 control.playMusic(list, index, isJustPlay);
@@ -266,12 +266,12 @@ public class MusicManager implements IPlayControl {
         }
     }
 
-    public void playMusic(List<MusicInfo> list, int index) {
+    public void playMusic(List<SongInfo> list, int index) {
         playMusic(list, index, false);
     }
 
     @Override
-    public void playMusicByInfo(MusicInfo info, boolean isJustPlay) {
+    public void playMusicByInfo(SongInfo info, boolean isJustPlay) {
         if (control != null) {
             try {
                 control.playMusicByInfo(info, isJustPlay);
@@ -281,7 +281,7 @@ public class MusicManager implements IPlayControl {
         }
     }
 
-    public void playMusicByInfo(MusicInfo info) {
+    public void playMusicByInfo(SongInfo info) {
         playMusicByInfo(info, false);
     }
 
@@ -301,7 +301,7 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public void playMusicAutoStopWhen(List<MusicInfo> list, int index, int time) {
+    public void playMusicAutoStopWhen(List<SongInfo> list, int index, int time) {
         if (control != null) {
             try {
                 control.playMusicAutoStopWhen(list, index, time);
@@ -312,7 +312,7 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public void playMusicByInfoAutoStopWhen(MusicInfo info, int time) {
+    public void playMusicByInfoAutoStopWhen(SongInfo info, int time) {
         if (control != null) {
             try {
                 control.playMusicByInfoAutoStopWhen(info, time);
@@ -390,7 +390,7 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public void setPlayList(List<MusicInfo> list) {
+    public void setPlayList(List<SongInfo> list) {
         if (control != null) {
             try {
                 control.setPlayList(list);
@@ -401,7 +401,7 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public void setPlayListWithIndex(List<MusicInfo> list, int index) {
+    public void setPlayListWithIndex(List<SongInfo> list, int index) {
         if (control != null) {
             try {
                 control.setPlayListWithIndex(list, index);
@@ -412,7 +412,7 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public List<MusicInfo> getPlayList() {
+    public List<SongInfo> getPlayList() {
         if (control != null) {
             try {
                 return control.getPlayList();
@@ -424,10 +424,10 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public void deleteMusicInfoOnPlayList(MusicInfo info,boolean isNeedToPlayNext) throws RemoteException {
+    public void deleteSongInfoOnPlayList(SongInfo info, boolean isNeedToPlayNext) throws RemoteException {
         if (control != null) {
             try {
-                  control.deleteMusicInfoOnPlayList(info,isNeedToPlayNext);
+                  control.deleteSongInfoOnPlayList(info,isNeedToPlayNext);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -493,7 +493,7 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public MusicInfo getPreMusic() {
+    public SongInfo getPreMusic() {
         if (control != null) {
             try {
                 return control.getPreMusic();
@@ -505,7 +505,7 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public MusicInfo getNextMusic() {
+    public SongInfo getNextMusic() {
         if (control != null) {
             try {
                 return control.getNextMusic();
@@ -517,7 +517,7 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public MusicInfo getCurrPlayingMusic() {
+    public SongInfo getCurrPlayingMusic() {
         if (control != null) {
             try {
                 return control.getCurrPlayingMusic();
@@ -599,13 +599,13 @@ public class MusicManager implements IPlayControl {
     /**
      * 判断当前的音乐是不是正在播放的音乐
      */
-    public static boolean isCurrMusicIsPlayingMusic(MusicInfo currMusic) {
-        MusicInfo playingMusic = MusicManager.get().getCurrPlayingMusic();
+    public static boolean isCurrMusicIsPlayingMusic(SongInfo currMusic) {
+        SongInfo playingMusic = MusicManager.get().getCurrPlayingMusic();
         boolean result;
         if (playingMusic == null) {
             result = false;
         } else {
-            result = currMusic.musicId.equals(playingMusic.musicId);
+            result = currMusic.getSongId().equals(playingMusic.getSongId());
         }
         return result;
     }
@@ -632,14 +632,14 @@ public class MusicManager implements IPlayControl {
     /**
      * 当前的音乐是否在播放
      */
-    public static boolean isCurrMusicIsPlaying(MusicInfo currMusic) {
+    public static boolean isCurrMusicIsPlaying(SongInfo currMusic) {
         return isCurrMusicIsPlayingMusic(currMusic) && isPlaying();
     }
 
     /**
      * 当前音乐是否在暂停
      */
-    public static boolean isCurrMusicIsPaused(MusicInfo currMusic) {
+    public static boolean isCurrMusicIsPaused(SongInfo currMusic) {
         return isCurrMusicIsPlayingMusic(currMusic) && isPaused();
     }
 

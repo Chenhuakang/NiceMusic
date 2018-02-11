@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.constans.Constans;
@@ -33,7 +33,7 @@ public class DialogMusicListAdapter extends RecyclerView.Adapter<DialogMusicList
 
     private Context mContext;
     private DbManager mDbManager;
-    private List<MusicInfo> mMusicInfos;
+    private List<SongInfo> mMusicInfos;
 
 
     public DialogMusicListAdapter(Context context) {
@@ -43,7 +43,7 @@ public class DialogMusicListAdapter extends RecyclerView.Adapter<DialogMusicList
         mDbManager.AsyQueryPlayList().subscribe(list -> mMusicInfos = list);
     }
 
-    public List<MusicInfo> getMusicInfos() {
+    public List<SongInfo> getMusicInfos() {
         return mMusicInfos==null?new ArrayList<>():mMusicInfos;
     }
 
@@ -55,8 +55,8 @@ public class DialogMusicListAdapter extends RecyclerView.Adapter<DialogMusicList
 
     @Override
     public void onBindViewHolder(ItemHolder holder, int position) {
-        MusicInfo info = mMusicInfos.get(position);
-        holder.mMusicTitle.setText(info.musicTitle + "(" + info.albumTitle + ")" + " - " + info.musicArtist);
+        SongInfo info = mMusicInfos.get(position);
+        holder.mMusicTitle.setText(info.getSongName() + "(" + info.getAlbumInfo().getAlbumName() + ")" + " - " + info.getArtist());
         AnimationDrawable animationDrawable = (AnimationDrawable) holder.mImageAnim.getDrawable();
         if (MusicManager.isCurrMusicIsPlayingMusic(info)) {
             holder.mMusicTitle.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
@@ -75,7 +75,7 @@ public class DialogMusicListAdapter extends RecyclerView.Adapter<DialogMusicList
             mDbManager.AsyDeleteInfoInPlayList(info)
                     .subscribe(aBoolean -> {
                         boolean isPlayNext = MusicManager.isCurrMusicIsPlayingMusic(info);
-                        MusicManager.get().deleteMusicInfoOnPlayList(info, isPlayNext);
+                        MusicManager.get().deleteSongInfoOnPlayList(info, isPlayNext);
                         mMusicInfos.remove(info);
                         notifyItemRemoved(position);
                         if (position != mMusicInfos.size()) {

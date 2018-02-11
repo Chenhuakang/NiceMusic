@@ -1,6 +1,6 @@
 package com.lzx.musiclibrary.aidl.listener;
 
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 
 /**
  * @author lzx
@@ -8,7 +8,7 @@ import com.lzx.musiclibrary.aidl.model.MusicInfo;
  */
 
 public interface OnPlayerEventListener {
-    void onMusicSwitch(MusicInfo music);
+    void onMusicSwitch(SongInfo music);
 
     void onPlayerStart();
 

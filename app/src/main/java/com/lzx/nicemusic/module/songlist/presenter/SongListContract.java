@@ -1,6 +1,6 @@
 package com.lzx.nicemusic.module.songlist.presenter;
 
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.nicemusic.base.mvp.BaseContract;
 
 import java.util.List;
@@ -13,9 +13,9 @@ import java.util.List;
 public interface SongListContract {
 
     interface View extends BaseContract.BaseView {
-        void onGetSongListSuccess(List<MusicInfo> list);
+        void onGetSongListSuccess(List<SongInfo> list);
 
-        void loadMoreSongListSuccess(List<MusicInfo> list);
+        void loadMoreSongListSuccess(List<SongInfo> list);
 
         void loadFinishAllData();
     }

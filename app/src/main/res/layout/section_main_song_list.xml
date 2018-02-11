@@ -31,7 +31,8 @@
             android:layout_height="30dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_main_play_list_play"
-            android:tint="#F3F2F4"/>
+            android:tint="#F3F2F4"
+            android:visibility="gone"/>
 
     </android.support.v7.widget.CardView>
 
@@ -54,8 +55,8 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="12dp"
         android:layout_toRightOf="@id/card_view"
-        android:text="收藏喜欢的歌曲"
         android:paddingBottom="5dp"
+        android:text="收藏喜欢的歌曲"
         android:textColor="@color/font_normal"
         android:textSize="13sp"/>
 

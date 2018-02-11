@@ -28,10 +28,10 @@ public class MainPresenter extends BasePresenter<MainContract.View> implements M
 //            emitter.onNext(json);
 //        })
 //        .map(json -> {
-//            List<MusicInfo> infoList = new Gson().fromJson(json, new TypeToken<List<MusicInfo>>() {
+//            List<SongInfo> infoList = new Gson().fromJson(json, new TypeToken<List<SongInfo>>() {
 //            }.getType());
-//            ConcurrentMap<String, List<MusicInfo>> musicListByType = new ConcurrentHashMap<>();
-//            for (MusicInfo info : infoList) {
+//            ConcurrentMap<String, List<SongInfo>> musicListByType = new ConcurrentHashMap<>();
+//            for (SongInfo info : infoList) {
 //                if (!musicListByType.containsKey(info.musicTitle)) {
 //                    musicListByType.put(info.musicType, DataHelper.getMusicByType(infoList, info.musicType));
 //                }

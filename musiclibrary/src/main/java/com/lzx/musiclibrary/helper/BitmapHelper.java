@@ -60,8 +60,7 @@ public class BitmapHelper {
     }
 
     @SuppressWarnings("SameParameterValue")
-    public static Bitmap fetchAndRescaleBitmap(String uri, int width, int height)
-            throws IOException {
+    public static Bitmap fetchAndRescaleBitmap(String uri, int width, int height)  throws IOException {
         URL url = new URL(uri);
         BufferedInputStream is = null;
         try {

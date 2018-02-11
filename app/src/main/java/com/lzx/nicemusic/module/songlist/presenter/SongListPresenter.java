@@ -1,6 +1,6 @@
 package com.lzx.nicemusic.module.songlist.presenter;
 
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
@@ -60,13 +60,13 @@ public class SongListPresenter extends BasePresenter<SongListContract.View> impl
         }
     }
 
-    private Observable<List<MusicInfo>> getSongList(String title) {
+    private Observable<List<SongInfo>> getSongList(String title) {
         int type = getListType(title);
         return RetrofitHelper.getMusicApi().requestMusicList(type, size, offset)
                 .map(responseBody -> {
-                    List<MusicInfo> list = DataHelper.fetchJSONFromUrl(responseBody);
-                    for (MusicInfo info : list) {
-                        RetrofitHelper.getMusicApi().playMusic(info.musicId)
+                    List<SongInfo> list = DataHelper.fetchJSONFromUrl(responseBody);
+                    for (SongInfo info : list) {
+                        RetrofitHelper.getMusicApi().playMusic(info.getSongId())
                                 .map(responseUrlBody -> {
                                     String json = responseUrlBody.string();
                                     json = json.substring(1, json.length() - 2);
@@ -77,7 +77,7 @@ public class SongListPresenter extends BasePresenter<SongListContract.View> impl
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(url -> {
-                                    info.musicUrl = url;
+                                    info.setSongUrl(url);
                                     list.add(info);
                                 }, throwable -> {
                                     LogUtil.i("1error = " + throwable.getMessage());

@@ -15,20 +15,20 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.android.exoplayer2.extractor.mp4.Track;
-import com.lzx.musiclibrary.MusicService;
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.manager.TimerTaskManager;
-import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.bean.LrcAnalysisInfo;
 import com.lzx.nicemusic.bean.LrcInfo;
+import com.lzx.nicemusic.db.DbManager;
 import com.lzx.nicemusic.utils.DisplayUtil;
 import com.lzx.nicemusic.utils.FormatUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.OuterLayerImageView;
+import com.lzx.nicemusic.widget.SimpleProgress;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +48,7 @@ public class PlayingUIController implements View.OnClickListener {
     private RelativeLayout mPlayListLayout;
     private TextView mBtnPlayMode, mBtnDismiss;
     private TextView mLyricsText;
+    private SimpleProgress mSimpleProgress;
     private List<LrcAnalysisInfo> lrcList;
 
     private RecyclerView mRecyclerView;
@@ -62,14 +63,23 @@ public class PlayingUIController implements View.OnClickListener {
     private ObjectAnimator mPlayDrakBgAnim;
     private long currentPlayTime = 0;
     private TimerTaskManager mTimerTaskManager;
-    private MusicInfo mMusicInfo;
+    private SongInfo mMusicInfo;
+    private DbManager mDbManager;
     private AppCompatActivity mActivity;
     private Context mContext;
 
-    PlayingUIController(AppCompatActivity activity, MusicInfo musicInfo) {
-        mActivity = activity;
+    PlayingUIController(AppCompatActivity activity, SongInfo musicInfo) {
         mMusicInfo = musicInfo;
+        mActivity = activity;
         mContext = mActivity.getApplicationContext();
+        mTimerTaskManager = new TimerTaskManager();
+        mTimerTaskManager.setUpdateProgressTask(this::updateProgress);
+    }
+
+    public PlayingUIController(AppCompatActivity activity) {
+        mActivity = activity;
+        mContext = mActivity.getApplicationContext();
+        mDbManager = new DbManager(activity);
         mTimerTaskManager = new TimerTaskManager();
         mTimerTaskManager.setUpdateProgressTask(this::updateProgress);
     }
@@ -83,27 +93,42 @@ public class PlayingUIController implements View.OnClickListener {
         mMusicBg = mActivity.findViewById(R.id.music_bg);
         mMusicCover = mActivity.findViewById(R.id.music_cover);
         mSongerName = mActivity.findViewById(R.id.songer_name);
-        mPlayListLayout = mActivity.findViewById(R.id.play_list_layout);
-        mBtnPlayMode = mActivity.findViewById(R.id.btn_play_mode);
-        mRecyclerView = mActivity.findViewById(R.id.recycle_view);
-        mBtnDismiss = mActivity.findViewById(R.id.btn_dismiss);
         mBtnMusicList = mActivity.findViewById(R.id.btn_music_list);
         mBtnPlayTime = mActivity.findViewById(R.id.btn_play_time);
         mBtnPre = mActivity.findViewById(R.id.btn_pre);
         mBtnNext = mActivity.findViewById(R.id.btn_next);
-        mPlayDarkBg = mActivity.findViewById(R.id.play_dark_bg);
-        mLyricsText = mActivity.findViewById(R.id.lyrics_text);
 
         mBtnMusicList.setOnClickListener(this);
         mBtnPlayTime.setOnClickListener(this);
         mBtnPre.setOnClickListener(this);
         mBtnNext.setOnClickListener(this);
         mBtnPlayPause.setOnClickListener(this);
+        initPlayListLayout();
+        initMusicCoverAnim();
+    }
+
+    public void initPlayListLayout() {
+        mPlayListLayout = mActivity.findViewById(R.id.play_list_layout);
+        mRecyclerView = mActivity.findViewById(R.id.recycle_view);
+        mBtnDismiss = mActivity.findViewById(R.id.btn_dismiss);
+        mPlayDarkBg = mActivity.findViewById(R.id.play_dark_bg);
+        mBtnPlayMode = mActivity.findViewById(R.id.btn_play_mode);
+        mLyricsText = mActivity.findViewById(R.id.lyrics_text);
         mBtnPlayMode.setOnClickListener(this);
         mBtnDismiss.setOnClickListener(this);
         mPlayDarkBg.setOnClickListener(this);
+        phoneHeight = DisplayUtil.getPhoneHeight(mContext);
+        params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, phoneHeight * 6 / 10);
+        mPlayListLayout.setLayoutParams(params);
+        mDialogMusicListAdapter = new DialogMusicListAdapter(mContext);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+        mRecyclerView.setAdapter(mDialogMusicListAdapter);
 
-        initMusicCoverAnim();
+        MusicManager.get().addStateObservable(mDialogMusicListAdapter);
+    }
+
+    public void initSimpleProgressBar() {
+        mSimpleProgress = mActivity.findViewById(R.id.simple_progress);
     }
 
     /**
@@ -124,15 +149,6 @@ public class PlayingUIController implements View.OnClickListener {
             }
         }
 
-        phoneHeight = DisplayUtil.getPhoneHeight(mContext);
-        params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, phoneHeight * 6 / 10);
-        mPlayListLayout.setLayoutParams(params);
-        mDialogMusicListAdapter = new DialogMusicListAdapter(mContext);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mRecyclerView.setAdapter(mDialogMusicListAdapter);
-
-        MusicManager.get().addStateObservable(mDialogMusicListAdapter);
-
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -151,15 +167,27 @@ public class PlayingUIController implements View.OnClickListener {
         });
     }
 
-    void updateUI(MusicInfo info) {
+    public void starUpdateProgress(){
+        mTimerTaskManager.scheduleSeekBarUpdate();
+    }
+
+    public void pauseUpdateProgress(){
+        mTimerTaskManager.stopSeekBarUpdate();
+    }
+
+    void updateUI(SongInfo info) {
+        mMusicInfo = info;
         resetCoverAnim();
-        mMusicName.setText(info.musicTitle);
-        mSongerName.setText(info.musicArtist);
-        GlideUtil.loadImageByUrl(mContext, info.musicCover, mMusicCover);
-        GlideUtil.loadBlurImage(mContext, info.musicCover, mMusicBg);
+        mMusicName.setText(info.getSongName());
+        mSongerName.setText(info.getArtist());
+        if (mLyricsText != null) {
+            mLyricsText.setText(info.getArtist());
+        }
+        GlideUtil.loadImageByUrl(mContext, info.getSongCover(), mMusicCover);
+        GlideUtil.loadBlurImage(mContext, info.getSongCover(), mMusicBg);
         mSeekBar.setProgress(0);
-        mSeekBar.setMax((int) info.musicDuration);
-        mTotalTime.setText(FormatUtil.formatMusicTime(info.musicDuration));
+        mSeekBar.setMax((int) info.getDuration());
+        mTotalTime.setText(FormatUtil.formatMusicTime(info.getDuration()));
     }
 
     /**
@@ -256,33 +284,41 @@ public class PlayingUIController implements View.OnClickListener {
     /**
      * 显示播放列表
      */
-    private void showPlayListLayout() {
-        int index = -1;
-        List<MusicInfo> list = mDialogMusicListAdapter.getMusicInfos();
-        for (int i = 0; i < list.size(); i++) {
-            MusicInfo info = list.get(i);
-            if (MusicManager.isCurrMusicIsPlayingMusic(info)) {
-                index = i;
-                break;
-            }
-        }
-        if (index != -1) {
-            mRecyclerView.scrollToPosition(index);
-        }
-        initPlayListAnim(true, phoneHeight, phoneHeight * 4 / 10);
+    public void showPlayListLayout() {
+        mDbManager.AsyQueryPlayList()
+                .subscribe(infoList -> {
+                    if (infoList == null || infoList.size() == 0) {
+                        return;
+                    }
+                    int index = -1;
+                    List<SongInfo> list = mDialogMusicListAdapter.getMusicInfos();
+                    for (int i = 0; i < list.size(); i++) {
+                        SongInfo info = list.get(i);
+                        if (MusicManager.isCurrMusicIsPlayingMusic(info)) {
+                            index = i;
+                            break;
+                        }
+                    }
+                    if (index != -1) {
+                        mRecyclerView.scrollToPosition(index);
+                    }
+                    initPlayListAnim(true, phoneHeight, phoneHeight * 4 / 10);
+                }, throwable -> {
+                    Toast.makeText(mActivity, "打开列表失败", Toast.LENGTH_SHORT).show();
+                });
     }
 
     /**
      * 隐藏播放列表
      */
-    void hidePlayListLayout() {
+    public void hidePlayListLayout() {
         initPlayListAnim(false, phoneHeight * 4 / 10, phoneHeight);
     }
 
     /**
      * 列表是否在显示
      */
-    boolean isPlayListVisible() {
+    public boolean isPlayListVisible() {
         return mPlayListLayout.getVisibility() == View.VISIBLE;
     }
 
@@ -291,8 +327,19 @@ public class PlayingUIController implements View.OnClickListener {
      */
     private void updateProgress() {
         long progress = MusicManager.get().getProgress();
-        mSeekBar.setProgress((int) progress);
-        mStartTime.setText(FormatUtil.formatMusicTime(progress));
+        if (mSeekBar != null && mStartTime != null) {
+            mSeekBar.setProgress((int) progress);
+            mStartTime.setText(FormatUtil.formatMusicTime(progress));
+        }
+        if (mSimpleProgress != null) {
+            if (mMusicInfo==null){
+                mMusicInfo = MusicManager.get().getCurrPlayingMusic();
+            }
+            if (mSimpleProgress.getMax() == -1) {
+                mSimpleProgress.setMax(mMusicInfo.getDuration());
+            }
+            mSimpleProgress.setProgress(progress);
+        }
         if (lrcList != null && lrcList.size() > 0) {
             mLyricsText.setText(getLrc(progress));
         }

@@ -3,7 +3,7 @@ package com.lzx.musiclibrary.playback.player;
 import android.content.Context;
 import android.media.MediaPlayer;
 
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 
 /**
  * Created by xian on 2018/1/20.
@@ -62,7 +62,7 @@ public class MediaPlayback implements Playback {
     }
 
     @Override
-    public void play(MusicInfo info) {
+    public void play(SongInfo info) {
 
     }
 

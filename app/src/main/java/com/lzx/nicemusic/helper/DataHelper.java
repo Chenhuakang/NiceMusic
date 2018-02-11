@@ -1,6 +1,7 @@
 package com.lzx.nicemusic.helper;
 
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.AlbumInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,9 +50,9 @@ public class DataHelper {
      * @param size
      * @return
      */
-    public static List<MusicInfo> getShuffleMusicList(List<MusicInfo> list, int size) {
+    public static List<SongInfo> getShuffleMusicList(List<SongInfo> list, int size) {
         Collections.shuffle(list);
-        List<MusicInfo> results = new ArrayList<>();
+        List<SongInfo> results = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             results.add(list.get(i));
         }
@@ -66,52 +67,55 @@ public class DataHelper {
      * @throws IOException
      * @throws JSONException
      */
-    public static List<MusicInfo> fetchJSONFromUrl(ResponseBody responseBody) throws IOException, JSONException {
-        List<MusicInfo> musicInfos = new ArrayList<>();
+    public static List<SongInfo> fetchJSONFromUrl(ResponseBody responseBody) throws IOException, JSONException {
+        List<SongInfo> musicInfos = new ArrayList<>();
         JSONObject jsonObject = new JSONObject(responseBody.string());
         JSONArray array = jsonObject.getJSONArray("song_list");
         JSONObject billboard = jsonObject.getJSONObject("billboard");
         for (int i = 0; i < array.length(); i++) {
             JSONObject object = array.getJSONObject(i);
-            MusicInfo info = new MusicInfo();
-            info.musicId = object.getString("song_id"); //音乐id
-            info.musicTitle = object.getString("title"); //音乐标题
-            info.musicCover = object.getString("pic_s500"); //音乐封面
-            info.musicUrl = ""; //音乐播放地址
-            info.musicGenre = billboard.getString("name"); //类型（流派）
-            info.musicType = billboard.getString("billboard_type"); //类型
-            info.musicSize = ""; //音乐大小
-            info.musicDuration = object.getInt("file_duration") * 1000; //音乐长度
-            info.musicArtist = object.getString("author"); //音乐艺术家
-            info.artistId = object.getString("ting_uid"); //音乐艺术家id
-            info.musicDownloadUrl = ""; //音乐下载地址
-            info.musicSite = object.getString("country"); //地点
-            info.favorites = Integer.parseInt(object.optString("hot", "0")); //喜欢数
-            info.playCount = info.favorites * 2; //播放数
-            info.trackNumber = i; //媒体的曲目号码（序号：1234567……）
+            SongInfo info = new SongInfo();
+            info.setSongId(object.getString("song_id")); //音乐id
+            info.setSongName(object.getString("title")); //音乐标题
+            info.setSongCover(object.getString("pic_s500"));  //音乐封面
+            info.setSongUrl(""); //音乐播放地址
+            info.setGenre(billboard.getString("name"));  //类型（流派）
+            info.setType(billboard.getString("billboard_type"));  //类型
+            info.setSize("");   //音乐大小
+            info.setDuration(object.getInt("file_duration") * 1000);   //音乐长度
+            info.setArtist(object.getString("author"));  //音乐艺术家
+            info.setArtistId(object.getString("ting_uid"));   //音乐艺术家id
+            info.setDownloadUrl("");  //音乐下载地址
+            info.setSite(object.getString("country"));  //地点
+            info.setFavorites(Integer.parseInt(object.optString("hot", "0")));  //喜欢数
+            info.setPlayCount(info.getFavorites() * 2);  //播放数
+            info.setTrackNumber(i);   //媒体的曲目号码（序号：1234567……）
 
-            info.language = object.getString("language");//语言
-            info.country = object.getString("country"); //地区
-            info.proxyCompany = object.getString("si_proxycompany");//代理公司
-            info.publishTime = object.getString("publishtime");//发布时间
-            info.musicInfo = object.getString("info"); //音乐描述
-            info.versions = object.getString("versions"); //版本
+            info.setLanguage(object.getString("language")); //语言
+            info.setCountry(object.getString("country")); //地区
+            info.setProxyCompany(object.getString("si_proxycompany")); //代理公司
+            info.setPublishTime(object.getString("publishtime"));  //发布时间
+            info.setDescription(object.getString("info"));  //音乐描述
+            info.setVersions(object.getString("versions"));  //版本
 
-            info.albumId = object.getString("album_id"); //专辑id
-            info.albumTitle = object.getString("album_title"); //专辑名称
-            info.albumCover = object.getString("album_500_500"); //专辑封面
-            info.temp_1 = object.getString("pic_huge"); //长方形的封面
-            info.temp_2 = object.getString("pic_premium"); //高清的封面
-            info.albumArtist = object.getString("artist_name"); //专辑艺术家
-            info.albumMusicCount = 0; //专辑音乐数
-            info.albumPlayCount = 0; //专辑播放数
+            AlbumInfo albumInfo = new AlbumInfo();
+            albumInfo.setAlbumId(object.getString("album_id")); //专辑id
+            albumInfo.setAlbumName(object.getString("album_title"));   //专辑名称
+            albumInfo.setAlbumCover(object.getString("album_500_500"));  //专辑封面
+            albumInfo.setAlbumRectCover(object.getString("pic_huge"));   //长方形的封面
+            albumInfo.setAlbumHDCover(object.getString("pic_premium"));   //高清的封面
+            albumInfo.setArtist(object.getString("artist_name"));   //专辑艺术家
+            albumInfo.setSongCount(0);   //专辑音乐数
+            albumInfo.setPlayCount(0);   //专辑播放数
+
+            info.setAlbumInfo(albumInfo);
             musicInfos.add(info);
         }
         return musicInfos;
     }
 
-    public static List<MusicInfo> subList(List<MusicInfo> list, int index, int size) {
-        List<MusicInfo> musicInfos = new ArrayList<>();
+    public static List<SongInfo> subList(List<SongInfo> list, int index, int size) {
+        List<SongInfo> musicInfos = new ArrayList<>();
         for (int i = index; i < size; i++) {
             musicInfos.add(list.get(i));
             size = size + i * size;
@@ -119,10 +123,10 @@ public class DataHelper {
         return musicInfos;
     }
 
-    public static List<MusicInfo> getMusicByType(List<MusicInfo> list, String type) {
-        List<MusicInfo> musicInfos = new ArrayList<>();
-        for (MusicInfo info : list) {
-            if (info.musicType.equals(type)) {
+    public static List<SongInfo> getMusicByType(List<SongInfo> list, String type) {
+        List<SongInfo> musicInfos = new ArrayList<>();
+        for (SongInfo info : list) {
+            if (info.getType().equals(type)) {
                 musicInfos.add(info);
             }
         }

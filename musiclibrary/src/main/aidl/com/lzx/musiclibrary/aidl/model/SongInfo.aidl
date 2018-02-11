@@ -3,4 +3,4 @@ package com.lzx.musiclibrary.aidl.model;
 
 
 
-parcelable MusicInfo;
+parcelable SongInfo;

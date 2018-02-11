@@ -10,7 +10,7 @@ import android.view.MotionEvent;
 import android.view.animation.AccelerateInterpolator;
 
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
@@ -29,14 +29,14 @@ import java.util.Random;
 @CreatePresenter(PlayPresenter.class)
 public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, PlayPresenter> implements PlayContract.View, OnPlayerEventListener {
 
-    private MusicInfo mMusicInfo;
+    private SongInfo mMusicInfo;
     private PlayingUIController mUIController;
     private SongListReceiver mSongListReceiver;
     private ParticleSystem ps;
 
-    public static void launch(Context context, MusicInfo info) {
+    public static void launch(Context context, SongInfo info) {
         Intent intent = new Intent(context, PlayingDetailActivity.class);
-        intent.putExtra("MusicInfo", info);
+        intent.putExtra("SongInfo", info);
         context.startActivity(intent);
     }
 
@@ -47,7 +47,7 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        mMusicInfo = getIntent().getParcelableExtra("MusicInfo");
+        mMusicInfo = getIntent().getParcelableExtra("SongInfo");
 
         mUIController = new PlayingUIController(this, mMusicInfo);
         mUIController.initViews();
@@ -60,15 +60,15 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         registerReceiver(mSongListReceiver, filter);
 
         //获取歌词
-        getPresenter().getLrcInfo(mMusicInfo.musicId);
+        getPresenter().getLrcInfo(mMusicInfo.getSongId());
 
         MusicManager.get().addPlayerEventListener(this);
     }
 
 
     @Override
-    public void onMusicSwitch(MusicInfo music) {
-        getPresenter().getLrcInfo(music.musicId);
+    public void onMusicSwitch(SongInfo music) {
+        getPresenter().getLrcInfo(music.getSongId());
         mUIController.updateUI(music);
     }
 

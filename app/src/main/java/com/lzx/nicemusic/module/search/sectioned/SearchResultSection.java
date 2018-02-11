@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.module.search.presenter.SearchPresenter;
 import com.lzx.nicemusic.utils.GlideUtil;
@@ -24,10 +24,10 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 public class SearchResultSection extends StatelessSection {
 
     private Context mContext;
-    private List<MusicInfo> mMusicInfos = new ArrayList<>();
+    private List<SongInfo> mMusicInfos = new ArrayList<>();
     private SearchPresenter mSearchPresenter;
 
-    public SearchResultSection(Context context, List<MusicInfo> infoList,SearchPresenter presenter) {
+    public SearchResultSection(Context context, List<SongInfo> infoList, SearchPresenter presenter) {
         super(new SectionParameters.Builder(R.layout.section_search_result)
                 .headerResourceId(R.layout.section_search_result_header).build());
         mContext = context;
@@ -48,10 +48,10 @@ public class SearchResultSection extends StatelessSection {
     @Override
     public void onBindItemViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         ResultHolder holder = (ResultHolder) viewHolder;
-        MusicInfo musicInfo = mMusicInfos.get(position);
-        GlideUtil.loadImageByUrl(mContext, musicInfo.albumCover, holder.mMusicCover);
-        holder.mMusicName.setText(musicInfo.musicTitle);
-        holder.mAlbumName.setText(musicInfo.musicArtist);
+        SongInfo musicInfo = mMusicInfos.get(position);
+        GlideUtil.loadImageByUrl(mContext, musicInfo.getAlbumInfo().getAlbumCover(), holder.mMusicCover);
+        holder.mMusicName.setText(musicInfo.getSongName());
+        holder.mAlbumName.setText(musicInfo.getArtist());
     }
 
     class ResultHolder extends RecyclerView.ViewHolder {

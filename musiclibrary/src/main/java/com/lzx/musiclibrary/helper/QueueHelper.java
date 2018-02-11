@@ -3,7 +3,7 @@ package com.lzx.musiclibrary.helper;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.manager.QueueManager;
 
 import java.util.ArrayList;
@@ -17,36 +17,40 @@ import java.util.concurrent.ConcurrentMap;
 
 public class QueueHelper {
 
-    public static List<MusicInfo> fetchListWithMediaMetadata(List<MusicInfo> list) {
-        List<MusicInfo> infos = new ArrayList<>();
-        for (MusicInfo info : list) {
-            info.metadataCompat = getMediaMetadataCompat(info);
+    public static List<SongInfo> fetchListWithMediaMetadata(List<SongInfo> list) {
+        List<SongInfo> infos = new ArrayList<>();
+        for (SongInfo info : list) {
+            info.setMetadataCompat(getMediaMetadataCompat(info));
             infos.add(info);
         }
         return infos;
     }
 
-    public static MusicInfo fetchInfoWithMediaMetadata(MusicInfo info) {
-        info.metadataCompat = getMediaMetadataCompat(info);
+    public static SongInfo fetchInfoWithMediaMetadata(SongInfo info) {
+        info.setMetadataCompat(getMediaMetadataCompat(info));
         return info;
     }
 
-    private static MediaMetadataCompat getMediaMetadataCompat(MusicInfo info) {
+    private static MediaMetadataCompat getMediaMetadataCompat(SongInfo info) {
+        if (info.getAlbumInfo()==null){
+            throw new RuntimeException("albumInfo must not be null.");
+        }
         return new MediaMetadataCompat.Builder()
-                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, info.musicId)
-                .putString("__SOURCE__", info.musicUrl)
-                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, info.albumTitle)
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, info.musicArtist)
-                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, info.musicDuration)
-                .putString(MediaMetadataCompat.METADATA_KEY_GENRE, info.musicGenre)
-                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, info.albumCover)
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, info.musicTitle)
-                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, info.trackNumber)
-                .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, info.albumMusicCount)
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, info.getSongId())
+                .putString("__SOURCE__", info.getSongUrl())
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, info.getAlbumInfo().getAlbumName())
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, info.getArtist())
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, info.getDuration())
+                .putString(MediaMetadataCompat.METADATA_KEY_GENRE, info.getGenre())
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, info.getAlbumInfo().getAlbumCover())
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, info.getSongName())
+                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, info.getTrackNumber())
+                .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, info.getSongCoverBitmap())
+                .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, info.getAlbumInfo().getSongCount())
                 .build();
     }
 
-    public static List<MediaSessionCompat.QueueItem> getQueueItems(ConcurrentMap<String, MusicInfo> musicListById) {
+    public static List<MediaSessionCompat.QueueItem> getQueueItems(ConcurrentMap<String, SongInfo> musicListById) {
         List<MediaMetadataCompat> result = new ArrayList<>();
         Iterable<MediaMetadataCompat> musics = getMusics(musicListById);
         for (MediaMetadataCompat metadata : musics) {
@@ -55,13 +59,13 @@ public class QueueHelper {
         return convertToQueue(result);
     }
 
-    private static Iterable<MediaMetadataCompat> getMusics(ConcurrentMap<String, MusicInfo> musicListById) {
+    private static Iterable<MediaMetadataCompat> getMusics(ConcurrentMap<String, SongInfo> musicListById) {
         if (musicListById.size() == 0) {
             return Collections.emptyList();
         }
         List<MediaMetadataCompat> compatArrayList = new ArrayList<>(musicListById.size());
-        for (MusicInfo mutableMetadata : musicListById.values()) {
-            compatArrayList.add(mutableMetadata.metadataCompat);
+        for (SongInfo mutableMetadata : musicListById.values()) {
+            compatArrayList.add(mutableMetadata.getMetadataCompat());
         }
         return compatArrayList;
     }
@@ -85,21 +89,21 @@ public class QueueHelper {
     }
 
 
-    public static MusicInfo getMusicInfoById(ConcurrentMap<String, MusicInfo> musicListById, String musicId) {
+    public static SongInfo getMusicInfoById(ConcurrentMap<String, SongInfo> musicListById, String musicId) {
         return musicListById.containsKey(musicId) ? musicListById.get(musicId) : null;
     }
 
     /**
      * 判断index是否合法
      */
-    public static boolean isIndexPlayable(int index, List<MusicInfo> queue) {
+    public static boolean isIndexPlayable(int index, List<SongInfo> queue) {
         return (queue != null && index >= 0 && index < queue.size());
     }
 
-    public static int getMusicIndexOnQueue(Iterable<MusicInfo> queue, String mediaId) {
+    public static int getMusicIndexOnQueue(Iterable<SongInfo> queue, String mediaId) {
         int index = 0;
-        for (MusicInfo item : queue) {
-            if (mediaId.equals(item.musicId)) {
+        for (SongInfo item : queue) {
+            if (mediaId.equals(item.getSongId())) {
                 return index;
             }
             index++;
@@ -110,16 +114,16 @@ public class QueueHelper {
     /**
      * 是否需要切歌
      */
-    public static boolean isNeedToSwitchMusic(QueueManager queueManager, List<MusicInfo> list, int index) {
+    public static boolean isNeedToSwitchMusic(QueueManager queueManager, List<SongInfo> list, int index) {
         return isNeedToSwitchMusic(queueManager, list.get(index));
     }
 
     /**
      * 是否需要切歌
      */
-    public static boolean isNeedToSwitchMusic(QueueManager queueManager, MusicInfo info) {
-        String playingMusicId = queueManager.getCurrentMusic().musicId;
-        String currMusicId = info.musicId;
+    public static boolean isNeedToSwitchMusic(QueueManager queueManager, SongInfo info) {
+        String playingMusicId = queueManager.getCurrentMusic().getSongId();
+        String currMusicId = info.getSongId();
         return !playingMusicId.equals(currMusicId);
     }
 

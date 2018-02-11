@@ -27,7 +27,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.lzx.musiclibrary.MusicService;
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.manager.FocusAndLockManager;
 import com.lzx.musiclibrary.constans.State;
 
@@ -168,11 +168,11 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
     }
 
     @Override
-    public void play(MusicInfo info) {
+    public void play(SongInfo info) {
         mPlayOnFocusGain = true;
         mFocusAndLockManager.tryToGetAudioFocus();
         registerAudioNoisyReceiver();
-        String mediaId = info.musicId;
+        String mediaId = info.getSongId();
         boolean mediaHasChanged = !TextUtils.equals(mediaId, mCurrentMediaId);
         if (mediaHasChanged) {
             mCurrentMediaId = mediaId;
@@ -181,7 +181,7 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
         if (mediaHasChanged || mExoPlayer == null) {
             releaseResources(false); // release everything except the player
 
-            String source = info.musicUrl;
+            String source = info.getSongUrl();
             if (source != null) {
                 source = source.replaceAll(" ", "%20"); // Escape spaces for URLs
             }

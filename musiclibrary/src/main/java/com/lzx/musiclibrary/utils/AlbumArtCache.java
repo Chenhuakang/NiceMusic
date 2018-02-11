@@ -20,7 +20,6 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.LruCache;
 
-
 import com.lzx.musiclibrary.helper.BitmapHelper;
 
 import java.io.IOException;
@@ -77,43 +76,47 @@ public final class AlbumArtCache {
     }
 
     public void fetch(final String artUrl, final FetchListener listener) {
-        // WARNING: for the sake of simplicity, simultaneous multi-thread fetch requests
-        // are not handled properly: they may cause redundant costly operations, like HTTP
-        // requests and bitmap rescales. For production-level apps, we recommend you use
-        // a proper image loading library, like Glide.
         Bitmap[] bitmap = mCache.get(artUrl);
         if (bitmap != null) {
             listener.onFetched(artUrl, bitmap[BIG_BITMAP_INDEX], bitmap[ICON_BITMAP_INDEX]);
             return;
         }
+        new BitmapAsyncTask(artUrl, listener, mCache).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
 
-        new AsyncTask<Void, Void, Bitmap[]>() {
-            @Override
-            protected Bitmap[] doInBackground(Void[] objects) {
-                Bitmap[] bitmaps;
-                try {
-                    Bitmap bitmap = BitmapHelper.fetchAndRescaleBitmap(artUrl,
-                            MAX_ART_WIDTH, MAX_ART_HEIGHT);
-                    Bitmap icon = BitmapHelper.scaleBitmap(bitmap,
-                            MAX_ART_WIDTH_ICON, MAX_ART_HEIGHT_ICON);
-                    bitmaps = new Bitmap[]{bitmap, icon};
-                    mCache.put(artUrl, bitmaps);
-                } catch (IOException e) {
-                    return null;
-                }
-                return bitmaps;
-            }
+    private static class BitmapAsyncTask extends AsyncTask<Void, Void, Bitmap[]> {
+        private String artUrl;
+        private FetchListener listener;
+        private LruCache<String, Bitmap[]> mCache;
 
-            @Override
-            protected void onPostExecute(Bitmap[] bitmaps) {
-                if (bitmaps == null) {
-                    listener.onError(artUrl, new IllegalArgumentException("got null bitmaps"));
-                } else {
-                    listener.onFetched(artUrl,
-                            bitmaps[BIG_BITMAP_INDEX], bitmaps[ICON_BITMAP_INDEX]);
-                }
+        BitmapAsyncTask(String artUrl, FetchListener listener, LruCache<String, Bitmap[]> cache) {
+            this.artUrl = artUrl;
+            this.listener = listener;
+            mCache = cache;
+        }
+
+        @Override
+        protected Bitmap[] doInBackground(Void... voids) {
+            Bitmap[] bitmaps;
+            try {
+                Bitmap bitmap = BitmapHelper.fetchAndRescaleBitmap(artUrl, MAX_ART_WIDTH, MAX_ART_HEIGHT);
+                Bitmap icon = BitmapHelper.scaleBitmap(bitmap, MAX_ART_WIDTH_ICON, MAX_ART_HEIGHT_ICON);
+                bitmaps = new Bitmap[]{bitmap, icon};
+                mCache.put(artUrl, bitmaps);
+            } catch (IOException e) {
+                return null;
             }
-        }.execute();
+            return bitmaps;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap[] bitmaps) {
+            if (bitmaps == null) {
+                listener.onError(artUrl, new IllegalArgumentException("got null bitmaps"));
+            } else {
+                listener.onFetched(artUrl, bitmaps[BIG_BITMAP_INDEX], bitmaps[ICON_BITMAP_INDEX]);
+            }
+        }
     }
 
     public static abstract class FetchListener {

@@ -4,11 +4,13 @@ import android.content.Context;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
+import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.aidl.listener.NotifyContract;
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.constans.PlayMode;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.helper.QueueHelper;
+import com.lzx.musiclibrary.manager.MediaSessionManager;
 import com.lzx.musiclibrary.manager.QueueManager;
 import com.lzx.musiclibrary.playback.PlaybackManager;
 import com.lzx.musiclibrary.playback.player.Playback;
@@ -25,14 +27,16 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
     private Context mContext;
     private QueueManager mQueueManager;
     private PlaybackManager mPlaybackManager;
-    private MediaSessionCompat mSession;
+    private MediaSessionManager mMediaSessionManager;
     private PlayMode mPlayMode;
     private NotifyContract.NotifyStatusChanged mNotifyStatusChanged;
     private NotifyContract.NotifyMusicSwitch mNotifyMusicSwitch;
     private Playback mPlayback;
 
+
     PlayController(
             Context context,
+            MusicService musicService,
             PlayMode playMode,
             Playback playback,
             NotifyContract.NotifyStatusChanged notifyStatusChanged,
@@ -49,19 +53,16 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         mPlaybackManager = new PlaybackManager(mPlayback, mQueueManager, mPlayMode, isAutoPlayNext);
         mPlaybackManager.setServiceCallback(this);
 
-        mSession = new MediaSessionCompat(mContext, "MusicService");
-        mSession.setCallback(mPlaybackManager.getMediaSessionCallback());
-        mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-
+        mMediaSessionManager = new MediaSessionManager(mContext, mPlaybackManager);
         mPlaybackManager.updatePlaybackState(null);
     }
 
-    void playMusic(List<MusicInfo> list, int index, boolean isJustPlay) {
+    void playMusic(List<SongInfo> list, int index, boolean isJustPlay) {
         mQueueManager.setCurrentQueue(list, index);
         setCurrentQueueItem(list.get(index), isJustPlay);
     }
 
-    void playMusicByInfo(MusicInfo info, boolean isJustPlay) {
+    void playMusicByInfo(SongInfo info, boolean isJustPlay) {
         mQueueManager.addQueueItem(info);
         setCurrentQueueItem(info, isJustPlay);
     }
@@ -73,7 +74,7 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         if (!QueueHelper.isIndexPlayable(index, mQueueManager.getPlayingQueue())) {
             return;
         }
-        MusicInfo playInfo = mQueueManager.getPlayingQueue().get(index);
+        SongInfo playInfo = mQueueManager.getPlayingQueue().get(index);
         setCurrentQueueItem(playInfo, isJustPlay);
     }
 
@@ -93,20 +94,20 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         mPlaybackManager.handleStopRequest("");
     }
 
-    void setPlayList(List<MusicInfo> list) {
+    void setPlayList(List<SongInfo> list) {
         mQueueManager.setCurrentQueue(list);
     }
 
-    void setPlayListWithIndex(List<MusicInfo> list, int index) {
+    void setPlayListWithIndex(List<SongInfo> list, int index) {
         mQueueManager.setCurrentQueue(list, index);
     }
 
-    List<MusicInfo> getPlayList() {
+    List<SongInfo> getPlayList() {
         return mQueueManager.getPlayingQueue();
     }
 
-    void deleteMusicInfoOnPlayList(MusicInfo info,boolean isNeedToPlayNext) {
-        mQueueManager.deleteQueueItem(info,isNeedToPlayNext);
+    void deleteMusicInfoOnPlayList(SongInfo info, boolean isNeedToPlayNext) {
+        mQueueManager.deleteQueueItem(info, isNeedToPlayNext);
     }
 
     int getState() {
@@ -129,15 +130,15 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         return mPlaybackManager.hasNextOrPre();
     }
 
-    MusicInfo getPreMusic() {
+    SongInfo getPreMusic() {
         return mQueueManager.getPreMusicInfo();
     }
 
-    MusicInfo getNextMusic() {
+    SongInfo getNextMusic() {
         return mQueueManager.getNextMusicInfo();
     }
 
-    MusicInfo getCurrPlayingMusic() {
+    SongInfo getCurrPlayingMusic() {
         return mQueueManager.getCurrentMusic();
     }
 
@@ -153,13 +154,14 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         mPlaybackManager.getPlayback().seekTo(position);
     }
 
-    private void setCurrentQueueItem(MusicInfo info, boolean isJustPlay) {
-        mQueueManager.setCurrentQueueItem(info.musicId, isJustPlay, QueueHelper.isNeedToSwitchMusic(mQueueManager, info));
+    private void setCurrentQueueItem(SongInfo info, boolean isJustPlay) {
+        mQueueManager.setCurrentQueueItem(info.getSongId(), isJustPlay, QueueHelper.isNeedToSwitchMusic(mQueueManager, info));
     }
 
     @Override
-    public void onMetadataChanged(MusicInfo metadata) {
-        mSession.setMetadata(metadata.metadataCompat);
+    public void onMetadataChanged(SongInfo metadata) {
+        //   mSession.setMetadata(metadata.getMetadataCompat());
+        mMediaSessionManager.updateMetaData(metadata.getMetadataCompat());
     }
 
     @Override
@@ -174,12 +176,13 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
     }
 
     @Override
-    public void onQueueUpdated(List<MediaSessionCompat.QueueItem> newQueue, List<MusicInfo> playingQueue) {
-        mSession.setQueue(newQueue);
+    public void onQueueUpdated(List<MediaSessionCompat.QueueItem> newQueue, List<SongInfo> playingQueue) {
+       // mSession.setQueue(newQueue);
+        mMediaSessionManager.setQueue(newQueue);
     }
 
     @Override
-    public void onPlaybackSwitch(MusicInfo info) {
+    public void onPlaybackSwitch(SongInfo info) {
         mNotifyMusicSwitch.notify(info);
     }
 
@@ -202,14 +205,10 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
     public void onPlaybackStateUpdated(int state, PlaybackStateCompat newState) {
         //状态改变
         mNotifyStatusChanged.notify(mQueueManager.getCurrentMusic(), mQueueManager.getCurrentIndex(), state, null);
-
-        mSession.setPlaybackState(newState);
-        if (state == State.STATE_PLAYING) {
-            mSession.setActive(true);
-        }
+        mMediaSessionManager.setPlaybackState(newState);
     }
 
     void releaseMediaSession() {
-        mSession.release();
+        mMediaSessionManager.release();
     }
 }

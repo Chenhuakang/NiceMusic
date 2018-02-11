@@ -1,6 +1,6 @@
 package com.lzx.nicemusic.module.search.presenter;
 
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.nicemusic.base.mvp.BaseContract;
 
 import java.util.List;
@@ -14,7 +14,7 @@ public interface SearchContract {
     interface View extends BaseContract.BaseView {
         void loadDefaultSearchDataSuccess(List<String> hotSearch, List<String> historys);
 
-        void searchSuccess(List<MusicInfo> infoList);
+        void searchSuccess(List<SongInfo> infoList);
 
         void deleteHistorySuccess();
     }

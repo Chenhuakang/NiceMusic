@@ -1,6 +1,5 @@
 package com.lzx.nicemusic;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -9,28 +8,26 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
-import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.module.main.MainFragment;
 import com.lzx.nicemusic.module.play.PlayingDetailActivity;
+import com.lzx.nicemusic.module.play.PlayingUIController;
 import com.lzx.nicemusic.module.search.SearchActivity;
 import com.lzx.nicemusic.module.songlist.SongListFragment;
 import com.lzx.nicemusic.utils.GlideUtil;
 
 
-
 public class MainActivity extends BaseMvpActivity implements View.OnClickListener, OnPlayerEventListener {
-
 
     private ImageView mMusicCover, mBtnPlayList, mBtnPlayPause;
     private TextView mMusicName;
-    private TextView mSingerName;
+
     private Intent intent;
     private MainFragment mMainFragment;
     private SongListFragment mSongListFragment;
-
+    private PlayingUIController mUIController;
 
     @Override
     protected int getLayoutId() {
@@ -39,19 +36,22 @@ public class MainActivity extends BaseMvpActivity implements View.OnClickListene
 
     @Override
     protected void init(Bundle savedInstanceState) {
-
         mMusicCover = findViewById(R.id.music_cover);
         mMusicName = findViewById(R.id.music_name);
-        mSingerName = findViewById(R.id.singer_name);
+
         mBtnPlayList = findViewById(R.id.btn_play_list);
         mBtnPlayPause = findViewById(R.id.btn_play_pause);
 
         initFragment();
 
+        mUIController = new PlayingUIController(this);
+        mUIController.initPlayListLayout();
+        mUIController.initSimpleProgressBar();
+
         mBtnPlayList.setOnClickListener(this);
         mBtnPlayPause.setOnClickListener(this);
         mMusicCover.setOnClickListener(this);
-        mSingerName.setOnClickListener(this);
+
         mMusicName.setOnClickListener(this);
         MusicManager.get().addPlayerEventListener(this);
     }
@@ -75,13 +75,14 @@ public class MainActivity extends BaseMvpActivity implements View.OnClickListene
 
     @Override
     public void onClick(View view) {
-        MusicInfo info = MusicManager.get().getCurrPlayingMusic();
+        SongInfo info = MusicManager.get().getCurrPlayingMusic();
         switch (view.getId()) {
             case R.id.ed_search:
                 intent = new Intent(this, SearchActivity.class);
                 startActivity(intent);
                 break;
             case R.id.btn_play_list:
+                mUIController.showPlayListLayout();
                 break;
             case R.id.btn_play_pause:
                 if (info != null) {
@@ -93,7 +94,7 @@ public class MainActivity extends BaseMvpActivity implements View.OnClickListene
                 }
                 break;
             case R.id.music_cover:
-            case R.id.singer_name:
+            case R.id.lyrics_text:
             case R.id.music_name:
                 if (info != null) {
                     PlayingDetailActivity.launch(this, info);
@@ -103,20 +104,22 @@ public class MainActivity extends BaseMvpActivity implements View.OnClickListene
     }
 
     @Override
-    public void onMusicSwitch(MusicInfo music) {
-        GlideUtil.loadImageByUrl(this, music.musicCover, mMusicCover);
-        mMusicName.setText(music.musicTitle);
-        mSingerName.setText(music.musicArtist);
+    public void onMusicSwitch(SongInfo music) {
+        GlideUtil.loadImageByUrl(this, music.getSongCover(), mMusicCover);
+        mMusicName.setText(music.getSongName());
+
     }
 
     @Override
     public void onPlayerStart() {
         mBtnPlayPause.setImageResource(R.drawable.notify_btn_dark_pause_normal);
+        mUIController.starUpdateProgress();
     }
 
     @Override
     public void onPlayerPause() {
         mBtnPlayPause.setImageResource(R.drawable.notify_btn_dark_play_normal);
+        mUIController.pauseUpdateProgress();
     }
 
     @Override
@@ -132,6 +135,15 @@ public class MainActivity extends BaseMvpActivity implements View.OnClickListene
     @Override
     public void onBuffering(boolean isFinishBuffer) {
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mUIController.isPlayListVisible()) {
+            mUIController.hidePlayListLayout();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override

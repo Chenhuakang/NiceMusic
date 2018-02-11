@@ -4,11 +4,10 @@ import android.graphics.Bitmap;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.constans.PlayMode;
 import com.lzx.musiclibrary.helper.QueueHelper;
 import com.lzx.musiclibrary.utils.AlbumArtCache;
-import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,14 +21,14 @@ import java.util.concurrent.ConcurrentMap;
 
 public class QueueManager {
 
-    private List<MusicInfo> mPlayingQueue;
+    private List<SongInfo> mPlayingQueue;
     private int mCurrentIndex;
     private MetadataUpdateListener mListener;
-    private final ConcurrentMap<String, MusicInfo> mMusicListById;
+    private final ConcurrentMap<String, SongInfo> mMusicListById;
     private PlayMode mPlayMode;
 
     public QueueManager(MetadataUpdateListener listener, PlayMode playMode) {
-        mPlayingQueue = Collections.synchronizedList(new ArrayList<MusicInfo>());
+        mPlayingQueue = Collections.synchronizedList(new ArrayList<SongInfo>());
         mMusicListById = new ConcurrentHashMap<>();
         mCurrentIndex = 0;
         mListener = listener;
@@ -45,7 +44,7 @@ public class QueueManager {
      *
      * @return
      */
-    public List<MusicInfo> getPlayingQueue() {
+    public List<SongInfo> getPlayingQueue() {
         return mPlayingQueue;
     }
 
@@ -64,7 +63,7 @@ public class QueueManager {
      * @param newQueue     整个队列
      * @param currentIndex 当前第几首
      */
-    public void setCurrentQueue(List<MusicInfo> newQueue, int currentIndex) {
+    public void setCurrentQueue(List<SongInfo> newQueue, int currentIndex) {
         mPlayingQueue = QueueHelper.fetchListWithMediaMetadata(newQueue);
         int index = 0;
         if (currentIndex != -1) {
@@ -73,8 +72,8 @@ public class QueueManager {
         mCurrentIndex = Math.max(index, 0);
 
         mMusicListById.clear();
-        for (MusicInfo musicInfo : newQueue) {
-            mMusicListById.put(musicInfo.musicId, musicInfo);
+        for (SongInfo musicInfo : newQueue) {
+            mMusicListById.put(musicInfo.getSongId(), musicInfo);
         }
 
         //通知播放列表更新了
@@ -89,7 +88,7 @@ public class QueueManager {
      *
      * @param newQueue 整个队列
      */
-    public void setCurrentQueue(List<MusicInfo> newQueue) {
+    public void setCurrentQueue(List<SongInfo> newQueue) {
         setCurrentQueue(newQueue, -1);
     }
 
@@ -98,13 +97,13 @@ public class QueueManager {
      *
      * @param info 音乐信息
      */
-    public void addQueueItem(MusicInfo info) {
+    public void addQueueItem(SongInfo info) {
         info = QueueHelper.fetchInfoWithMediaMetadata(info);
         if (mPlayingQueue.contains(info)) {
             return;
         }
         mPlayingQueue.add(info);
-        mMusicListById.put(info.musicId, info);
+        mMusicListById.put(info.getSongId(), info);
         //通知播放列表更新了
         List<MediaSessionCompat.QueueItem> queueItems = QueueHelper.getQueueItems(mMusicListById);
         if (mListener != null) {
@@ -112,15 +111,15 @@ public class QueueManager {
         }
     }
 
-    public void deleteQueueItem(MusicInfo info,boolean isNeedToPlayNext) {
+    public void deleteQueueItem(SongInfo info, boolean isNeedToPlayNext) {
         if (mPlayingQueue.size() == 0 || mMusicListById.size() == 0) {
             return;
         }
-        if (!mPlayingQueue.contains(info) || !mMusicListById.containsKey(info.musicId)) {
+        if (!mPlayingQueue.contains(info) || !mMusicListById.containsKey(info.getSongId())) {
             return;
         }
         mPlayingQueue.remove(info);
-        mMusicListById.remove(info.musicId, info);
+        mMusicListById.remove(info.getSongId(), info);
         List<MediaSessionCompat.QueueItem> queueItems = QueueHelper.getQueueItems(mMusicListById);
         if (mListener != null) {
             mListener.onQueueUpdated(queueItems, mPlayingQueue);
@@ -148,7 +147,7 @@ public class QueueManager {
      *
      * @return 音乐信息
      */
-    public MusicInfo getCurrentMusic() {
+    public SongInfo getCurrentMusic() {
         if (!QueueHelper.isIndexPlayable(mCurrentIndex, mPlayingQueue)) {
             return null;
         } else {
@@ -195,13 +194,14 @@ public class QueueManager {
      * @param bitmap
      * @param icon
      */
-    public void updateMusicArt(String musicId, Bitmap bitmap, Bitmap icon) {
-        MusicInfo musicInfo = QueueHelper.getMusicInfoById(mMusicListById, musicId);
+    public void updateSongCoverBitmap(String musicId, Bitmap bitmap, Bitmap icon) {
+        SongInfo musicInfo = QueueHelper.getMusicInfoById(mMusicListById, musicId);
         if (musicInfo == null) {
             return;
         }
+        musicInfo.setSongCoverBitmap(bitmap);
+        musicInfo = QueueHelper.fetchInfoWithMediaMetadata(musicInfo);
         int index = mPlayingQueue.indexOf(musicInfo);
-        musicInfo.musicCoverBitmap = bitmap;
         mPlayingQueue.set(index, musicInfo);
     }
 
@@ -234,19 +234,19 @@ public class QueueManager {
     /**
      * 得到上一首音乐信息
      */
-    public MusicInfo getPreMusicInfo() {
+    public SongInfo getPreMusicInfo() {
         return getNextOrPreMusicInfo(-1);
     }
 
     /**
      * 得到下一首音乐信息
      */
-    public MusicInfo getNextMusicInfo() {
+    public SongInfo getNextMusicInfo() {
         return getNextOrPreMusicInfo(1);
     }
 
-    private MusicInfo getNextOrPreMusicInfo(int amount) {
-        MusicInfo info = null;
+    private SongInfo getNextOrPreMusicInfo(int amount) {
+        SongInfo info = null;
         switch (mPlayMode.getCurrPlayMode()) {
             //单曲循环
             case PlayMode.PLAY_IN_SINGLE_LOOP:
@@ -277,36 +277,30 @@ public class QueueManager {
      * 更新媒体信息
      */
     public void updateMetadata() {
-        MusicInfo currentMusic = getCurrentMusic();
+        SongInfo currentMusic = getCurrentMusic();
         if (currentMusic == null) {
             if (mListener != null) {
                 mListener.onMetadataRetrieveError();
             }
             return;
         }
-        final String musicId = currentMusic.musicId;
-        MusicInfo metadata = QueueHelper.getMusicInfoById(mMusicListById, musicId);
+        final String musicId = currentMusic.getSongId();
+        SongInfo metadata = QueueHelper.getMusicInfoById(mMusicListById, musicId);
         if (metadata == null) {
             throw new IllegalArgumentException("Invalid musicId " + musicId);
         }
-        if (mListener != null) {
-            mListener.onMetadataChanged(metadata);
-        }
-        // Set the proper album artwork on the media session, so it can be shown in the
-        // locked screen and in other places.
-        if (metadata.musicCoverBitmap == null && !TextUtils.isEmpty(metadata.musicCover)) {
-            String albumUri = metadata.musicCover;
-            AlbumArtCache.getInstance().fetch(albumUri, new AlbumArtCache.FetchListener() {
+        if (!TextUtils.isEmpty(metadata.getSongCover())) {
+            String coverUri = metadata.getSongCover();
+            //获取图片bitmap
+            AlbumArtCache.getInstance().fetch(coverUri, new AlbumArtCache.FetchListener() {
                 @Override
                 public void onFetched(String artUrl, Bitmap bitmap, Bitmap icon) {
-                    updateMusicArt(musicId, bitmap, icon);
-
-                    // If we are still playing the same music, notify the listeners:
-                    MusicInfo currentMusic = getCurrentMusic();
+                    updateSongCoverBitmap(musicId, bitmap, icon);
+                    SongInfo currentMusic = getCurrentMusic();
                     if (currentMusic == null) {
                         return;
                     }
-                    String currentPlayingId = currentMusic.musicId;
+                    String currentPlayingId = currentMusic.getSongId();
                     if (musicId.equals(currentPlayingId)) {
                         if (mListener != null) {
                             mListener.onMetadataChanged(QueueHelper.getMusicInfoById(mMusicListById, currentPlayingId));
@@ -319,13 +313,13 @@ public class QueueManager {
 
 
     public interface MetadataUpdateListener {
-        void onMetadataChanged(MusicInfo metadata);
+        void onMetadataChanged(SongInfo metadata);
 
         void onMetadataRetrieveError();
 
         void onCurrentQueueIndexUpdated(int queueIndex, boolean isJustPlay, boolean isSwitchMusic);
 
-        void onQueueUpdated(List<MediaSessionCompat.QueueItem> newQueue, List<MusicInfo> playingQueue);
+        void onQueueUpdated(List<MediaSessionCompat.QueueItem> newQueue, List<SongInfo> playingQueue);
     }
 
 

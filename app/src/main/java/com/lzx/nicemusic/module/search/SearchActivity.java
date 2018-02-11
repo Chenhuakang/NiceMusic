@@ -9,7 +9,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.jakewharton.rxbinding2.widget.RxTextView;
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
@@ -117,7 +117,7 @@ public class SearchActivity extends BaseMvpActivity<SearchContract.View, SearchP
     }
 
     @Override
-    public void searchSuccess(List<MusicInfo> infoList) {
+    public void searchSuccess(List<SongInfo> infoList) {
         mSectionedRecyclerViewAdapter.removeSection(SearchHistorySectionTag);
         mSearchResultSection = new SearchResultSection(this, infoList, getPresenter());
         mSectionedRecyclerViewAdapter.addSection(SearchResultSectionTag, mSearchResultSection);

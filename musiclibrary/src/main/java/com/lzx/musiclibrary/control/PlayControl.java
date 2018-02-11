@@ -4,10 +4,11 @@ import android.content.Context;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 
+import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.aidl.listener.IOnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.listener.IPlayControl;
 import com.lzx.musiclibrary.aidl.listener.NotifyContract;
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.constans.PlayMode;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.helper.QueueHelper;
@@ -32,7 +33,7 @@ public class PlayControl extends IPlayControl.Stub {
     private NotifyContract.NotifyStatusChanged mNotifyStatusChanged;
     private NotifyContract.NotifyMusicSwitch mNotifyMusicSwitch;
 
-    public PlayControl(Context context, boolean isUseMediaPlayer, boolean isAutoPlayNext) {
+    public PlayControl(Context context, MusicService service, boolean isUseMediaPlayer, boolean isAutoPlayNext) {
         mContext = context;
 
         mNotifyStatusChanged = new NotifyStatusChange();
@@ -42,14 +43,14 @@ public class PlayControl extends IPlayControl.Stub {
         mPlayMode = new PlayMode();
         playback = isUseMediaPlayer ? new MediaPlayback(context) : new ExoPlayback(context);
         mController = new PlayController(
-                mContext, mPlayMode, playback, mNotifyStatusChanged, mNotifyMusicSwitch, isAutoPlayNext
+                mContext, service, mPlayMode, playback, mNotifyStatusChanged, mNotifyMusicSwitch, isAutoPlayNext
         );
     }
 
     private class NotifyStatusChange implements NotifyContract.NotifyStatusChanged {
 
         @Override
-        public void notify(MusicInfo info, int index, int status, String errorMsg) {
+        public void notify(SongInfo info, int index, int status, String errorMsg) {
 
             synchronized (NotifyStatusChange.class) {
                 final int N = mRemoteCallbackList.beginBroadcast();
@@ -94,7 +95,7 @@ public class PlayControl extends IPlayControl.Stub {
     private class NotifyMusicSwitch implements NotifyContract.NotifyMusicSwitch {
 
         @Override
-        public void notify(MusicInfo info) {
+        public void notify(SongInfo info) {
             synchronized (NotifyMusicSwitch.class) {
                 final int N = mRemoteCallbackList.beginBroadcast();
                 for (int i = 0; i < N; i++) {
@@ -121,7 +122,7 @@ public class PlayControl extends IPlayControl.Stub {
     }
 
     @Override
-    public void playMusic(List<MusicInfo> list, int index, boolean isJustPlay) throws RemoteException {
+    public void playMusic(List<SongInfo> list, int index, boolean isJustPlay) throws RemoteException {
         if (!QueueHelper.isIndexPlayable(index, list)) {
             return;
         }
@@ -129,7 +130,7 @@ public class PlayControl extends IPlayControl.Stub {
     }
 
     @Override
-    public void playMusicByInfo(MusicInfo info, boolean isJustPlay) throws RemoteException {
+    public void playMusicByInfo(SongInfo info, boolean isJustPlay) throws RemoteException {
         if (info == null) {
             return;
         }
@@ -142,12 +143,12 @@ public class PlayControl extends IPlayControl.Stub {
     }
 
     @Override
-    public void playMusicAutoStopWhen(List<MusicInfo> list, int index, int time) throws RemoteException {
+    public void playMusicAutoStopWhen(List<SongInfo> list, int index, int time) throws RemoteException {
 
     }
 
     @Override
-    public void playMusicByInfoAutoStopWhen(MusicInfo info, int time) throws RemoteException {
+    public void playMusicByInfoAutoStopWhen(SongInfo info, int time) throws RemoteException {
 
     }
 
@@ -182,24 +183,25 @@ public class PlayControl extends IPlayControl.Stub {
     }
 
     @Override
-    public void setPlayList(List<MusicInfo> list) throws RemoteException {
+    public void setPlayList(List<SongInfo> list) throws RemoteException {
         mController.setPlayList(list);
     }
 
     @Override
-    public void setPlayListWithIndex(List<MusicInfo> list, int index) throws RemoteException {
+    public void setPlayListWithIndex(List<SongInfo> list, int index) throws RemoteException {
         mController.setPlayListWithIndex(list, index);
     }
 
     @Override
-    public List<MusicInfo> getPlayList() throws RemoteException {
+    public List<SongInfo> getPlayList() throws RemoteException {
         return mController.getPlayList();
     }
 
     @Override
-    public void deleteMusicInfoOnPlayList(MusicInfo info,boolean isNeedToPlayNext) throws RemoteException {
-        mController.deleteMusicInfoOnPlayList(info,isNeedToPlayNext);
+    public void deleteSongInfoOnPlayList(SongInfo info, boolean isNeedToPlayNext) throws RemoteException {
+        mController.deleteMusicInfoOnPlayList(info, isNeedToPlayNext);
     }
+
 
     @Override
     public int getStatus() throws RemoteException {
@@ -227,17 +229,17 @@ public class PlayControl extends IPlayControl.Stub {
     }
 
     @Override
-    public MusicInfo getPreMusic() throws RemoteException {
+    public SongInfo getPreMusic() throws RemoteException {
         return mController.getPreMusic();
     }
 
     @Override
-    public MusicInfo getNextMusic() throws RemoteException {
+    public SongInfo getNextMusic() throws RemoteException {
         return mController.getNextMusic();
     }
 
     @Override
-    public MusicInfo getCurrPlayingMusic() throws RemoteException {
+    public SongInfo getCurrPlayingMusic() throws RemoteException {
         return mController.getCurrPlayingMusic();
     }
 

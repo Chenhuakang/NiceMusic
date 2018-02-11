@@ -1,14 +1,14 @@
 // IOnPlayerEventListener.aidl
 package com.lzx.musiclibrary.aidl.listener;
 
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 
 interface IOnPlayerEventListener {
 
         /**
          * 切换歌曲
          */
-        void onMusicSwitch(out MusicInfo music);
+        void onMusicSwitch(out SongInfo music);
 
         /**
          * 继续播放
@@ -29,5 +29,4 @@ interface IOnPlayerEventListener {
 
 
         void onError(String errorMsg);
-
 }

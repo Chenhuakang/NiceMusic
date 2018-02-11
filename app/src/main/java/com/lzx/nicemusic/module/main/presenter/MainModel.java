@@ -1,7 +1,7 @@
 package com.lzx.nicemusic.module.main.presenter;
 
 import com.google.gson.Gson;
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.nicemusic.helper.DataHelper;
 import com.lzx.nicemusic.network.RetrofitHelper;
 
@@ -23,8 +23,8 @@ public class MainModel {
      *
      * @return
      */
-    public Observable<List<MusicInfo>> loadMainData() {
-        List<MusicInfo> infoList = new ArrayList<>();
+    public Observable<List<SongInfo>> loadMainData() {
+        List<SongInfo> infoList = new ArrayList<>();
         return RetrofitHelper.getMusicApi().requestMusicList(1, 4, 0)
                 .flatMap(responseBody -> {
                     infoList.addAll(DataHelper.fetchJSONFromUrl(responseBody));

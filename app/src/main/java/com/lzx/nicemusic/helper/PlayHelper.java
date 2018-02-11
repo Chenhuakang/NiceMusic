@@ -7,7 +7,7 @@ package com.lzx.nicemusic.helper;
 
 public class PlayHelper {
 
-//    public static void playMusic(Context context, MusicInfo musicInfo) {
+//    public static void playMusic(Context context, SongInfo musicInfo) {
 //        RetrofitHelper.getMusicApi().playMusic(musicInfo.musicId)
 //                .map(responseBody -> {
 //                    String json = responseBody.string();

@@ -1,25 +1,25 @@
 // IPlayControl.aidl
 package com.lzx.musiclibrary.aidl.listener;
 
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.aidl.listener.IOnPlayerEventListener;
 
 interface IPlayControl {
 
     //播放，并设置播放列表
-     void playMusic(in List<MusicInfo> list, int index ,boolean isJustPlay);
+     void playMusic(in List<SongInfo> list, int index ,boolean isJustPlay);
 
     //根据音乐信息播放
-     void playMusicByInfo(in MusicInfo info,boolean isJustPlay);
+     void playMusicByInfo(in SongInfo info,boolean isJustPlay);
 
     //根据索引播放
     void playMusicByIndex(int index,boolean isJustPlay);
 
     //定时播放
-    void playMusicAutoStopWhen(in List<MusicInfo> list, int index, int time);
+    void playMusicAutoStopWhen(in List<SongInfo> list, int index, int time);
 
     //定时播放
-    void playMusicByInfoAutoStopWhen(in MusicInfo info, int time);
+    void playMusicByInfoAutoStopWhen(in SongInfo info, int time);
 
     //定时播放
     void playMusicByIndexAutoStopWhen(int index, int time);
@@ -40,16 +40,16 @@ interface IPlayControl {
     void stopMusic();
 
     //设置播放列表
-    void setPlayList(in List<MusicInfo> list);
+    void setPlayList(in List<SongInfo> list);
 
     //设置播放列表
-    void setPlayListWithIndex(in List<MusicInfo> list,int index);
+    void setPlayListWithIndex(in List<SongInfo> list,int index);
 
     //得到播放列表
-    List<MusicInfo> getPlayList();
+    List<SongInfo> getPlayList();
 
     //从播放列表中删除一条信息
-    void deleteMusicInfoOnPlayList(in MusicInfo info,boolean isNeedToPlayNext);
+    void deleteSongInfoOnPlayList(in SongInfo info,boolean isNeedToPlayNext);
 
     //获取播放状态
     int getStatus();
@@ -67,13 +67,13 @@ interface IPlayControl {
     boolean hasNext();
 
     //得到上一首信息
-    MusicInfo getPreMusic();
+    SongInfo getPreMusic();
 
     //得到下一首信息
-    MusicInfo getNextMusic();
+    SongInfo getNextMusic();
 
     //得到当前播放信息
-    MusicInfo getCurrPlayingMusic();
+    SongInfo getCurrPlayingMusic();
 
     //设置当前音乐信息
     void setCurrMusic(int index);

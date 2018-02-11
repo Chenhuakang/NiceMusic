@@ -17,7 +17,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Toast;
 
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
@@ -25,7 +25,6 @@ import com.lzx.nicemusic.base.BaseMvpFragment;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
 import com.lzx.nicemusic.db.DbManager;
 import com.lzx.nicemusic.MainActivity;
-import com.lzx.nicemusic.module.play.PlayingDetailActivity;
 import com.lzx.nicemusic.module.songlist.adapter.SongListAdapter;
 import com.lzx.nicemusic.module.songlist.presenter.SongListContract;
 import com.lzx.nicemusic.module.songlist.presenter.SongListPresenter;
@@ -117,6 +116,7 @@ public class SongListFragment extends BaseMvpFragment<SongListContract.View, Son
                             MusicManager.get().playMusic(mAdapter.getDataList(), position, true);
                         }
                     }, throwable -> {
+                        LogUtil.i("error = "+throwable.getMessage());
                         Toast.makeText(mContext, "播放失败", Toast.LENGTH_SHORT).show();
                     });
         });
@@ -170,13 +170,13 @@ public class SongListFragment extends BaseMvpFragment<SongListContract.View, Son
     }
 
     @Override
-    public void onGetSongListSuccess(List<MusicInfo> list) {
+    public void onGetSongListSuccess(List<SongInfo> list) {
         mAdapter.setDataList(list);
         mAdapter.setShowLoadMore(list.size() >= getPresenter().size);
     }
 
     @Override
-    public void loadMoreSongListSuccess(List<MusicInfo> list) {
+    public void loadMoreSongListSuccess(List<SongInfo> list) {
         mAdapter.addDataList(list);
         mAdapter.setShowLoadMore(list.size() >= getPresenter().size);
     }

@@ -33,7 +33,7 @@ public class MusicService extends Service {
     public IBinder onBind(Intent intent) {
         boolean isUseMediaPlayer = intent.getBooleanExtra("isUseMediaPlayer", false);
         boolean isAutoPlayNext = intent.getBooleanExtra("isAutoPlayNext", true);
-        mBinder = new PlayControl(this, isUseMediaPlayer, isAutoPlayNext);
+        mBinder = new PlayControl(this,this, isUseMediaPlayer, isAutoPlayNext);
         return mBinder;
     }
 

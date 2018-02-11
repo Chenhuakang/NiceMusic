@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.constans.PlayMode;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.manager.QueueManager;
@@ -53,12 +53,15 @@ public class PlaybackManager implements Playback.Callback {
      * 播放
      */
     public void handlePlayRequest() {
-        MusicInfo currentMusic = mQueueManager.getCurrentMusic();
+        SongInfo currentMusic = mQueueManager.getCurrentMusic();
         if (currentMusic != null) {
             //通知切歌
             notifyPlaybackSwitch(currentMusic);
             //播放
             mPlayback.play(currentMusic);
+            //更新媒体信息
+            mQueueManager.updateMetadata();
+            updatePlaybackState(null);
         }
     }
 
@@ -68,6 +71,7 @@ public class PlaybackManager implements Playback.Callback {
     public void handlePauseRequest() {
         if (mPlayback.isPlaying()) {
             mPlayback.pause();
+            updatePlaybackState(null);
         }
     }
 
@@ -140,7 +144,6 @@ public class PlaybackManager implements Playback.Callback {
             case PlayMode.PLAY_IN_SINGLE_LOOP:
                 if (mQueueManager.skipQueuePosition(0)) {
                     handlePlayRequest();
-                    mQueueManager.updateMetadata();
                 } else {
                     handleStopRequest(null);
                 }
@@ -151,7 +154,6 @@ public class PlaybackManager implements Playback.Callback {
                 int random = (int) (Math.random() * mQueueManager.getCurrentQueueSize() - 1);
                 if (mQueueManager.skipQueuePosition(random)) {
                     handlePlayRequest();
-                    mQueueManager.updateMetadata();
                 } else {
                     handleStopRequest(null);
                 }
@@ -160,7 +162,6 @@ public class PlaybackManager implements Playback.Callback {
             case PlayMode.PLAY_IN_LIST_LOOP:
                 if (mQueueManager.skipQueuePosition(amount)) {
                     handlePlayRequest();
-                    mQueueManager.updateMetadata();
                 }
                 break;
             default:
@@ -169,7 +170,7 @@ public class PlaybackManager implements Playback.Callback {
         }
     }
 
-    private void notifyPlaybackSwitch(MusicInfo info) {
+    private void notifyPlaybackSwitch(SongInfo info) {
         if (mServiceCallback != null) {
             mServiceCallback.onPlaybackSwitch(info);
         }
@@ -214,6 +215,7 @@ public class PlaybackManager implements Playback.Callback {
                 .setActions(getAvailableActions());
 
         //获取播放状态
+        //int state = mPlayback.getState();
         int state = mPlayback.getState();
         //如果是播放失败
         if (error != null) {
@@ -225,11 +227,13 @@ public class PlaybackManager implements Playback.Callback {
             }
         }
         //设置播放状态
-        stateBuilder.setState(state, position, 1.0f, SystemClock.elapsedRealtime());
+
+        stateBuilder.setState(state == State.STATE_PLAYING ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED,
+                position, 1.0f, SystemClock.elapsedRealtime());
         // Set the activeQueueItemId if the current index is valid.
-        MusicInfo currentMusic = mQueueManager.getCurrentMusic();
+        SongInfo currentMusic = mQueueManager.getCurrentMusic();
         if (currentMusic != null) {
-            stateBuilder.setActiveQueueItemId(currentMusic.trackNumber);
+            stateBuilder.setActiveQueueItemId(currentMusic.getTrackNumber());
         }
         if (mServiceCallback != null) {
             //回调状态更新
@@ -253,8 +257,10 @@ public class PlaybackManager implements Playback.Callback {
         } else {
             actions |= PlaybackStateCompat.ACTION_PLAY;
         }
+
         return actions;
     }
+
 
     public void switchToPlayback(Playback playback, boolean resumePlaying) {
         if (playback == null) {
@@ -278,7 +284,7 @@ public class PlaybackManager implements Playback.Callback {
                 mPlayback.pause();
                 break;
             case PlaybackStateCompat.STATE_PLAYING:
-                MusicInfo currentMusic = mQueueManager.getCurrentMusic();
+                SongInfo currentMusic = mQueueManager.getCurrentMusic();
                 if (resumePlaying && currentMusic != null) {
                     mPlayback.play(currentMusic);
                 } else if (!resumePlaying) {
@@ -394,7 +400,7 @@ public class PlaybackManager implements Playback.Callback {
 
     public interface PlaybackServiceCallback {
 
-        void onPlaybackSwitch(MusicInfo info);
+        void onPlaybackSwitch(SongInfo info);
 
         void onPlaybackError(String errorMsg);
 

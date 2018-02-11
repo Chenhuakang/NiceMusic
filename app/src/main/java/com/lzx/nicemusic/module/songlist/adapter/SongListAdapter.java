@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.utils.FormatUtil;
@@ -22,7 +22,7 @@ import java.util.Observer;
  * Created by xian on 2018/2/5.
  */
 
-public class SongListAdapter extends LoadMoreAdapter<MusicInfo> implements Observer {
+public class SongListAdapter extends LoadMoreAdapter<SongInfo> implements Observer {
 
     private Context mContext;
 
@@ -46,12 +46,12 @@ public class SongListAdapter extends LoadMoreAdapter<MusicInfo> implements Obser
     @Override
     protected void BindViewHolder(BaseViewHolder viewHolder, int position) {
         ItemHolder holder = (ItemHolder) viewHolder;
-        MusicInfo musicInfo = mDataList.get(position);
+        SongInfo musicInfo = mDataList.get(position);
         holder.mSongNum.setText(String.valueOf((position + 1)));
-        holder.mMusicName.setText(musicInfo.musicTitle);
-        holder.mMusicTime.setText(FormatUtil.formatMusicTime(musicInfo.musicDuration));
-        holder.mMusicTitle.setText(musicInfo.albumArtist + " · " + musicInfo.albumTitle);
-        GlideUtil.loadImageByUrl(mContext, musicInfo.musicCover, holder.mMusicCover);
+        holder.mMusicName.setText(musicInfo.getSongName());
+        holder.mMusicTime.setText(FormatUtil.formatMusicTime(musicInfo.getDuration()));
+        holder.mMusicTitle.setText(musicInfo.getAlbumInfo().getArtist() + " · " + musicInfo.getAlbumInfo().getAlbumName());
+        GlideUtil.loadImageByUrl(mContext, musicInfo.getSongCover(), holder.mMusicCover);
         if (MusicManager.isCurrMusicIsPlayingMusic(musicInfo)) {
             holder.mImgVolume.setVisibility(View.VISIBLE);
             holder.mSongNum.setVisibility(View.INVISIBLE);
@@ -75,7 +75,7 @@ public class SongListAdapter extends LoadMoreAdapter<MusicInfo> implements Obser
     }
 
     public interface OnItemClickListener {
-        void onItemClick(MusicInfo musicInfo, int position);
+        void onItemClick(SongInfo musicInfo, int position);
     }
 
     @Override

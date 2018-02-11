@@ -1,6 +1,6 @@
 package com.lzx.musiclibrary.playback.player;
 
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 
 /**
  * Created by xian on 2018/1/20.
@@ -54,7 +54,7 @@ public interface Playback {
      */
     void updateLastKnownStreamPosition();
 
-    void play(MusicInfo info);
+    void play(SongInfo info);
 
     void pause();
 

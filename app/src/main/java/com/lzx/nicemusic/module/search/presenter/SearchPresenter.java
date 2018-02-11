@@ -2,7 +2,7 @@ package com.lzx.nicemusic.module.search.presenter;
 
 
 import com.google.gson.Gson;
-import com.lzx.musiclibrary.aidl.model.MusicInfo;
+import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.base.mvp.factory.BasePresenter;
 import com.lzx.nicemusic.network.RetrofitHelper;
@@ -85,10 +85,10 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                     JSONObject jsonObject = new JSONObject(responseBody.string());
                     JSONArray array = jsonObject.getJSONObject("showapi_res_body")
                             .getJSONObject("pagebean").getJSONArray("contentlist");
-                    List<MusicInfo> list = new ArrayList<>();
+                    List<SongInfo> list = new ArrayList<>();
                     for (int i = 0; i < array.length(); i++) {
                         JSONObject object = array.getJSONObject(i);
-                        MusicInfo info = new Gson().fromJson(object.toString(), MusicInfo.class);
+                        SongInfo info = new Gson().fromJson(object.toString(), SongInfo.class);
                         list.add(info);
                     }
                     return list;
