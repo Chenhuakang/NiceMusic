@@ -1,5 +1,6 @@
 package com.lzx.musiclibrary;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
@@ -19,13 +20,13 @@ import java.lang.ref.WeakReference;
 public class MusicService extends Service {
 
     private static final int STOP_DELAY = 30000;
-  //  private DelayedStopHandler mDelayedStopHandler;
+    //  private DelayedStopHandler mDelayedStopHandler;
     private PlayControl mBinder;
 
     @Override
     public void onCreate() {
         super.onCreate();
-      //  mDelayedStopHandler = new DelayedStopHandler(this);
+        //  mDelayedStopHandler = new DelayedStopHandler(this);
     }
 
     @Nullable
@@ -33,7 +34,8 @@ public class MusicService extends Service {
     public IBinder onBind(Intent intent) {
         boolean isUseMediaPlayer = intent.getBooleanExtra("isUseMediaPlayer", false);
         boolean isAutoPlayNext = intent.getBooleanExtra("isAutoPlayNext", true);
-        mBinder = new PlayControl(this,this, isUseMediaPlayer, isAutoPlayNext);
+        Notification notification = intent.getParcelableExtra("notification");
+        mBinder = new PlayControl(this, isUseMediaPlayer, isAutoPlayNext, notification);
         return mBinder;
     }
 
@@ -74,7 +76,7 @@ public class MusicService extends Service {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-      //  mDelayedStopHandler.removeCallbacksAndMessages(null);
+        //  mDelayedStopHandler.removeCallbacksAndMessages(null);
     }
 
     private static class DelayedStopHandler extends Handler {

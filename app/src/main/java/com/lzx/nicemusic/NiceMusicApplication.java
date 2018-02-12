@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 
 import com.lzx.musiclibrary.manager.MusicManager;
-import com.lzx.nicemusic.notification.MediaNotificationManager;
 import com.lzx.nicemusic.utils.CrashHandler;
 import com.lzx.nicemusic.utils.SpUtil;
 

@@ -1,10 +1,9 @@
 package com.lzx.musiclibrary.control;
 
-import android.content.Context;
+import android.app.Notification;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 
-import com.lzx.musiclibrary.IMediaNotification;
 import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.aidl.listener.IOnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.listener.IPlayControl;
@@ -26,28 +25,30 @@ import java.util.List;
 public class PlayControl extends IPlayControl.Stub {
 
     private PlayMode mPlayMode;
-    private Context mContext;
+
     private PlayController mController;
     private Playback playback;
 
     private RemoteCallbackList<IOnPlayerEventListener> mRemoteCallbackList;
-    private RemoteCallbackList<IMediaNotification> mMediaNotificationList;
+
     private NotifyContract.NotifyStatusChanged mNotifyStatusChanged;
     private NotifyContract.NotifyMusicSwitch mNotifyMusicSwitch;
 
-    public PlayControl(Context context, MusicService service, boolean isUseMediaPlayer, boolean isAutoPlayNext) {
-        mContext = context;
-
+    public PlayControl(MusicService service, boolean isUseMediaPlayer, boolean isAutoPlayNext, Notification notification) {
         mNotifyStatusChanged = new NotifyStatusChange();
         mNotifyMusicSwitch = new NotifyMusicSwitch();
         mRemoteCallbackList = new RemoteCallbackList<>();
-        mMediaNotificationList = new RemoteCallbackList<>();
 
         mPlayMode = new PlayMode();
-        playback = isUseMediaPlayer ? new MediaPlayback(context) : new ExoPlayback(context);
-        mController = new PlayController(
-                mContext, service, mPlayMode, playback, mNotifyStatusChanged, mNotifyMusicSwitch, isAutoPlayNext
-        );
+        playback = isUseMediaPlayer ? new MediaPlayback(service) : new ExoPlayback(service);
+        mController = new PlayController.Builder(service)
+                .setAutoPlayNext(isAutoPlayNext)
+                .setNotifyMusicSwitch(mNotifyMusicSwitch)
+                .setNotifyStatusChanged(mNotifyStatusChanged)
+                .setPlayback(playback)
+                .setPlayMode(mPlayMode)
+                .setNotification(notification)
+                .build();
     }
 
     private class NotifyStatusChange implements NotifyContract.NotifyStatusChanged {
@@ -286,17 +287,5 @@ public class PlayControl extends IPlayControl.Stub {
         mRemoteCallbackList.unregister(listener);
     }
 
-    @Override
-    public void registerMediaNotification(IMediaNotification notification) throws RemoteException {
-        if (notification != null) {
-            mMediaNotificationList.register(notification);
-        }
-    }
 
-    @Override
-    public void unregisterMediaNotification(IMediaNotification notification) throws RemoteException {
-        if (notification != null) {
-            mMediaNotificationList.unregister(notification);
-        }
-    }
 }

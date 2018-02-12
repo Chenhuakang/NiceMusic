@@ -1,6 +1,7 @@
 package com.lzx.musiclibrary.manager;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -11,7 +12,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
 
-import com.lzx.musiclibrary.IMediaNotification;
 import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.aidl.listener.IOnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.listener.IPlayControl;
@@ -44,7 +44,7 @@ public class MusicManager implements IPlayControl {
     private Context mContext;
     private boolean isUseMediaPlayer;
     private boolean isAutoPlayNext = true;
-    private IMediaNotification mIMediaNotification;
+    private Notification mNotification;
     private IPlayControl control;
     private ClientHandler mClientHandler;
     private PlayStateObservable mStateObservable;
@@ -79,8 +79,8 @@ public class MusicManager implements IPlayControl {
         return this;
     }
 
-    public MusicManager setMediaNotification(IMediaNotification IMediaNotification) {
-        mIMediaNotification = IMediaNotification;
+    public MusicManager setNotification(Notification notification) {
+        mNotification = notification;
         return this;
     }
 
@@ -88,6 +88,7 @@ public class MusicManager implements IPlayControl {
         Intent intent = new Intent(mContext, MusicService.class);
         intent.putExtra("isUseMediaPlayer", isUseMediaPlayer);
         intent.putExtra("isAutoPlayNext", isAutoPlayNext);
+        intent.putExtra("notification", mNotification);
         mContext.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -97,9 +98,6 @@ public class MusicManager implements IPlayControl {
             control = IPlayControl.Stub.asInterface(iBinder);
             try {
                 control.registerPlayerEventListener(mOnPlayerEventListener);
-                if (mIMediaNotification != null) {
-                    control.registerMediaNotification(mIMediaNotification);
-                }
                 LogUtil.i("--onServiceConnected--");
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -663,15 +661,6 @@ public class MusicManager implements IPlayControl {
 
     }
 
-    @Override
-    public void registerMediaNotification(IMediaNotification notification) throws RemoteException {
-
-    }
-
-    @Override
-    public void unregisterMediaNotification(IMediaNotification notification) throws RemoteException {
-
-    }
 
     @Override
     public IBinder asBinder() {
