@@ -200,9 +200,8 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
     }
 
     @Override
-    public void onMetadataChanged(SongInfo metadata) {
-        //   mSession.setMetadata(metadata.getMetadataCompat());
-        mMediaSessionManager.updateMetaData(metadata.getMetadataCompat());
+    public void onMetadataChanged(SongInfo songInfo) {
+        mMediaSessionManager.updateMetaData(QueueHelper.fetchInfoWithMediaMetadata(songInfo));
     }
 
     @Override
@@ -224,17 +223,18 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
 
     @Override
     public void onPlaybackSwitch(SongInfo info) {
-        mNotifyMusicSwitch.notify(info);
+        //mNotifyMusicSwitch.notify(info);
+        mNotifyStatusChanged.notify(mQueueManager.getCurrentMusic(), mQueueManager.getCurrentIndex(), State.STATE_NONE, null,true);
     }
 
     @Override
     public void onPlaybackError(String errorMsg) {
-        mNotifyStatusChanged.notify(mQueueManager.getCurrentMusic(), mQueueManager.getCurrentIndex(), State.STATE_ERROR, errorMsg);
+        mNotifyStatusChanged.notify(mQueueManager.getCurrentMusic(), mQueueManager.getCurrentIndex(), State.STATE_ERROR, errorMsg,false);
     }
 
     @Override
     public void onPlaybackCompletion() {
-        mNotifyStatusChanged.notify(mQueueManager.getCurrentMusic(), mQueueManager.getCurrentIndex(), State.STATE_ENDED, null);
+        mNotifyStatusChanged.notify(mQueueManager.getCurrentMusic(), mQueueManager.getCurrentIndex(), State.STATE_ENDED, null,false);
     }
 
     @Override
@@ -245,7 +245,7 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
     @Override
     public void onPlaybackStateUpdated(int state, PlaybackStateCompat newState) {
         //状态改变
-        mNotifyStatusChanged.notify(mQueueManager.getCurrentMusic(), mQueueManager.getCurrentIndex(), state, null);
+        mNotifyStatusChanged.notify(mQueueManager.getCurrentMusic(), mQueueManager.getCurrentIndex(), state, null,false);
         mMediaSessionManager.setPlaybackState(newState);
     }
 

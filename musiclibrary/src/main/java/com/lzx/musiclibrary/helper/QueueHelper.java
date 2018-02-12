@@ -17,22 +17,21 @@ import java.util.concurrent.ConcurrentMap;
 
 public class QueueHelper {
 
-    public static List<SongInfo> fetchListWithMediaMetadata(List<SongInfo> list) {
-        List<SongInfo> infos = new ArrayList<>();
-        for (SongInfo info : list) {
-            info.setMetadataCompat(getMediaMetadataCompat(info));
-            infos.add(info);
-        }
-        return infos;
-    }
+//    public static List<SongInfo> fetchListWithMediaMetadata(List<SongInfo> list) {
+//        List<SongInfo> infos = new ArrayList<>();
+//        for (SongInfo info : list) {
+//            info.setMetadataCompat(getMediaMetadataCompat(info));
+//            infos.add(info);
+//        }
+//        return infos;
+//    }
 
-    public static SongInfo fetchInfoWithMediaMetadata(SongInfo info) {
-        info.setMetadataCompat(getMediaMetadataCompat(info));
-        return info;
+    public static MediaMetadataCompat fetchInfoWithMediaMetadata(SongInfo info) {
+        return getMediaMetadataCompat(info);
     }
 
     private static MediaMetadataCompat getMediaMetadataCompat(SongInfo info) {
-        if (info.getAlbumInfo()==null){
+        if (info.getAlbumInfo() == null) {
             throw new RuntimeException("albumInfo must not be null.");
         }
         return new MediaMetadataCompat.Builder()
@@ -64,8 +63,8 @@ public class QueueHelper {
             return Collections.emptyList();
         }
         List<MediaMetadataCompat> compatArrayList = new ArrayList<>(musicListById.size());
-        for (SongInfo mutableMetadata : musicListById.values()) {
-            compatArrayList.add(mutableMetadata.getMetadataCompat());
+        for (SongInfo songInfo : musicListById.values()) {
+            compatArrayList.add(getMediaMetadataCompat(songInfo));
         }
         return compatArrayList;
     }
@@ -122,9 +121,14 @@ public class QueueHelper {
      * 是否需要切歌
      */
     public static boolean isNeedToSwitchMusic(QueueManager queueManager, SongInfo info) {
-        String playingMusicId = queueManager.getCurrentMusic().getSongId();
-        String currMusicId = info.getSongId();
-        return !playingMusicId.equals(currMusicId);
+        SongInfo songInfo = queueManager.getCurrentMusic();
+        if (songInfo == null) {
+            return true;
+        } else {
+            String playingMusicId = songInfo.getSongId();
+            String currMusicId = info.getSongId();
+            return !playingMusicId.equals(currMusicId);
+        }
     }
 
 }

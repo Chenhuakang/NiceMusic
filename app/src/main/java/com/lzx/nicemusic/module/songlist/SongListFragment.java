@@ -20,11 +20,11 @@ import android.widget.Toast;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.utils.LogUtil;
+import com.lzx.nicemusic.MainActivity;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpFragment;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
 import com.lzx.nicemusic.db.DbManager;
-import com.lzx.nicemusic.MainActivity;
 import com.lzx.nicemusic.module.songlist.adapter.SongListAdapter;
 import com.lzx.nicemusic.module.songlist.presenter.SongListContract;
 import com.lzx.nicemusic.module.songlist.presenter.SongListPresenter;
@@ -101,6 +101,7 @@ public class SongListFragment extends BaseMvpFragment<SongListContract.View, Son
         mCollapsingToolbarLayout.setExpandedTitleColor(Color.TRANSPARENT);
         //设置收缩后Toolbar上字体的颜色
         mCollapsingToolbarLayout.setCollapsedTitleTextColor(Color.WHITE);
+        mToolbar.setNavigationOnClickListener(v -> getActivity().onBackPressed());
         SystemBarHelper.setHeightAndPadding(getActivity(), mToolbar);
     }
 

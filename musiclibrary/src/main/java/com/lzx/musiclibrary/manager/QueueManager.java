@@ -64,14 +64,15 @@ public class QueueManager {
      * @param currentIndex 当前第几首
      */
     public void setCurrentQueue(List<SongInfo> newQueue, int currentIndex) {
-        mPlayingQueue = QueueHelper.fetchListWithMediaMetadata(newQueue);
         int index = 0;
         if (currentIndex != -1) {
             index = currentIndex;
         }
         mCurrentIndex = Math.max(index, 0);
-
+        mPlayingQueue.clear();
         mMusicListById.clear();
+
+        mPlayingQueue.addAll(newQueue);
         for (SongInfo musicInfo : newQueue) {
             mMusicListById.put(musicInfo.getSongId(), musicInfo);
         }
@@ -98,7 +99,6 @@ public class QueueManager {
      * @param info 音乐信息
      */
     public void addQueueItem(SongInfo info) {
-        info = QueueHelper.fetchInfoWithMediaMetadata(info);
         if (mPlayingQueue.contains(info)) {
             return;
         }
@@ -200,7 +200,6 @@ public class QueueManager {
             return;
         }
         musicInfo.setSongCoverBitmap(bitmap);
-        musicInfo = QueueHelper.fetchInfoWithMediaMetadata(musicInfo);
         int index = mPlayingQueue.indexOf(musicInfo);
         mPlayingQueue.set(index, musicInfo);
     }

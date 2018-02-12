@@ -54,11 +54,11 @@ public class PlayControl extends IPlayControl.Stub {
     private class NotifyStatusChange implements NotifyContract.NotifyStatusChanged {
 
         @Override
-        public void notify(SongInfo info, int index, int status, String errorMsg) {
-
+        public void notify(SongInfo info, int index, int status, String errorMsg, boolean isSwitchSong) {
             synchronized (NotifyStatusChange.class) {
                 final int N = mRemoteCallbackList.beginBroadcast();
                 for (int i = 0; i < N; i++) {
+
                     IOnPlayerEventListener listener = mRemoteCallbackList.getBroadcastItem(i);
                     if (listener != null) {
                         try {
@@ -82,9 +82,9 @@ public class PlayControl extends IPlayControl.Stub {
                                 case State.STATE_ERROR:
                                     listener.onError("");
                                     break;
-                                default:
-                                    listener.onError("");
-                                    break;
+                            }
+                            if (isSwitchSong) {
+                                listener.onMusicSwitch(info);
                             }
                         } catch (RemoteException e) {
                             e.printStackTrace();

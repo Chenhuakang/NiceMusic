@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.module.main.MainFragment;
 import com.lzx.nicemusic.module.play.PlayingDetailActivity;
@@ -106,7 +107,7 @@ public class MainActivity extends BaseMvpActivity implements View.OnClickListene
     public void onMusicSwitch(SongInfo music) {
         GlideUtil.loadImageByUrl(this, music.getSongCover(), mMusicCover);
         mMusicName.setText(music.getSongName());
-
+        LogUtil.i("cover = " + music.getSongCover() + " name = " + music.getSongName());
     }
 
     @Override

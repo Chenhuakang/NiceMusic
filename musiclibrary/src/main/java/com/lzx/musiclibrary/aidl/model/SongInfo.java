@@ -3,7 +3,6 @@ package com.lzx.musiclibrary.aidl.model;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v4.media.MediaMetadataCompat;
 
 /**
  * 统一音乐信息
@@ -39,7 +38,7 @@ public class SongInfo implements Parcelable {
     private String publishTime = "";//发布时间
     private String description = ""; //音乐描述
     private String versions = ""; //版本
-    private MediaMetadataCompat metadataCompat; //媒体信息
+
 
     private AlbumInfo albumInfo;  //专辑信息
     private TempInfo tempInfo;   //其他信息
@@ -249,13 +248,7 @@ public class SongInfo implements Parcelable {
         this.versions = versions;
     }
 
-    public MediaMetadataCompat getMetadataCompat() {
-        return metadataCompat;
-    }
 
-    public void setMetadataCompat(MediaMetadataCompat metadataCompat) {
-        this.metadataCompat = metadataCompat;
-    }
 
     public AlbumInfo getAlbumInfo() {
         return albumInfo;
@@ -313,7 +306,7 @@ public class SongInfo implements Parcelable {
         dest.writeString(this.publishTime);
         dest.writeString(this.description);
         dest.writeString(this.versions);
-        dest.writeParcelable(this.metadataCompat, flags);
+        //dest.writeParcelable(this.metadataCompat, flags);
         dest.writeParcelable(this.albumInfo, flags);
         dest.writeParcelable(this.tempInfo, flags);
         dest.writeParcelable(this.songCoverBitmap, flags);
@@ -348,7 +341,7 @@ public class SongInfo implements Parcelable {
         this.publishTime = in.readString();
         this.description = in.readString();
         this.versions = in.readString();
-        this.metadataCompat = in.readParcelable(MediaMetadataCompat.class.getClassLoader());
+       // this.metadataCompat = in.readParcelable(MediaMetadataCompat.class.getClassLoader());
         this.albumInfo = in.readParcelable(AlbumInfo.class.getClassLoader());
         this.tempInfo = in.readParcelable(TempInfo.class.getClassLoader());
         this.songCoverBitmap = in.readParcelable(Bitmap.class.getClassLoader());

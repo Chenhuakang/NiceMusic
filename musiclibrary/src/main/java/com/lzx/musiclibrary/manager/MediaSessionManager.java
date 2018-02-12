@@ -8,7 +8,6 @@ import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.lzx.musiclibrary.playback.PlaybackManager;
 import com.lzx.musiclibrary.receiver.RemoteControlReceiver;
-import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class MediaSessionManager {
     }
 
     public void updateMetaData(MediaMetadataCompat metadataCompat) {
-        LogUtil.i("updateMetaData");
+
         mMediaSession.setMetadata(metadataCompat);
     }
 
@@ -41,7 +40,6 @@ public class MediaSessionManager {
     }
 
     public void setPlaybackState(PlaybackStateCompat state){
-        LogUtil.i("setPlaybackState");
         mMediaSession.setPlaybackState(state);
     }
 
