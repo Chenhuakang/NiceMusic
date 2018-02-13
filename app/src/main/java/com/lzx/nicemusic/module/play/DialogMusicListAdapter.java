@@ -17,6 +17,7 @@ import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.constans.Constans;
 import com.lzx.nicemusic.db.DbManager;
+import com.lzx.nicemusic.utils.SpUtil;
 import com.lzx.nicemusic.widget.adapter.BaseViewHolder;
 
 import java.util.ArrayList;
@@ -40,11 +41,11 @@ public class DialogMusicListAdapter extends RecyclerView.Adapter<DialogMusicList
         mContext = context;
         mContext = context;
         mDbManager = new DbManager(context);
-        mDbManager.AsyQueryPlayList().subscribe(list -> mMusicInfos = list);
+        mDbManager.asyQueryPlayList().subscribe(list -> mMusicInfos = list);
     }
 
     public List<SongInfo> getMusicInfos() {
-        return mMusicInfos==null?new ArrayList<>():mMusicInfos;
+        return mMusicInfos == null ? new ArrayList<>() : mMusicInfos;
     }
 
     @Override
@@ -72,7 +73,7 @@ public class DialogMusicListAdapter extends RecyclerView.Adapter<DialogMusicList
             holder.mImageAnim.setVisibility(View.INVISIBLE);
         }
         holder.mBtnDelete.setOnClickListener(v -> {
-            mDbManager.AsyDeleteInfoInPlayList(info)
+            mDbManager.asyDeleteInfoInPlayList(info)
                     .subscribe(aBoolean -> {
                         boolean isPlayNext = MusicManager.isCurrMusicIsPlayingMusic(info);
                         MusicManager.get().deleteSongInfoOnPlayList(info, isPlayNext);
@@ -88,7 +89,10 @@ public class DialogMusicListAdapter extends RecyclerView.Adapter<DialogMusicList
                         Toast.makeText(mContext, "删除失败", Toast.LENGTH_SHORT).show();
                     });
         });
-        holder.itemView.setOnClickListener(v -> MusicManager.get().playMusicByInfo(info));
+        holder.itemView.setOnClickListener(v -> {
+            SpUtil.getInstance().putString(Constans.LAST_PLAYING_MUSIC, info.getSongId());
+            MusicManager.get().playMusicByInfo(info);
+        });
     }
 
     @Override

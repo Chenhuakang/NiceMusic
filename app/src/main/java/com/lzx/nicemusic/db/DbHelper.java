@@ -26,6 +26,8 @@ public class DbHelper extends SQLiteOpenHelper {
             + DbConstants.MUSIC_TITLE + " text, "
             + DbConstants.ALBUM_TITLE + " text, "
             + DbConstants.DURATION + " text, "
+            + DbConstants.URL + " text, "
+            + DbConstants.COVER + " text, "
             + DbConstants.ARTIST + " text);";
 
     /**
@@ -37,6 +39,8 @@ public class DbHelper extends SQLiteOpenHelper {
             + DbConstants.MUSIC_TITLE + " text, "
             + DbConstants.ALBUM_TITLE + " text, "
             + DbConstants.DURATION + " text, "
+            + DbConstants.URL + " text, "
+            + DbConstants.COVER + " text, "
             + DbConstants.ARTIST + " text);";
 
     @Override

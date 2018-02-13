@@ -3,24 +3,33 @@ package com.lzx.nicemusic;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
+import com.lzx.musiclibrary.helper.QueueHelper;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.base.BaseMvpActivity;
+import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
+import com.lzx.nicemusic.bean.LrcInfo;
+import com.lzx.nicemusic.constans.Constans;
 import com.lzx.nicemusic.module.main.MainFragment;
 import com.lzx.nicemusic.module.play.PlayingDetailActivity;
 import com.lzx.nicemusic.module.play.PlayingUIController;
+import com.lzx.nicemusic.module.play.presenter.PlayContract;
+import com.lzx.nicemusic.module.play.presenter.PlayPresenter;
 import com.lzx.nicemusic.module.search.SearchActivity;
 import com.lzx.nicemusic.module.songlist.SongListFragment;
 import com.lzx.nicemusic.utils.GlideUtil;
+import com.lzx.nicemusic.utils.SpUtil;
 
-
-public class MainActivity extends BaseMvpActivity implements View.OnClickListener, OnPlayerEventListener {
+@CreatePresenter(PlayPresenter.class)
+public class MainActivity extends BaseMvpActivity<PlayContract.View, PlayPresenter> implements PlayContract.View, View.OnClickListener, OnPlayerEventListener {
 
     private ImageView mMusicCover, mBtnPlayList, mBtnPlayPause;
     private TextView mMusicName;
@@ -29,6 +38,7 @@ public class MainActivity extends BaseMvpActivity implements View.OnClickListene
     private MainFragment mMainFragment;
     private SongListFragment mSongListFragment;
     private PlayingUIController mUIController;
+    private SongInfo localSongInfo;
 
     @Override
     protected int getLayoutId() {
@@ -39,7 +49,6 @@ public class MainActivity extends BaseMvpActivity implements View.OnClickListene
     protected void init(Bundle savedInstanceState) {
         mMusicCover = findViewById(R.id.music_cover);
         mMusicName = findViewById(R.id.music_name);
-
         mBtnPlayList = findViewById(R.id.btn_play_list);
         mBtnPlayPause = findViewById(R.id.btn_play_pause);
 
@@ -49,10 +58,23 @@ public class MainActivity extends BaseMvpActivity implements View.OnClickListene
         mUIController.initPlayListLayout();
         mUIController.initSimpleProgressBar();
 
+        String musicId = SpUtil.getInstance().getString(Constans.LAST_PLAYING_MUSIC);
+        if (!TextUtils.isEmpty(musicId)) {
+            mUIController.getDbManager().asyGetSongInfoById(musicId)
+                    .subscribe(songInfo -> {
+                        if (songInfo != null) {
+                            localSongInfo = songInfo;
+                            GlideUtil.loadImageByUrl(MainActivity.this, songInfo.getSongCover(), mMusicCover);
+                            mMusicName.setText(songInfo.getSongName());
+                        }
+                    }, throwable -> {
+                        LogUtil.i(throwable.getMessage());
+                    });
+        }
+
         mBtnPlayList.setOnClickListener(this);
         mBtnPlayPause.setOnClickListener(this);
         mMusicCover.setOnClickListener(this);
-
         mMusicName.setOnClickListener(this);
         MusicManager.get().addPlayerEventListener(this);
     }
@@ -86,11 +108,22 @@ public class MainActivity extends BaseMvpActivity implements View.OnClickListene
                 mUIController.showPlayListLayout();
                 break;
             case R.id.btn_play_pause:
-                if (info != null) {
+                boolean hasLocalInfo = info == null && localSongInfo != null;
+                boolean hasPlayingInfo = info != null;
+                if (hasLocalInfo || hasPlayingInfo) {
                     if (MusicManager.isPlaying()) {
                         MusicManager.get().pauseMusic();
                     } else {
-                        MusicManager.get().resumeMusic();
+                        if (hasLocalInfo) {
+                            mUIController.getDbManager().asyQueryPlayList().subscribe(songInfos -> {
+                                int index = QueueHelper.getMusicIndexOnQueue(songInfos, localSongInfo.getSongId());
+                                MusicManager.get().playMusic(songInfos, index);
+                            }, throwable -> {
+                                Toast.makeText(mContext, "播放失败", Toast.LENGTH_SHORT).show();
+                            });
+                        } else {
+                            MusicManager.get().resumeMusic();
+                        }
                     }
                 }
                 break;
@@ -104,10 +137,15 @@ public class MainActivity extends BaseMvpActivity implements View.OnClickListene
     }
 
     @Override
+    public void onLrcInfoSuccess(LrcInfo info) {
+        mUIController.initLrcView(info);
+    }
+
+    @Override
     public void onMusicSwitch(SongInfo music) {
         GlideUtil.loadImageByUrl(this, music.getSongCover(), mMusicCover);
         mMusicName.setText(music.getSongName());
-        LogUtil.i("cover = " + music.getSongCover() + " name = " + music.getSongName());
+        getPresenter().getLrcInfo(music.getSongId());
     }
 
     @Override
@@ -130,6 +168,7 @@ public class MainActivity extends BaseMvpActivity implements View.OnClickListene
     @Override
     public void onError(String errorMsg) {
         mBtnPlayPause.setImageResource(R.drawable.notify_btn_dark_play_normal);
+        Toast.makeText(mContext, "errorMsg = " + errorMsg, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -151,5 +190,7 @@ public class MainActivity extends BaseMvpActivity implements View.OnClickListene
         super.onDestroy();
         MusicManager.get().removePlayerEventListener(this);
     }
+
+
 }
 

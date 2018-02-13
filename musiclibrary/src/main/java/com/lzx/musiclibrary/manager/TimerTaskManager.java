@@ -26,9 +26,12 @@ public class TimerTaskManager {
         stopSeekBarUpdate();
         if (!mExecutorService.isShutdown()) {
             mScheduleFuture = mExecutorService.scheduleAtFixedRate(
-                    () -> {
-                        if (mUpdateProgressTask != null) {
-                            mHandler.post(mUpdateProgressTask);
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mUpdateProgressTask != null) {
+                                mHandler.post(mUpdateProgressTask);
+                            }
                         }
                     },
                     PROGRESS_UPDATE_INITIAL_INTERVAL,
@@ -66,7 +69,6 @@ public class TimerTaskManager {
             mScheduleFuture.cancel(false);
         }
     }
-
 
 
     public void onRemoveUpdateProgressTask() {

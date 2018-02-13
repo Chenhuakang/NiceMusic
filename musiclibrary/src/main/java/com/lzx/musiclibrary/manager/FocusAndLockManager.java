@@ -66,32 +66,35 @@ public class FocusAndLockManager {
         mWifiLock.acquire();
     }
 
-    private final AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener = focusChange -> {
-        switch (focusChange) {
-            case AudioManager.AUDIOFOCUS_GAIN:
-                mCurrentAudioFocusState = AUDIO_FOCUSED;
-                break;
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                // Audio focus was lost, but it's possible to duck (i.e.: play quietly)
-                mCurrentAudioFocusState = AUDIO_NO_FOCUS_CAN_DUCK;
-                break;
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                // Lost audio focus, but will gain it back (shortly), so note whether
-                // playback should resume
-                mCurrentAudioFocusState = AUDIO_NO_FOCUS_NO_DUCK;
+    private final AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            switch (focusChange) {
+                case AudioManager.AUDIOFOCUS_GAIN:
+                    mCurrentAudioFocusState = AUDIO_FOCUSED;
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    // Audio focus was lost, but it's possible to duck (i.e.: play quietly)
+                    mCurrentAudioFocusState = AUDIO_NO_FOCUS_CAN_DUCK;
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                    // Lost audio focus, but will gain it back (shortly), so note whether
+                    // playback should resume
+                    mCurrentAudioFocusState = AUDIO_NO_FOCUS_NO_DUCK;
 
-                if (mListener!=null){
-                    mListener.onAudioFocusLossTransient();
-                }
-                break;
-            case AudioManager.AUDIOFOCUS_LOSS:
-                // Lost audio focus, probably "permanently"
-                mCurrentAudioFocusState = AUDIO_NO_FOCUS_NO_DUCK;
-                break;
-        }
+                    if (mListener != null) {
+                        mListener.onAudioFocusLossTransient();
+                    }
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS:
+                    // Lost audio focus, probably "permanently"
+                    mCurrentAudioFocusState = AUDIO_NO_FOCUS_NO_DUCK;
+                    break;
+            }
 
-        if (mListener!=null){
-            mListener.onAudioFocusChange();
+            if (mListener != null) {
+                mListener.onAudioFocusChange();
+            }
         }
     };
 

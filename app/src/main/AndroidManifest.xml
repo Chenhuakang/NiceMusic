@@ -37,7 +37,6 @@
 
         <activity
             android:name=".module.play.PlayingDetailActivity"
-
             android:screenOrientation="portrait"/>
 
         <provider

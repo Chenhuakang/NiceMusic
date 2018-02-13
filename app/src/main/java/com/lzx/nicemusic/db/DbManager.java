@@ -39,7 +39,7 @@ public class DbManager {
      *
      * @return
      */
-    public List<SongInfo> queryPlayList() {
+    private List<SongInfo> queryPlayList() {
         Uri uri = MusicContentProvider.SONG_LIST_URI;
         Cursor cursor = mResolver.query(uri, null, null, null, null);
         if (cursor == null) {
@@ -52,11 +52,15 @@ public class DbManager {
             String musicTitle = cursor.getString(cursor.getColumnIndex(DbConstants.MUSIC_TITLE));
             String albumTitle = cursor.getString(cursor.getColumnIndex(DbConstants.ALBUM_TITLE));
             long duration = cursor.getLong(cursor.getColumnIndex(DbConstants.DURATION));
+            String cover = cursor.getString(cursor.getColumnIndex(DbConstants.COVER));
+            String url = cursor.getString(cursor.getColumnIndex(DbConstants.URL));
             SongInfo info = new SongInfo();
             info.setSongId(musicId);
             info.setArtist(artist);
             info.setSongName(musicTitle);
             info.setDuration(duration);
+            info.setSongCover(cover);
+            info.setSongUrl(url);
             AlbumInfo albumInfo = new AlbumInfo();
             albumInfo.setAlbumName(albumTitle);
             info.setAlbumInfo(albumInfo);
@@ -71,7 +75,7 @@ public class DbManager {
      *
      * @param list
      */
-    public void savePlayList(List<SongInfo> list) {
+    private void savePlayList(List<SongInfo> list) {
         clearPlayList();
         Uri uri = MusicContentProvider.SONG_LIST_URI;
         for (SongInfo info : list) {
@@ -84,6 +88,8 @@ public class DbManager {
             values.put(DbConstants.MUSIC_TITLE, info.getSongName());
             values.put(DbConstants.ALBUM_TITLE, info.getAlbumInfo().getAlbumName());
             values.put(DbConstants.DURATION, info.getDuration());
+            values.put(DbConstants.COVER, info.getSongCover());
+            values.put(DbConstants.URL, info.getSongUrl());
             mResolver.insert(uri, values);
         }
     }
@@ -93,7 +99,7 @@ public class DbManager {
      *
      * @return The number of rows deleted.
      */
-    public int deleteInfoInPlayList(SongInfo info) {
+    private int deleteInfoInPlayList(SongInfo info) {
         Uri uri = MusicContentProvider.SONG_LIST_URI;
         return mResolver.delete(uri, DbConstants.MUSIC_ID + " = ?", new String[]{info.getSongId()});
     }
@@ -103,9 +109,41 @@ public class DbManager {
      *
      * @return The number of rows deleted.
      */
-    public int clearPlayList() {
+    private int clearPlayList() {
         Uri uri = MusicContentProvider.SONG_LIST_URI;
         return mResolver.delete(uri, null, null);
+    }
+
+    /**
+     * 获取一条音乐信息
+     */
+    private SongInfo querySongInfoById(String songId) {
+        Uri uri = MusicContentProvider.SONG_LIST_URI;
+        Cursor cursor = mResolver.query(uri, null, DbConstants.MUSIC_ID + " = ?", new String[]{songId}, null);
+        if (cursor == null) {
+            return null;
+        }
+        SongInfo info = new SongInfo();
+        while (cursor.moveToNext()) {
+            String musicId = cursor.getString(cursor.getColumnIndex(DbConstants.MUSIC_ID));
+            String artist = cursor.getString(cursor.getColumnIndex(DbConstants.ARTIST));
+            String musicTitle = cursor.getString(cursor.getColumnIndex(DbConstants.MUSIC_TITLE));
+            String albumTitle = cursor.getString(cursor.getColumnIndex(DbConstants.ALBUM_TITLE));
+            long duration = cursor.getLong(cursor.getColumnIndex(DbConstants.DURATION));
+            String cover = cursor.getString(cursor.getColumnIndex(DbConstants.COVER));
+            String url = cursor.getString(cursor.getColumnIndex(DbConstants.URL));
+            info.setSongId(musicId);
+            info.setArtist(artist);
+            info.setSongName(musicTitle);
+            info.setDuration(duration);
+            info.setSongCover(cover);
+            info.setSongUrl(url);
+            AlbumInfo albumInfo = new AlbumInfo();
+            albumInfo.setAlbumName(albumTitle);
+            info.setAlbumInfo(albumInfo);
+        }
+        cursor.close();
+        return info;
     }
 
     /**
@@ -113,7 +151,7 @@ public class DbManager {
      *
      * @return
      */
-    public List<SongInfo> queryFavoriteList() {
+    private List<SongInfo> queryFavoriteList() {
         Uri uri = MusicContentProvider.FAVORITES_URI;
         Cursor cursor = mResolver.query(uri, null, null, null, null);
         if (cursor == null) {
@@ -126,11 +164,15 @@ public class DbManager {
             String musicTitle = cursor.getString(cursor.getColumnIndex(DbConstants.MUSIC_TITLE));
             String albumTitle = cursor.getString(cursor.getColumnIndex(DbConstants.ALBUM_TITLE));
             long duration = cursor.getLong(cursor.getColumnIndex(DbConstants.DURATION));
+            String cover = cursor.getString(cursor.getColumnIndex(DbConstants.COVER));
+            String url = cursor.getString(cursor.getColumnIndex(DbConstants.URL));
             SongInfo info = new SongInfo();
             info.setSongId(musicId);
             info.setArtist(artist);
             info.setSongName(musicTitle);
             info.setDuration(duration);
+            info.setSongCover(cover);
+            info.setSongUrl(url);
             AlbumInfo albumInfo = new AlbumInfo();
             albumInfo.setAlbumName(albumTitle);
             info.setAlbumInfo(albumInfo);
@@ -145,7 +187,7 @@ public class DbManager {
      *
      * @param info
      */
-    public int deleteInfoInFavoriteList(SongInfo info) {
+    private int deleteInfoInFavoriteList(SongInfo info) {
         Uri uri = MusicContentProvider.FAVORITES_URI;
         return mResolver.delete(uri, DbConstants.MUSIC_ID + " = ?", new String[]{info.getSongId()});
     }
@@ -155,7 +197,7 @@ public class DbManager {
      *
      * @param info
      */
-    public void addInfoInFavoriteList(SongInfo info) {
+    private void addInfoInFavoriteList(SongInfo info) {
         if (info.getAlbumInfo() == null) {
             throw new RuntimeException("albumInfo must not be null.");
         }
@@ -166,13 +208,15 @@ public class DbManager {
         values.put(DbConstants.MUSIC_TITLE, info.getSongName());
         values.put(DbConstants.ALBUM_TITLE, info.getAlbumInfo().getAlbumName());
         values.put(DbConstants.DURATION, info.getDuration());
+        values.put(DbConstants.COVER, info.getSongCover());
+        values.put(DbConstants.URL, info.getSongUrl());
         mResolver.insert(uri, values);
     }
 
     /**
      * 清空我的歌单
      */
-    public int clearFavoriteList() {
+    private int clearFavoriteList() {
         Uri uri = MusicContentProvider.FAVORITES_URI;
         return mResolver.delete(uri, null, null);
     }
@@ -180,54 +224,57 @@ public class DbManager {
     /**
      * 下面是异步方法
      */
-
-    public Observable<List<SongInfo>> AsyQueryPlayList() {
+    public Observable<List<SongInfo>> asyQueryPlayList() {
         return Observable.create((ObservableOnSubscribe<List<SongInfo>>) emitter -> {
             List<SongInfo> list = queryPlayList();
             emitter.onNext(list);
         }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<Boolean> AsySavePlayList(List<SongInfo> list) {
+    public Observable<Boolean> asySavePlayList(List<SongInfo> list) {
         return Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             savePlayList(list);
             emitter.onNext(true);
         }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<Boolean> AsyDeleteInfoInPlayList(SongInfo info) {
+    public Observable<Boolean> asyDeleteInfoInPlayList(SongInfo info) {
         return Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             int rows = deleteInfoInPlayList(info);
             emitter.onNext(rows > 0);
         }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<List<SongInfo>> AsyQueryFavoriteList() {
+    public Observable<List<SongInfo>> asyQueryFavoriteList() {
         return Observable.create((ObservableOnSubscribe<List<SongInfo>>) emitter -> {
             List<SongInfo> list = queryFavoriteList();
             emitter.onNext(list);
         }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<Boolean> AsyDeleteInfoInFavoriteList(SongInfo info) {
+    public Observable<Boolean> asyDeleteInfoInFavoriteList(SongInfo info) {
         return Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             int rows = deleteInfoInFavoriteList(info);
             emitter.onNext(rows > 0);
         }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<Boolean> AsyAddInfoInFavoriteList(SongInfo info) {
+    public Observable<Boolean> asyAddInfoInFavoriteList(SongInfo info) {
         return Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             addInfoInFavoriteList(info);
             emitter.onNext(true);
         }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<Boolean> AsyClearFavoriteList() {
+    public Observable<Boolean> asyClearFavoriteList() {
         return Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             int rows = clearFavoriteList();
             emitter.onNext(rows > 0);
         }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread());
     }
 
+    public Observable<SongInfo> asyGetSongInfoById(String songId) {
+        return Observable.create((ObservableOnSubscribe<SongInfo>) emitter -> emitter.onNext(querySongInfoById(songId)))
+                .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread());
+    }
 }

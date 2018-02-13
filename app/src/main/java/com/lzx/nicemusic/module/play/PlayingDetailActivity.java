@@ -12,6 +12,7 @@ import android.view.animation.AccelerateInterpolator;
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
@@ -20,8 +21,6 @@ import com.lzx.nicemusic.constans.Constans;
 import com.lzx.nicemusic.module.play.presenter.PlayContract;
 import com.lzx.nicemusic.module.play.presenter.PlayPresenter;
 import com.plattysoft.leonids.ParticleSystem;
-
-import java.util.Random;
 
 /**
  * Created by xian on 2018/1/21.
@@ -50,6 +49,7 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         mMusicInfo = getIntent().getParcelableExtra("SongInfo");
 
         mUIController = new PlayingUIController(this, mMusicInfo);
+
         mUIController.initViews();
         mUIController.initialization();
 
@@ -68,12 +68,14 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
 
     @Override
     public void onMusicSwitch(SongInfo music) {
+        LogUtil.i("onMusicSwitch = " + music.getSongName());
         getPresenter().getLrcInfo(music.getSongId());
         mUIController.updateUI(music);
     }
 
     @Override
     public void onPlayerStart() {
+        LogUtil.i(" ===onPlayerStart=== ");
         mUIController.onPlayerStart();
     }
 
@@ -125,8 +127,8 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                // Create a particle system and start emiting
-                ps = new ParticleSystem(this, 100, starArray[new Random().nextInt(starArray.length)], 800);
+                int random = (int) (Math.random() * starArray.length - 1);
+                ps = new ParticleSystem(this, 100, starArray[random], 800);
                 ps.setScaleRange(0.7f, 1.3f);
                 ps.setSpeedRange(0.05f, 0.1f);
                 ps.setRotationSpeedRange(90, 180);

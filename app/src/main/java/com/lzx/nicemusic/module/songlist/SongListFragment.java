@@ -24,12 +24,14 @@ import com.lzx.nicemusic.MainActivity;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpFragment;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
+import com.lzx.nicemusic.constans.Constans;
 import com.lzx.nicemusic.db.DbManager;
 import com.lzx.nicemusic.module.songlist.adapter.SongListAdapter;
 import com.lzx.nicemusic.module.songlist.presenter.SongListContract;
 import com.lzx.nicemusic.module.songlist.presenter.SongListPresenter;
 import com.lzx.nicemusic.utils.DisplayUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
+import com.lzx.nicemusic.utils.SpUtil;
 import com.lzx.nicemusic.utils.SystemBarHelper;
 import com.lzx.nicemusic.widget.OuterLayerImageView;
 
@@ -111,13 +113,15 @@ public class SongListFragment extends BaseMvpFragment<SongListContract.View, Son
         mRecyclerView.setAdapter(mAdapter);
         MusicManager.get().addStateObservable(mAdapter);
         mAdapter.setOnItemClickListener((musicInfo, position) -> {
-            mDbManager.AsySavePlayList(mAdapter.getDataList())
+            mDbManager.asySavePlayList(mAdapter.getDataList())
                     .subscribe(aBoolean -> {
-                        if (!MusicManager.isCurrMusicIsPlayingMusic(mAdapter.getDataList().get(position))) {
+                        SongInfo info = mAdapter.getDataList().get(position);
+                        if (!MusicManager.isCurrMusicIsPlayingMusic(info)) {
+                            SpUtil.getInstance().putString(Constans.LAST_PLAYING_MUSIC, info.getSongId());
                             MusicManager.get().playMusic(mAdapter.getDataList(), position, true);
                         }
                     }, throwable -> {
-                        LogUtil.i("error = "+throwable.getMessage());
+                        LogUtil.i("error = " + throwable.getMessage());
                         Toast.makeText(mContext, "播放失败", Toast.LENGTH_SHORT).show();
                     });
         });
@@ -128,7 +132,7 @@ public class SongListFragment extends BaseMvpFragment<SongListContract.View, Son
         mFloatingActionButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.colorPrimary)));
         mFloatingActionButton.setTranslationY(-DisplayUtil.dip2px(getActivity(), 32));
         mFloatingActionButton.setOnClickListener(v -> {
-            mDbManager.AsySavePlayList(mAdapter.getDataList())
+            mDbManager.asySavePlayList(mAdapter.getDataList())
                     .subscribe(aBoolean -> {
                         if (!MusicManager.isCurrMusicIsPlayingMusic(mAdapter.getDataList().get(0))) {
                             MusicManager.get().playMusic(mAdapter.getDataList(), 0);

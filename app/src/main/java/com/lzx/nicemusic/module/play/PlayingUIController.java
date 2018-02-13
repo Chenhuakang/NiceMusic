@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lzx.musiclibrary.aidl.model.SongInfo;
+import com.lzx.musiclibrary.constans.PlayMode;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.manager.TimerTaskManager;
 import com.lzx.nicemusic.R;
@@ -72,6 +73,7 @@ public class PlayingUIController implements View.OnClickListener {
         mMusicInfo = musicInfo;
         mActivity = activity;
         mContext = mActivity.getApplicationContext();
+        mDbManager = new DbManager(activity);
         mTimerTaskManager = new TimerTaskManager();
         mTimerTaskManager.setUpdateProgressTask(this::updateProgress);
     }
@@ -127,6 +129,10 @@ public class PlayingUIController implements View.OnClickListener {
         MusicManager.get().addStateObservable(mDialogMusicListAdapter);
     }
 
+    public DbManager getDbManager() {
+        return mDbManager;
+    }
+
     public void initSimpleProgressBar() {
         mSimpleProgress = mActivity.findViewById(R.id.simple_progress);
     }
@@ -167,11 +173,11 @@ public class PlayingUIController implements View.OnClickListener {
         });
     }
 
-    public void starUpdateProgress(){
+    public void starUpdateProgress() {
         mTimerTaskManager.scheduleSeekBarUpdate();
     }
 
-    public void pauseUpdateProgress(){
+    public void pauseUpdateProgress() {
         mTimerTaskManager.stopSeekBarUpdate();
     }
 
@@ -285,7 +291,7 @@ public class PlayingUIController implements View.OnClickListener {
      * 显示播放列表
      */
     public void showPlayListLayout() {
-        mDbManager.AsyQueryPlayList()
+        mDbManager.asyQueryPlayList()
                 .subscribe(infoList -> {
                     if (infoList == null || infoList.size() == 0) {
                         return;
@@ -302,6 +308,19 @@ public class PlayingUIController implements View.OnClickListener {
                     if (index != -1) {
                         mRecyclerView.scrollToPosition(index);
                     }
+
+                    int playMode = MusicManager.get().getPlayMode();
+                    if (playMode == PlayMode.PLAY_IN_LIST_LOOP) {
+                        mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat_black_24dp, 0, 0, 0);
+                        mBtnPlayMode.setText("顺序播放");
+                    } else if (playMode == PlayMode.PLAY_IN_RANDOM) {
+                        mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_shuffle_black_24dp, 0, 0, 0);
+                        mBtnPlayMode.setText("随机播放");
+                    } else if (playMode == PlayMode.PLAY_IN_SINGLE_LOOP) {
+                        mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat_one_black_24dp, 0, 0, 0);
+                        mBtnPlayMode.setText("单曲循环");
+                    }
+
                     initPlayListAnim(true, phoneHeight, phoneHeight * 4 / 10);
                 }, throwable -> {
                     Toast.makeText(mActivity, "打开列表失败", Toast.LENGTH_SHORT).show();
@@ -332,7 +351,7 @@ public class PlayingUIController implements View.OnClickListener {
             mStartTime.setText(FormatUtil.formatMusicTime(progress));
         }
         if (mSimpleProgress != null) {
-            if (mMusicInfo==null){
+            if (mMusicInfo == null) {
                 mMusicInfo = MusicManager.get().getCurrPlayingMusic();
             }
             if (mSimpleProgress.getMax() == -1) {
@@ -363,7 +382,7 @@ public class PlayingUIController implements View.OnClickListener {
     @SuppressLint("UseSparseArrays")
     private Map<Long, String> lrcMap = new HashMap<>();
 
-    void initLrcView(LrcInfo info) {
+    public void initLrcView(LrcInfo info) {
         mLyricsText.setVisibility(View.VISIBLE);
         lrcList = LrcAnalysisInfo.parseLrcString(info.getLrcContent());
         if (lrcList != null) {
@@ -417,6 +436,20 @@ public class PlayingUIController implements View.OnClickListener {
                 MusicManager.get().playNext();
                 break;
             case R.id.btn_play_mode:
+                int playMode = MusicManager.get().getPlayMode();
+                if (playMode == PlayMode.PLAY_IN_LIST_LOOP) {
+                    MusicManager.get().setPlayMode(PlayMode.PLAY_IN_RANDOM);
+                    mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_shuffle_black_24dp, 0, 0, 0);
+                    mBtnPlayMode.setText("随机播放");
+                } else if (playMode == PlayMode.PLAY_IN_RANDOM) {
+                    MusicManager.get().setPlayMode(PlayMode.PLAY_IN_SINGLE_LOOP);
+                    mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat_one_black_24dp, 0, 0, 0);
+                    mBtnPlayMode.setText("单曲循环");
+                } else if (playMode == PlayMode.PLAY_IN_SINGLE_LOOP) {
+                    MusicManager.get().setPlayMode(PlayMode.PLAY_IN_LIST_LOOP);
+                    mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat_black_24dp, 0, 0, 0);
+                    mBtnPlayMode.setText("顺序播放");
+                }
                 break;
             case R.id.btn_dismiss:
                 hidePlayListLayout();
