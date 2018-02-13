@@ -105,7 +105,7 @@ public class MainActivity extends BaseMvpActivity<PlayContract.View, PlayPresent
                 startActivity(intent);
                 break;
             case R.id.btn_play_list:
-                mUIController.showPlayListLayout();
+                mUIController.showPlayListLayout(true);
                 break;
             case R.id.btn_play_pause:
                 boolean hasLocalInfo = info == null && localSongInfo != null;

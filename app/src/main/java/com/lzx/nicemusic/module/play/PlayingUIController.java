@@ -25,6 +25,8 @@ import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.bean.LrcAnalysisInfo;
 import com.lzx.nicemusic.bean.LrcInfo;
 import com.lzx.nicemusic.db.DbManager;
+import com.lzx.nicemusic.module.play.adapter.DialogMusicListAdapter;
+import com.lzx.nicemusic.module.play.adapter.TimerAdapter;
 import com.lzx.nicemusic.utils.DisplayUtil;
 import com.lzx.nicemusic.utils.FormatUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
@@ -55,6 +57,7 @@ public class PlayingUIController implements View.OnClickListener {
     private RecyclerView mRecyclerView;
     private View mPlayDarkBg;
     private DialogMusicListAdapter mDialogMusicListAdapter;
+    private TimerAdapter mTimerAdapter;
 
     private RelativeLayout.LayoutParams params;
     private int phoneHeight;
@@ -123,9 +126,8 @@ public class PlayingUIController implements View.OnClickListener {
         params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, phoneHeight * 6 / 10);
         mPlayListLayout.setLayoutParams(params);
         mDialogMusicListAdapter = new DialogMusicListAdapter(mContext);
+        mTimerAdapter = new TimerAdapter(mContext);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mRecyclerView.setAdapter(mDialogMusicListAdapter);
-
         MusicManager.get().addStateObservable(mDialogMusicListAdapter);
     }
 
@@ -290,41 +292,49 @@ public class PlayingUIController implements View.OnClickListener {
     /**
      * 显示播放列表
      */
-    public void showPlayListLayout() {
-        mDbManager.asyQueryPlayList()
-                .subscribe(infoList -> {
-                    if (infoList == null || infoList.size() == 0) {
-                        return;
-                    }
-                    int index = -1;
-                    List<SongInfo> list = mDialogMusicListAdapter.getMusicInfos();
-                    for (int i = 0; i < list.size(); i++) {
-                        SongInfo info = list.get(i);
-                        if (MusicManager.isCurrMusicIsPlayingMusic(info)) {
-                            index = i;
-                            break;
+    public void showPlayListLayout(boolean isSongList) {
+        if (!isSongList) {
+            mBtnPlayMode.setVisibility(View.GONE);
+            mRecyclerView.setAdapter(mTimerAdapter);
+            initPlayListAnim(true, phoneHeight, phoneHeight * 4 / 10);
+        } else {
+            mBtnPlayMode.setVisibility(View.VISIBLE);
+            mRecyclerView.setAdapter(mDialogMusicListAdapter);
+            mDbManager.asyQueryPlayList()
+                    .subscribe(infoList -> {
+                        if (infoList == null || infoList.size() == 0) {
+                            return;
                         }
-                    }
-                    if (index != -1) {
-                        mRecyclerView.scrollToPosition(index);
-                    }
+                        int index = -1;
+                        List<SongInfo> list = mDialogMusicListAdapter.getMusicInfos();
+                        for (int i = 0; i < list.size(); i++) {
+                            SongInfo info = list.get(i);
+                            if (MusicManager.isCurrMusicIsPlayingMusic(info)) {
+                                index = i;
+                                break;
+                            }
+                        }
+                        if (index != -1) {
+                            mRecyclerView.scrollToPosition(index);
+                        }
 
-                    int playMode = MusicManager.get().getPlayMode();
-                    if (playMode == PlayMode.PLAY_IN_LIST_LOOP) {
-                        mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat_black_24dp, 0, 0, 0);
-                        mBtnPlayMode.setText("顺序播放");
-                    } else if (playMode == PlayMode.PLAY_IN_RANDOM) {
-                        mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_shuffle_black_24dp, 0, 0, 0);
-                        mBtnPlayMode.setText("随机播放");
-                    } else if (playMode == PlayMode.PLAY_IN_SINGLE_LOOP) {
-                        mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat_one_black_24dp, 0, 0, 0);
-                        mBtnPlayMode.setText("单曲循环");
-                    }
+                        int playMode = MusicManager.get().getPlayMode();
+                        if (playMode == PlayMode.PLAY_IN_LIST_LOOP) {
+                            mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat_black_24dp, 0, 0, 0);
+                            mBtnPlayMode.setText("顺序播放");
+                        } else if (playMode == PlayMode.PLAY_IN_RANDOM) {
+                            mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_shuffle_black_24dp, 0, 0, 0);
+                            mBtnPlayMode.setText("随机播放");
+                        } else if (playMode == PlayMode.PLAY_IN_SINGLE_LOOP) {
+                            mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat_one_black_24dp, 0, 0, 0);
+                            mBtnPlayMode.setText("单曲循环");
+                        }
 
-                    initPlayListAnim(true, phoneHeight, phoneHeight * 4 / 10);
-                }, throwable -> {
-                    Toast.makeText(mActivity, "打开列表失败", Toast.LENGTH_SHORT).show();
-                });
+                        initPlayListAnim(true, phoneHeight, phoneHeight * 4 / 10);
+                    }, throwable -> {
+                        Toast.makeText(mActivity, "打开列表失败", Toast.LENGTH_SHORT).show();
+                    });
+        }
     }
 
     /**
@@ -422,9 +432,12 @@ public class PlayingUIController implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_music_list:
-                showPlayListLayout();
+
+                showPlayListLayout(true);
                 break;
             case R.id.btn_play_time:
+                mRecyclerView.setAdapter(mTimerAdapter);
+                showPlayListLayout(false);
                 break;
             case R.id.btn_play_pause:
                 MusicManager.get().playMusicByInfo(mMusicInfo);

@@ -1,4 +1,4 @@
-package com.lzx.nicemusic.module.play;
+package com.lzx.nicemusic.module.play.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -38,7 +38,6 @@ public class DialogMusicListAdapter extends RecyclerView.Adapter<DialogMusicList
 
 
     public DialogMusicListAdapter(Context context) {
-        mContext = context;
         mContext = context;
         mDbManager = new DbManager(context);
         mDbManager.asyQueryPlayList().subscribe(list -> mMusicInfos = list);

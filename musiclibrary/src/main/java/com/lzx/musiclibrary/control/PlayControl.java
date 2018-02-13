@@ -24,8 +24,8 @@ import java.util.List;
 
 public class PlayControl extends IPlayControl.Stub {
 
+    private MusicService mService;
     private PlayMode mPlayMode;
-
     private PlayController mController;
     private Playback playback;
 
@@ -35,6 +35,8 @@ public class PlayControl extends IPlayControl.Stub {
     private NotifyContract.NotifyMusicSwitch mNotifyMusicSwitch;
 
     public PlayControl(MusicService service, boolean isUseMediaPlayer, boolean isAutoPlayNext, Notification notification) {
+        mService = service;
+
         mNotifyStatusChanged = new NotifyStatusChange();
         mNotifyMusicSwitch = new NotifyMusicSwitch();
         mRemoteCallbackList = new RemoteCallbackList<>();
@@ -54,7 +56,7 @@ public class PlayControl extends IPlayControl.Stub {
     private class NotifyStatusChange implements NotifyContract.NotifyStatusChanged {
 
         @Override
-        public void notify(SongInfo info, int index, int status, String errorMsg, boolean isSwitchSong) {
+        public void notify(SongInfo info, int index, int status, String errorMsg) {
             synchronized (NotifyStatusChange.class) {
                 final int N = mRemoteCallbackList.beginBroadcast();
                 for (int i = 0; i < N; i++) {
@@ -82,9 +84,6 @@ public class PlayControl extends IPlayControl.Stub {
                                 case State.STATE_ERROR:
                                     listener.onError("");
                                     break;
-                            }
-                            if (isSwitchSong) {
-                                listener.onMusicSwitch(info);
                             }
                         } catch (RemoteException e) {
                             e.printStackTrace();
@@ -147,23 +146,8 @@ public class PlayControl extends IPlayControl.Stub {
     }
 
     @Override
-    public void playMusicAutoStopWhen(List<SongInfo> list, int index, int time) throws RemoteException {
-
-    }
-
-    @Override
-    public void playMusicByInfoAutoStopWhen(SongInfo info, int time) throws RemoteException {
-
-    }
-
-    @Override
-    public void playMusicByIndexAutoStopWhen(int index, int time) throws RemoteException {
-
-    }
-
-    @Override
-    public void setAutoStopTime(int time) throws RemoteException {
-
+    public void pausePlayInMillis(long time) throws RemoteException {
+        mController.pausePlayInMillis(time);
     }
 
     @Override
@@ -205,7 +189,6 @@ public class PlayControl extends IPlayControl.Stub {
     public void deleteSongInfoOnPlayList(SongInfo info, boolean isNeedToPlayNext) throws RemoteException {
         mController.deleteMusicInfoOnPlayList(info, isNeedToPlayNext);
     }
-
 
     @Override
     public int getStatus() throws RemoteException {
@@ -253,12 +236,16 @@ public class PlayControl extends IPlayControl.Stub {
     }
 
     @Override
-    public void setPlayMode(int mode) throws RemoteException {
-        mPlayMode.setCurrPlayMode(mode);
+    public void setPlayMode(int mode, boolean isSaveLocal) throws RemoteException {
+        if (isSaveLocal) {
+            mPlayMode.setCurrPlayMode(mService, mode);
+        } else {
+            mPlayMode.setCurrPlayMode(mode);
+        }
     }
 
     @Override
-    public int getPlayMode() throws RemoteException {
+    public int getPlayMode(boolean isGetLocal) throws RemoteException {
         return mPlayMode.getCurrPlayMode();
     }
 

@@ -308,45 +308,12 @@ public class MusicManager implements IPlayControl {
     public void playMusicByIndex(int index) {
         playMusicByIndex(index, false);
     }
-
+    
     @Override
-    public void playMusicAutoStopWhen(List<SongInfo> list, int index, int time) {
+    public void pausePlayInMillis(long time) {
         if (control != null) {
             try {
-                control.playMusicAutoStopWhen(list, index, time);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void playMusicByInfoAutoStopWhen(SongInfo info, int time) {
-        if (control != null) {
-            try {
-                control.playMusicByInfoAutoStopWhen(info, time);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void playMusicByIndexAutoStopWhen(int index, int time) {
-        if (control != null) {
-            try {
-                control.playMusicByIndexAutoStopWhen(index, time);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void setAutoStopTime(int time) {
-        if (control != null) {
-            try {
-                control.setAutoStopTime(time);
+                control.pausePlayInMillis(time);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -549,26 +516,34 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public void setPlayMode(int mode) {
+    public void setPlayMode(int mode, boolean isSaveLocal) {
         if (control != null) {
             try {
-                control.setPlayMode(mode);
+                control.setPlayMode(mode, isSaveLocal);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
         }
     }
 
+    public void setPlayMode(int mode) {
+        setPlayMode(mode, false);
+    }
+
     @Override
-    public int getPlayMode() {
+    public int getPlayMode(boolean isGetLocal) {
         if (control != null) {
             try {
-                return control.getPlayMode();
+                return control.getPlayMode(isGetLocal);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
         }
         return 0;
+    }
+
+    public int getPlayMode() {
+        return getPlayMode(false);
     }
 
     @Override

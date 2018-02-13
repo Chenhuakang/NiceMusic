@@ -15,17 +15,8 @@ interface IPlayControl {
     //根据索引播放
     void playMusicByIndex(int index,boolean isJustPlay);
 
-    //定时播放
-    void playMusicAutoStopWhen(in List<SongInfo> list, int index, int time);
-
-    //定时播放
-    void playMusicByInfoAutoStopWhen(in SongInfo info, int time);
-
-    //定时播放
-    void playMusicByIndexAutoStopWhen(int index, int time);
-
     //设置定时时间
-    void setAutoStopTime(int time);
+    void pausePlayInMillis(long time);
 
     //得到当前播放索引
     int getCurrPlayingIndex();
@@ -79,10 +70,10 @@ interface IPlayControl {
     void setCurrMusic(int index);
 
     //设置播放模式
-    void setPlayMode(int mode);
+    void setPlayMode(int mode,boolean isSaveLocal);
 
     //得到播放模式
-    int getPlayMode();
+    int getPlayMode(boolean isGetLocal);
 
     //获取当前进度
     long getProgress();

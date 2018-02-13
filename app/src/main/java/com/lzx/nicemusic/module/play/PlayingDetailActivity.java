@@ -12,7 +12,6 @@ import android.view.animation.AccelerateInterpolator;
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
-import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
@@ -68,14 +67,12 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
 
     @Override
     public void onMusicSwitch(SongInfo music) {
-        LogUtil.i("onMusicSwitch = " + music.getSongName());
         getPresenter().getLrcInfo(music.getSongId());
         mUIController.updateUI(music);
     }
 
     @Override
     public void onPlayerStart() {
-        LogUtil.i(" ===onPlayerStart=== ");
         mUIController.onPlayerStart();
     }
 

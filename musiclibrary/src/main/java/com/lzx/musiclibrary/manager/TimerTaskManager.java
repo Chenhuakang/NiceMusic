@@ -1,5 +1,6 @@
 package com.lzx.musiclibrary.manager;
 
+import android.os.CountDownTimer;
 import android.os.Handler;
 
 import java.util.concurrent.Executors;
@@ -22,6 +23,9 @@ public class TimerTaskManager {
     private ScheduledFuture<?> mScheduleFuture;
     private Runnable mUpdateProgressTask;
 
+    /**
+     * 开始更新进度条
+     */
     public void scheduleSeekBarUpdate() {
         stopSeekBarUpdate();
         if (!mExecutorService.isShutdown()) {
@@ -44,37 +48,62 @@ public class TimerTaskManager {
         mUpdateProgressTask = task;
     }
 
-
-//    private final  Runnable mUpdateTimerTask = new Runnable() {
-//        @Override
-//        public void run() {
-//
-//        }
-//    };
-//
-//    private CountDownTimer mCountDownTimer = new CountDownTimer() {
-//        @Override
-//        public void onTick(long millisUntilFinished) {
-//
-//        }
-//
-//        @Override
-//        public void onFinish() {
-//
-//        }
-//    }
-
+    /**
+     * 停止更新进度条
+     */
     public void stopSeekBarUpdate() {
         if (mScheduleFuture != null) {
             mScheduleFuture.cancel(false);
         }
     }
 
-
+    /**
+     * 释放资源
+     */
     public void onRemoveUpdateProgressTask() {
         stopSeekBarUpdate();
         mExecutorService.shutdown();
         mHandler.removeCallbacksAndMessages(null);
+    }
+
+
+    //    private final  Runnable mUpdateTimerTask = new Runnable() {
+//        @Override
+//        public void run() {
+//
+//        }
+//    };
+//
+
+    private CountDownTimer mCountDownTimer;
+
+    /**
+     * 开始倒计时
+     */
+    public void starCountDownTask(long millisInFuture, long countDownInterval, final OnCountDownFinishListener listener) {
+        mCountDownTimer = new CountDownTimer(millisInFuture, countDownInterval) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                listener.onFinish();
+            }
+        };
+        mCountDownTimer.start();
+    }
+
+    public interface OnCountDownFinishListener {
+        void onFinish();
+    }
+
+    public void cancelCountDownTask() {
+        if (mCountDownTimer != null) {
+            mCountDownTimer.cancel();
+            mCountDownTimer = null;
+        }
     }
 
 
