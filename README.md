@@ -1,6 +1,6 @@
 # NiceMusic
 
-## Power by [MusicLibrary](https://github.com/lizixian18/MusicLibrary)
+### A Nice MusicPlayer Power by [MusicLibrary](https://github.com/lizixian18/MusicLibrary)
 
 ## Screenshots ：
 <a href="art/image_1.png"><img src="art/image_1.png" width="30%"/></a>
@@ -8,7 +8,7 @@
 <a href="art/image_3.png"><img src="art/image_3.png" width="30%"/></a>
 <a href="art/image_4.png"><img src="art/image_4.png" width="30%"/></a>
 <a href="art/image_5.png"><img src="art/image_5.png" width="30%"/></a> 
-<a href="art/ic_gif.png"><img src="art/ic_gif.png" width="30%"/></a>
+<a href="art/ic_gif.gif"><img src="art/ic_gif.gif" width="30%"/></a>
 
 ## Statement
 本项目现阶段旨在尽量模拟各种场景来测试[MusicLibrary](https://github.com/lizixian18/MusicLibrary)的
