@@ -27,7 +27,7 @@
         </activity>
 
         <activity
-            android:name=".MainActivity"
+            android:name=".module.main.HomeActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"/>
 
@@ -39,10 +39,14 @@
             android:name=".module.play.PlayingDetailActivity"
             android:screenOrientation="portrait"/>
 
+        <activity
+            android:name=".module.artist.ArtistDetailActivity"
+            android:screenOrientation="portrait"/>
+
         <provider
             android:name="com.lzx.nicemusic.db.MusicContentProvider"
             android:authorities="com.lzx.nicemusic.db.provider"
-            android:exported="false" />
+            android:exported="false"/>
     </application>
 
 </manifest>
