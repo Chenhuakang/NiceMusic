@@ -8,18 +8,22 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class SingerInfo {
-    private String nickname;
+    private String name;
     @SerializedName("avatar_s500")
     private String avatar;
     private String intro;
     private String country;
+    @SerializedName("songs_total")
+    private String songsTotal;
+    private String birth;
+    private String company;
 
     public String getNickname() {
-        return nickname;
+        return name;
     }
 
     public void setNickname(String nickname) {
-        this.nickname = nickname;
+        this.name = nickname;
     }
 
     public String getAvatar() {
@@ -44,5 +48,29 @@ public class SingerInfo {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public String getSongsTotal() {
+        return songsTotal;
+    }
+
+    public void setSongsTotal(String songsTotal) {
+        this.songsTotal = songsTotal;
+    }
+
+    public String getBirth() {
+        return birth;
+    }
+
+    public void setBirth(String birth) {
+        this.birth = birth;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
     }
 }

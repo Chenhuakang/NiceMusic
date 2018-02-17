@@ -196,21 +196,21 @@ public class MusicManager implements IPlayControl {
                     break;
                 case MSG_PLAYER_PAUSE:
                     manager.notifyPlayerEventChange(MSG_PLAYER_PAUSE, null, "", false);
-                    manager.mStateObservable.stateChangeNotifyObservers(MSG_PLAYER_START);
+                    manager.mStateObservable.stateChangeNotifyObservers(MSG_PLAYER_PAUSE);
                     break;
                 case MSG_PLAY_COMPLETION:
                     manager.notifyPlayerEventChange(MSG_PLAY_COMPLETION, null, "", false);
-                    manager.mStateObservable.stateChangeNotifyObservers(MSG_PLAYER_START);
+                    manager.mStateObservable.stateChangeNotifyObservers(MSG_PLAY_COMPLETION);
                     break;
                 case MSG_PLAYER_ERROR:
                     String errMsg = (String) msg.obj;
                     manager.notifyPlayerEventChange(MSG_PLAYER_ERROR, null, errMsg, false);
-                    manager.mStateObservable.stateChangeNotifyObservers(MSG_PLAYER_START);
+                    manager.mStateObservable.stateChangeNotifyObservers(MSG_PLAYER_ERROR);
                     break;
                 case MSG_BUFFERING:
                     boolean isFinishBuffer = (boolean) msg.obj;
                     manager.notifyPlayerEventChange(MSG_BUFFERING, null, "", isFinishBuffer);
-                    manager.mStateObservable.stateChangeNotifyObservers(MSG_PLAYER_START);
+                    manager.mStateObservable.stateChangeNotifyObservers(MSG_BUFFERING);
                     break;
                 default:
                     super.handleMessage(msg);

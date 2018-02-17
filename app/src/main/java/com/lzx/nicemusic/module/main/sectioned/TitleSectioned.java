@@ -16,8 +16,12 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
  */
 
 public class TitleSectioned extends StatelessSection {
-    public TitleSectioned(Context context) {
+
+    private String title;
+
+    public TitleSectioned(Context context,String title) {
         super(new SectionParameters.Builder(R.layout.home_secton_title).build());
+        this.title = title;
     }
 
     @Override
@@ -33,7 +37,7 @@ public class TitleSectioned extends StatelessSection {
     @Override
     public void onBindItemViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         TitleHolder holder = (TitleHolder) viewHolder;
-
+holder.mTitle.setText(title);
     }
 
     class TitleHolder extends RecyclerView.ViewHolder {

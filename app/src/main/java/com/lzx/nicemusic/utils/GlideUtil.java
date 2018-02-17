@@ -29,7 +29,7 @@ public class GlideUtil {
                 .into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        Bitmap blurBitmap = ImageUtils.blur(resource);
+                        Bitmap blurBitmap = FastBlurUtil.doBlur(resource, 20, true);
                         imageView.setImageBitmap(blurBitmap);
                     }
                 });

@@ -175,13 +175,13 @@ public class SongListFragment extends BaseMvpFragment<SongListContract.View, Son
     }
 
     @Override
-    public void onGetSongListSuccess(List<SongInfo> list) {
+    public void onGetSongListSuccess(List<SongInfo> list, String title) {
         mAdapter.setDataList(list);
         mAdapter.setShowLoadMore(list.size() >= getPresenter().size);
     }
 
     @Override
-    public void loadMoreSongListSuccess(List<SongInfo> list) {
+    public void loadMoreSongListSuccess(List<SongInfo> list, String title) {
         mAdapter.addDataList(list);
         mAdapter.setShowLoadMore(list.size() >= getPresenter().size);
     }

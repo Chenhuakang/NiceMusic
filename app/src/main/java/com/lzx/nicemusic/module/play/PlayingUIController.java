@@ -90,18 +90,18 @@ public class PlayingUIController implements View.OnClickListener {
     }
 
     void initViews() {
-        mSeekBar = mActivity.findViewById(R.id.seekBar);
-        mTotalTime = mActivity.findViewById(R.id.total_time);
-        mBtnPlayPause = mActivity.findViewById(R.id.btn_play_pause);
-        mStartTime = mActivity.findViewById(R.id.start_time);
-        mMusicName = mActivity.findViewById(R.id.music_name);
-        mMusicBg = mActivity.findViewById(R.id.music_bg);
-        mMusicCover = mActivity.findViewById(R.id.music_cover);
-        mSongerName = mActivity.findViewById(R.id.songer_name);
-        mBtnMusicList = mActivity.findViewById(R.id.btn_music_list);
-        mBtnPlayTime = mActivity.findViewById(R.id.btn_play_time);
-        mBtnPre = mActivity.findViewById(R.id.btn_pre);
-        mBtnNext = mActivity.findViewById(R.id.btn_next);
+//        mSeekBar = mActivity.findViewById(R.id.seekBar);
+//        mTotalTime = mActivity.findViewById(R.id.total_time);
+//        mBtnPlayPause = mActivity.findViewById(R.id.btn_play_pause);
+//        mStartTime = mActivity.findViewById(R.id.start_time);
+//        mMusicName = mActivity.findViewById(R.id.music_name);
+//        mMusicBg = mActivity.findViewById(R.id.music_bg);
+//        mMusicCover = mActivity.findViewById(R.id.music_cover);
+//        mSongerName = mActivity.findViewById(R.id.songer_name);
+//        mBtnMusicList = mActivity.findViewById(R.id.btn_music_list);
+//        mBtnPlayTime = mActivity.findViewById(R.id.btn_play_time);
+//        mBtnPre = mActivity.findViewById(R.id.btn_pre);
+//        mBtnNext = mActivity.findViewById(R.id.btn_next);
 
         mBtnMusicList.setOnClickListener(this);
         mBtnPlayTime.setOnClickListener(this);
@@ -430,46 +430,46 @@ public class PlayingUIController implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_music_list:
-
-                showPlayListLayout(true);
-                break;
-            case R.id.btn_play_time:
-                mRecyclerView.setAdapter(mTimerAdapter);
-                showPlayListLayout(false);
-                break;
-            case R.id.btn_play_pause:
-                MusicManager.get().playMusicByInfo(mMusicInfo);
-                break;
-            case R.id.btn_pre:
-                MusicManager.get().playPre();
-                break;
-            case R.id.btn_next:
-                MusicManager.get().playNext();
-                break;
-            case R.id.btn_play_mode:
-                int playMode = MusicManager.get().getPlayMode();
-                if (playMode == PlayMode.PLAY_IN_LIST_LOOP) {
-                    MusicManager.get().setPlayMode(PlayMode.PLAY_IN_RANDOM);
-                    mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_shuffle_black_24dp, 0, 0, 0);
-                    mBtnPlayMode.setText("随机播放");
-                } else if (playMode == PlayMode.PLAY_IN_RANDOM) {
-                    MusicManager.get().setPlayMode(PlayMode.PLAY_IN_SINGLE_LOOP);
-                    mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat_one_black_24dp, 0, 0, 0);
-                    mBtnPlayMode.setText("单曲循环");
-                } else if (playMode == PlayMode.PLAY_IN_SINGLE_LOOP) {
-                    MusicManager.get().setPlayMode(PlayMode.PLAY_IN_LIST_LOOP);
-                    mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat_black_24dp, 0, 0, 0);
-                    mBtnPlayMode.setText("顺序播放");
-                }
-                break;
-            case R.id.btn_dismiss:
-                hidePlayListLayout();
-                break;
-            case R.id.play_dark_bg:
-                hidePlayListLayout();
-                break;
-        }
+//        switch (v.getId()) {
+//            case R.id.btn_music_list:
+//
+//                showPlayListLayout(true);
+//                break;
+//            case R.id.btn_play_time:
+//                mRecyclerView.setAdapter(mTimerAdapter);
+//                showPlayListLayout(false);
+//                break;
+//            case R.id.btn_play_pause:
+//                MusicManager.get().playMusicByInfo(mMusicInfo);
+//                break;
+//            case R.id.btn_pre:
+//                MusicManager.get().playPre();
+//                break;
+//            case R.id.btn_next:
+//                MusicManager.get().playNext();
+//                break;
+//            case R.id.btn_play_mode:
+//                int playMode = MusicManager.get().getPlayMode();
+//                if (playMode == PlayMode.PLAY_IN_LIST_LOOP) {
+//                    MusicManager.get().setPlayMode(PlayMode.PLAY_IN_RANDOM);
+//                    mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_shuffle_black_24dp, 0, 0, 0);
+//                    mBtnPlayMode.setText("随机播放");
+//                } else if (playMode == PlayMode.PLAY_IN_RANDOM) {
+//                    MusicManager.get().setPlayMode(PlayMode.PLAY_IN_SINGLE_LOOP);
+//                    mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat_one_black_24dp, 0, 0, 0);
+//                    mBtnPlayMode.setText("单曲循环");
+//                } else if (playMode == PlayMode.PLAY_IN_SINGLE_LOOP) {
+//                    MusicManager.get().setPlayMode(PlayMode.PLAY_IN_LIST_LOOP);
+//                    mBtnPlayMode.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat_black_24dp, 0, 0, 0);
+//                    mBtnPlayMode.setText("顺序播放");
+//                }
+//                break;
+//            case R.id.btn_dismiss:
+//                hidePlayListLayout();
+//                break;
+//            case R.id.play_dark_bg:
+//                hidePlayListLayout();
+//                break;
+//        }
     }
 }

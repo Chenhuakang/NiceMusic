@@ -127,12 +127,6 @@ public class MainActivity extends BaseMvpActivity<PlayContract.View, PlayPresent
                     }
                 }
                 break;
-            case R.id.music_cover:
-            case R.id.music_name:
-                if (info != null) {
-                    PlayingDetailActivity.launch(this, info);
-                }
-                break;
         }
     }
 

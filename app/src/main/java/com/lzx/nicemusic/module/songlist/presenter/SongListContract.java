@@ -13,9 +13,9 @@ import java.util.List;
 public interface SongListContract {
 
     interface View extends BaseContract.BaseView {
-        void onGetSongListSuccess(List<SongInfo> list);
+        void onGetSongListSuccess(List<SongInfo> list,String title);
 
-        void loadMoreSongListSuccess(List<SongInfo> list);
+        void loadMoreSongListSuccess(List<SongInfo> list,String title);
 
         void loadFinishAllData();
     }

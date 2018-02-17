@@ -9,6 +9,7 @@ import com.lzx.nicemusic.network.RetrofitHelper;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -34,7 +35,7 @@ public class SongListPresenter extends BasePresenter<SongListContract.View> impl
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(list -> {
                     isMore = list.size() >= size;
-                    mView.onGetSongListSuccess(list);
+                    mView.onGetSongListSuccess(list, title);
                 }, throwable -> {
                     LogUtil.i("error = " + throwable.getMessage());
                 });
@@ -50,7 +51,7 @@ public class SongListPresenter extends BasePresenter<SongListContract.View> impl
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(list -> {
                         isMore = list.size() >= size;
-                        mView.loadMoreSongListSuccess(list);
+                        mView.loadMoreSongListSuccess(list, title);
                     }, throwable -> {
                         LogUtil.i("error = " + throwable.getMessage());
                     });
@@ -65,6 +66,7 @@ public class SongListPresenter extends BasePresenter<SongListContract.View> impl
         return RetrofitHelper.getMusicApi().requestMusicList(type, size, offset)
                 .map(responseBody -> {
                     List<SongInfo> list = DataHelper.fetchJSONFromUrl(responseBody);
+                    List<SongInfo> newList = new ArrayList<>();
                     for (SongInfo info : list) {
                         RetrofitHelper.getMusicApi().playMusic(info.getSongId())
                                 .map(responseUrlBody -> {
@@ -78,12 +80,12 @@ public class SongListPresenter extends BasePresenter<SongListContract.View> impl
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(url -> {
                                     info.setSongUrl(url);
-                                    list.add(info);
+                                    newList.add(info);
                                 }, throwable -> {
                                     LogUtil.i("1error = " + throwable.getMessage());
                                 });
                     }
-                    return list;
+                    return newList;
                 });
     }
 
