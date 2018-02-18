@@ -195,7 +195,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#a2ffffff" />
+        android:background="#ceffffff" />
 
     <View
         android:layout_width="match_parent"
@@ -210,7 +210,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="500dp"
         android:layout_alignParentBottom="true"
         android:background="@drawable/shadow_white" />
 
@@ -286,7 +286,7 @@
         android:gravity="center"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:text="Fuck"
+        android:text="Nice"
         android:textColor="#000b3c"
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -352,7 +352,6 @@
             android:textColor="#7a8db0"
             android:textSize="12sp" />
     </RelativeLayout>
-
 
     <ImageView
         android:id="@+id/btn_play_pause"

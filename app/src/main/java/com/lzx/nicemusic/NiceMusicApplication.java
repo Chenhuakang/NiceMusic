@@ -1,9 +1,12 @@
 package com.lzx.nicemusic;
 
 import android.app.Application;
+import android.app.Notification;
 import android.content.Context;
 
 import com.lzx.musiclibrary.manager.MusicManager;
+import com.lzx.musiclibrary.notification.NotificationCreater;
+import com.lzx.nicemusic.module.main.HomeActivity;
 import com.lzx.nicemusic.utils.CrashHandler;
 import com.lzx.nicemusic.utils.SpUtil;
 
@@ -21,10 +24,14 @@ public class NiceMusicApplication extends Application {
         sContext = this;
         SpUtil.getInstance().init(this);
         CrashHandler.getInstance().init(this);
-        MusicManager.
-                get().
-                setContext(this).
-                bindService();
+
+
+        MusicManager.get()
+                .setContext(this)
+                .setCreateNotification(true)
+                .bindService();
+
+
     }
 
     public static Context getContext() {

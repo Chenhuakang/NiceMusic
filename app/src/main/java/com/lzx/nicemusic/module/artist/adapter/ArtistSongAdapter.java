@@ -1,6 +1,8 @@
 package com.lzx.nicemusic.module.artist.adapter;
 
 import android.content.Context;
+import android.graphics.drawable.AnimationDrawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,10 +11,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lzx.musiclibrary.aidl.model.SongInfo;
+import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.nicemusic.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Created by xian on 2018/2/15.
@@ -52,9 +57,23 @@ public class ArtistSongAdapter extends RecyclerView.Adapter<ArtistSongAdapter.Ar
         SongInfo info = mSongInfoList.get(position);
         holder.mMusicNum.setText(String.valueOf(position + 1));
         holder.mMusicName.setText(info.getSongName());
+        AnimationDrawable animationDrawable = (AnimationDrawable) holder.mImageAnim.getDrawable();
+        if (MusicManager.isCurrMusicIsPlayingMusic(info)) {
+            holder.mMusicNum.setVisibility(View.GONE);
+            holder.mImageAnim.setVisibility(View.VISIBLE);
+            if (MusicManager.isPlaying()) {
+                animationDrawable.start();
+            } else {
+                animationDrawable.stop();
+            }
+        } else {
+            animationDrawable.stop();
+            holder.mMusicNum.setVisibility(View.VISIBLE);
+            holder.mImageAnim.setVisibility(View.GONE);
+        }
         holder.itemView.setOnClickListener(view -> {
             if (mOnItemClickListener != null) {
-                mOnItemClickListener.onItemClick(info,position);
+                mOnItemClickListener.onItemClick(info, position);
             }
         });
     }
@@ -64,14 +83,17 @@ public class ArtistSongAdapter extends RecyclerView.Adapter<ArtistSongAdapter.Ar
         return mSongInfoList.size();
     }
 
+
     class ArtistHolder extends RecyclerView.ViewHolder {
 
         TextView mMusicNum, mMusicName;
+        ImageView mImageAnim;
 
         ArtistHolder(View itemView) {
             super(itemView);
             mMusicNum = itemView.findViewById(R.id.song_num);
             mMusicName = itemView.findViewById(R.id.song_name);
+            mImageAnim = itemView.findViewById(R.id.image_anim);
         }
     }
 

@@ -1,10 +1,13 @@
 package com.lzx.nicemusic.module.main;
 
+import android.app.Notification;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.lzx.musiclibrary.aidl.model.SongInfo;
+import com.lzx.musiclibrary.manager.MusicManager;
+import com.lzx.musiclibrary.notification.NotificationCreater;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
@@ -43,6 +46,10 @@ public class HomeActivity extends BaseMvpActivity<SongListContract.View, SongLis
         mAdapter = new SectionedRecyclerViewAdapter();
         mRecyclerView.setAdapter(mAdapter);
         getPresenter().requestSongList("热歌榜");
+
+        Notification notification = NotificationCreater.getInstanse(this)
+                .initNotification(this, HomeActivity.class);
+        MusicManager.get().setNotification(notification);
 
     }
 

@@ -84,6 +84,16 @@ interface IPlayControl {
     //初始化
     void reset();
 
+    void setStartOrPauseIntent(in PendingIntent startOrPauseIntent);
+
+    void setNextIntent(in PendingIntent nextIntent);
+
+    void setPreIntent(in PendingIntent preIntent);
+
+    void setCloseIntent(in PendingIntent closeIntent);
+
+    void setNotification(in Notification notification);
+
     void registerPlayerEventListener(IOnPlayerEventListener listener);
 
     void unregisterPlayerEventListener(IOnPlayerEventListener listener);

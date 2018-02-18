@@ -114,11 +114,15 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         initMusicCoverAnim();
         MusicManager.get().addPlayerEventListener(this);
         //播放
-        if (songInfos.size() > 0 && QueueHelper.isIndexPlayable(position, songInfos)) {
-            MusicManager.get().playMusic(songInfos, position);
+        if (MusicManager.isPlaying()) {
+            onPlayerStart();
         } else {
-            if (mSongInfo != null) {
-                MusicManager.get().playMusicByInfo(mSongInfo);
+            if (songInfos.size() > 0 && QueueHelper.isIndexPlayable(position, songInfos)) {
+                MusicManager.get().playMusic(songInfos, position);
+            } else {
+                if (mSongInfo != null) {
+                    MusicManager.get().playMusicByInfo(mSongInfo);
+                }
             }
         }
     }

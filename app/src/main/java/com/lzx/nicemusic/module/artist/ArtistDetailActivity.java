@@ -95,13 +95,14 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
         getPresenter().getArtistInfo(mSongInfo.getArtistId());
 
         MusicManager.get().addStateObservable(this);
+
         mAppBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> setViewsTranslation(verticalOffset));
         mFloatingActionButton.setOnClickListener(view -> {
             List<SongInfo> songInfos = mAdapter.getSongInfoList();
             int position = 0;
             if (songInfos.size() > 0 && songInfos.contains(mSongInfo)) {
                 position = QueueHelper.getMusicIndexOnQueue(songInfos, mSongInfo.getSongId());
-            }else {
+            } else {
                 songInfos.add(mSongInfo);
             }
             PlayingDetailActivity.launch(mContext, songInfos, position);
@@ -113,6 +114,7 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
             } else {
                 MusicManager.get().playMusicByInfo(info);
             }
+            mSongInfo = info;
             initUI(info);
         });
     }
@@ -168,6 +170,8 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
         int msg = (int) o;
         if (msg == MusicManager.MSG_PLAYER_ERROR) {
             Toast.makeText(mContext, "播放失败!", Toast.LENGTH_SHORT).show();
+        }else  if (msg == MusicManager.MSG_PLAYER_START || msg == MusicManager.MSG_PLAYER_PAUSE) {
+            mAdapter.notifyDataSetChanged();
         }
     }
 

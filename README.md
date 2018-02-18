@@ -1,6 +1,6 @@
 # NiceMusic
 
-### A Nice MusicPlayer Power by [MusicLibrary](https://github.com/lizixian18/MusicLibrary)
+### A Nice MusicPlayer Powered by [MusicLibrary](https://github.com/lizixian18/MusicLibrary)
 
 ## Screenshots ：
 <a href="art/image_1.png"><img src="art/image_1.png" width="30%"/></a>

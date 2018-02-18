@@ -34,8 +34,13 @@ public class MusicService extends Service {
     public IBinder onBind(Intent intent) {
         boolean isUseMediaPlayer = intent.getBooleanExtra("isUseMediaPlayer", false);
         boolean isAutoPlayNext = intent.getBooleanExtra("isAutoPlayNext", true);
-        Notification notification = intent.getParcelableExtra("notification");
-        mBinder = new PlayControl(this, isUseMediaPlayer, isAutoPlayNext, notification);
+        boolean isCreateNotification = intent.getBooleanExtra("isCreateNotification", false);
+        mBinder = new PlayControl
+                .Builder(this)
+                .setAutoPlayNext(isAutoPlayNext)
+                .setUseMediaPlayer(isUseMediaPlayer)
+                .setCreateNotification(isCreateNotification)
+                .build();
         return mBinder;
     }
 
