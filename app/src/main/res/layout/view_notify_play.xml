@@ -34,7 +34,7 @@
             android:text="Nice Music"
             android:textSize="16sp"
             android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent"
-            android:textColor="@color/font_color"
+            android:textColor="@color/white"
             android:textStyle="normal" />
 
         <TextView
@@ -48,7 +48,7 @@
             android:singleLine="true"
             android:text="听你所想"
             android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent"
-            android:textColor="@color/font_normal"
+            android:textColor="@color/white"
             android:textSize="13sp" />
     </LinearLayout>
 

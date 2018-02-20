@@ -39,10 +39,7 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
     private NotifyContract.NotifyStatusChanged mNotifyStatusChanged;
     private NotifyContract.NotifyMusicSwitch mNotifyMusicSwitch;
     private Playback mPlayback;
-    private boolean hasInitNotification = false;
-    private boolean isCreateNotification = false;
-    private NotificationCreater mNotificationCreater;
-    private Notification mNotification;
+
 
     private PlayController(Builder builder) {
         this.mMusicService = builder.mMusicService;
@@ -55,13 +52,10 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         mQueueManager = new QueueManager(this, mPlayMode);
         mPlaybackManager = new PlaybackManager(mPlayback, mQueueManager, mPlayMode, builder.isAutoPlayNext);
         mPlaybackManager.setServiceCallback(this);
-        mMediaSessionManager = new MediaSessionManager(this.mMusicService, mPlaybackManager);
+        mMediaSessionManager = new MediaSessionManager(this.mMusicService.getApplicationContext(), mPlaybackManager);
         mPlaybackManager.updatePlaybackState(null);
 
-        this.isCreateNotification = builder.isCreateNotification;
-        if (this.isCreateNotification) {
-            mNotificationCreater = NotificationCreater.getInstanse(mMusicService.getApplicationContext());
-        }
+
     }
 
     public static class Builder {
@@ -138,11 +132,11 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         return mQueueManager.getCurrentIndex();
     }
 
-    void pauseMusic() {
+    public void pauseMusic() {
         mPlaybackManager.handlePauseRequest();
     }
 
-    void resumeMusic() {
+    public void resumeMusic() {
         mPlaybackManager.handlePlayRequest();
     }
 
@@ -166,15 +160,15 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         mQueueManager.deleteQueueItem(info, isNeedToPlayNext);
     }
 
-    int getState() {
+    public int getState() {
         return mPlaybackManager.getPlayback().getState();
     }
 
-    void playNext() {
+    public   void playNext() {
         mPlaybackManager.playNextOrPre(1);
     }
 
-    void playPre() {
+    public  void playPre() {
         mPlaybackManager.playNextOrPre(-1);
     }
 
@@ -202,29 +196,6 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         mQueueManager.setCurrentMusic(index);
     }
 
-    void setStartOrPauseIntent(PendingIntent startOrPauseIntent) {
-        if (isCreateNotification && startOrPauseIntent != null) {
-            mNotificationCreater.setStartOrPausePendingIntent(startOrPauseIntent);
-        }
-    }
-
-    void setNextIntent(PendingIntent nextIntent) {
-        if (isCreateNotification && nextIntent != null) {
-            mNotificationCreater.setNextPendingIntent(nextIntent);
-        }
-    }
-
-    void setPreIntent(PendingIntent preIntent) {
-        if (isCreateNotification && preIntent != null) {
-            mNotificationCreater.setPrePendingIntent(preIntent);
-        }
-    }
-
-    void setCloseIntent(PendingIntent closeIntent) {
-        if (isCreateNotification && closeIntent != null) {
-            mNotificationCreater.setClosePendingIntent(closeIntent);
-        }
-    }
 
     long getProgress() {
         return mPlaybackManager.getCurrentPosition();
@@ -252,20 +223,6 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
                 QueueHelper.isNeedToSwitchMusic(mQueueManager, info));
     }
 
-    void setNotification(Notification notification) {
-        if (!hasInitNotification) {
-            hasInitNotification = true;
-            mNotification = notification;
-            try {
-                if (mNotification != null) {
-                    mMusicService.startForeground(NotificationCreater.NOTIFICATION_ID, mNotification);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                LogUtil.i(e.getMessage());
-            }
-        }
-    }
 
     @Override
     public void onMetadataChanged(SongInfo songInfo) {
@@ -291,9 +248,7 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
     @Override
     public void onPlaybackSwitch(SongInfo info) {
         mNotifyMusicSwitch.notify(info);
-        if (isCreateNotification && mNotification != null) {
-            mNotificationCreater.updateModelDetail(info, mNotification);
-        }
+
     }
 
     @Override
@@ -316,21 +271,11 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         //状态改变
         mNotifyStatusChanged.notify(mQueueManager.getCurrentMusic(), mQueueManager.getCurrentIndex(), state, null);
         mMediaSessionManager.setPlaybackState(newState);
-        if (isCreateNotification && mNotification != null) {
-            if (state == State.STATE_PLAYING) {
-                mNotificationCreater.updateViewStateAtStart(mNotification);
-            } else if (state == State.STATE_PAUSED) {
-                mNotificationCreater.updateViewStateAtPause(mNotification);
-            }
-        }
+
     }
 
     void releaseMediaSession() {
         mMediaSessionManager.release();
-        if (isCreateNotification && mNotification != null) {
-            NotificationCreater.release();
-            mNotificationCreater.closeNotification();
-            mMusicService.stopForeground(true);
-        }
+
     }
 }

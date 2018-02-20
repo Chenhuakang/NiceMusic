@@ -7,14 +7,29 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application>
-        <service android:name="com.lzx.musiclibrary.MusicService" />
+        <service
+            android:name="com.lzx.musiclibrary.MusicService"
+            android:exported="true" />
 
-        <receiver android:name=".receiver.RemoteControlReceiver">
+        <receiver
+            android:name=".receiver.RemoteControlReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".receiver.PlayerReceiver" />
+
+        <receiver
+            android:name=".receiver.PlayerReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.lzx.nicemusic.close" />
+                <action android:name="com.lzx.nicemusic.play_pause" />
+                <action android:name="com.lzx.nicemusic.prev" />
+                <action android:name="com.lzx.nicemusic.next" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

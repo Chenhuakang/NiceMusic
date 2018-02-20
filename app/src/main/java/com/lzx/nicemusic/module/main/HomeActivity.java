@@ -47,12 +47,11 @@ public class HomeActivity extends BaseMvpActivity<SongListContract.View, SongLis
         mRecyclerView.setAdapter(mAdapter);
         getPresenter().requestSongList("热歌榜");
 
-        Notification notification = NotificationCreater.getInstanse(this)
+        Notification notification = NotificationCreater.getInstanse(this.getApplicationContext())
                 .initNotification(this, HomeActivity.class);
         MusicManager.get().setNotification(notification);
 
     }
-
 
     @Override
     public void onGetSongListSuccess(List<SongInfo> list, String title) {

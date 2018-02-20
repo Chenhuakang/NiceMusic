@@ -61,8 +61,6 @@ public class NotificationCreater {
         packageName = mContext.getPackageName();
     }
 
-
-
     public <T> Notification initNotification(Context context, Class<T> targetClass) {
         return createNotification(context, targetClass);
     }
@@ -92,7 +90,7 @@ public class NotificationCreater {
         notificationBuilder
                 .setContentIntent(pendingIntent)
                 .setContentTitle("Nice Music")
-                .setContentText("随时随地 听我想听")
+                .setContentText("随时随地 听我所想")
                 .setSmallIcon(getResourceId("icon_notification", "drawable"));
         if (Build.VERSION.SDK_INT >= 16) {
             notificationBuilder.setPriority(2);
@@ -143,7 +141,7 @@ public class NotificationCreater {
     }
 
     private int getResourceId(String name, String className) {
-        return res.getIdentifier(name, className, mContext.getPackageName());
+        return res.getIdentifier(name, className, packageName);
     }
 
     public void setStartOrPausePendingIntent(PendingIntent pendingIntent) {
@@ -164,7 +162,6 @@ public class NotificationCreater {
         } else {
             nextIntent = pendingIntent;
         }
-
     }
 
     public void setPrePendingIntent(PendingIntent pendingIntent) {
@@ -213,7 +210,7 @@ public class NotificationCreater {
                 mRemoteView.setTextViewText(getResourceId("txt_notifySongName", "id"), info.getSongName());
                 mRemoteView.setTextViewText(getResourceId("txt_notifyArtistName", "id"), info.getArtist());
                 mRemoteView.setImageViewResource(getResourceId("img_notifyPlayOrPause", "id"),
-                        getResourceId("notify_btn_pause.xml", "drawable"));
+                        getResourceId("notify_btn_pause", "drawable"));
                 String fetchArtUrl = null;
                 Bitmap art = null;
                 if (!TextUtils.isEmpty(info.getSongCover())) {
@@ -237,7 +234,7 @@ public class NotificationCreater {
                             mNotificationManager.notify(NOTIFICATION_ID, notification);
                         }
                     });
-                }else {
+                } else {
                     mNotificationManager.notify(NOTIFICATION_ID, notification);
                 }
             }
@@ -252,7 +249,8 @@ public class NotificationCreater {
             mRemoteView = createRemoteViews(mContext);
             notification.contentView = mRemoteView;
             if (mRemoteView != null) {
-                mRemoteView.setImageViewResource(getResourceId("img_notifyPlayOrPause", "id"), getResourceId("notify_btn_dark_pause2_normal_xml", "drawable"));
+                mRemoteView.setImageViewResource(getResourceId("img_notifyPlayOrPause", "id"),
+                        getResourceId("notify_btn_pause", "drawable"));
                 mNotificationManager.notify(NOTIFICATION_ID, notification);
             }
         }
@@ -266,7 +264,8 @@ public class NotificationCreater {
             mRemoteView = createRemoteViews(mContext);
             notification.contentView = mRemoteView;
             if (mRemoteView != null) {
-                mRemoteView.setImageViewResource(getResourceId("img_notifyPlayOrPause", "id"), getResourceId("notify_btn_dark_play2_normal_xml", "drawable"));
+                mRemoteView.setImageViewResource(getResourceId("img_notifyPlayOrPause", "id"),
+                        getResourceId("notify_btn_play", "drawable"));
                 mNotificationManager.notify(NOTIFICATION_ID, notification);
             }
         }

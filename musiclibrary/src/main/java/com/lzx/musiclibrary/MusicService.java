@@ -22,11 +22,13 @@ public class MusicService extends Service {
     private static final int STOP_DELAY = 30000;
     //  private DelayedStopHandler mDelayedStopHandler;
     private PlayControl mBinder;
+    private static MusicService mService;
 
     @Override
     public void onCreate() {
         super.onCreate();
         //  mDelayedStopHandler = new DelayedStopHandler(this);
+        mService = this;
     }
 
     @Nullable
@@ -44,7 +46,14 @@ public class MusicService extends Service {
         return mBinder;
     }
 
-//    @Override
+    public PlayControl getBinder() {
+        return mBinder;
+    }
+
+    public static MusicService getService() {
+        return mService;
+    }
+    //    @Override
 //    public void onPlaybackStateUpdated(int state, PlaybackStateCompat newState) {
 //
 //        if (state == State.STATE_PLAYING) {
@@ -83,6 +92,8 @@ public class MusicService extends Service {
         }
         //  mDelayedStopHandler.removeCallbacksAndMessages(null);
     }
+
+
 
     private static class DelayedStopHandler extends Handler {
         private final WeakReference<MusicService> mWeakReference;

@@ -67,7 +67,7 @@ public class MusicManager implements IPlayControl {
     }
 
     public MusicManager setContext(Context context) {
-        mContext = context;
+        mContext = context.getApplicationContext();
         return this;
     }
 
@@ -84,6 +84,15 @@ public class MusicManager implements IPlayControl {
     public MusicManager setCreateNotification(boolean createNotification) {
         this.isCreateNotification = createNotification;
         return this;
+    }
+
+    private void init(){
+        Intent intent = new Intent(mContext, MusicService.class);
+        intent.putExtra("isUseMediaPlayer", isUseMediaPlayer);
+        intent.putExtra("isAutoPlayNext", isAutoPlayNext);
+        intent.putExtra("isCreateNotification", isCreateNotification);
+        mContext.startService(intent);
+        mContext.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     public void bindService() {
