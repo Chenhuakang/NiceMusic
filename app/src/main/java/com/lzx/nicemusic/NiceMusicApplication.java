@@ -30,7 +30,7 @@ public class NiceMusicApplication extends Application {
         MusicManager.get()
                 .setContext(this)
                 .setNotificationCreater(creater)
-                .bindService();
+                .init();
     }
 
     public static Context getContext() {
