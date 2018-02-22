@@ -161,7 +161,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/btn_play_pause"
-            android:src="@drawable/notify_btn_dark_prev_normal"
+            android:src="@drawanotify_btn_light_prev_pressedrmal"
             android:tint="@color/white"/>
 
         <ImageView
@@ -170,7 +170,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/btn_play_pause"
-            android:src="@drawable/notify_btn_dark_next_normal"
+            android:src="@drawanotify_btn_light_next_pressedrmal"
             android:tint="@color/white"/>
 
     </RelativeLayout>

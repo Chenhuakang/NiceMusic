@@ -11,13 +11,13 @@ import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.constans.PlayMode;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.helper.QueueHelper;
+import com.lzx.musiclibrary.manager.MediaNotificationManager;
 import com.lzx.musiclibrary.manager.MediaSessionManager;
 import com.lzx.musiclibrary.manager.QueueManager;
 import com.lzx.musiclibrary.manager.TimerTaskManager;
 import com.lzx.musiclibrary.notification.NotificationCreater;
 import com.lzx.musiclibrary.playback.PlaybackManager;
 import com.lzx.musiclibrary.playback.player.Playback;
-import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.util.List;
 
@@ -40,6 +40,8 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
     private NotifyContract.NotifyMusicSwitch mNotifyMusicSwitch;
     private Playback mPlayback;
 
+    private MediaNotificationManager mNotificationManager;
+
 
     private PlayController(Builder builder) {
         this.mMusicService = builder.mMusicService;
@@ -55,7 +57,7 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         mMediaSessionManager = new MediaSessionManager(this.mMusicService.getApplicationContext(), mPlaybackManager);
         mPlaybackManager.updatePlaybackState(null);
 
-
+        mNotificationManager = new MediaNotificationManager(mMusicService, builder.notificationCreater, mPlaybackManager);
     }
 
     public static class Builder {
@@ -65,7 +67,7 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         private NotifyContract.NotifyStatusChanged mNotifyStatusChanged;
         private NotifyContract.NotifyMusicSwitch mNotifyMusicSwitch;
         private boolean isAutoPlayNext;
-        private boolean isCreateNotification;
+        private NotificationCreater notificationCreater;
 
         public Builder(MusicService mService) {
             mMusicService = mService;
@@ -96,8 +98,8 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
             return this;
         }
 
-        Builder setCreateNotification(boolean createNotification) {
-            isCreateNotification = createNotification;
+        Builder setNotificationCreater(NotificationCreater notificationCreater) {
+            this.notificationCreater = notificationCreater;
             return this;
         }
 
@@ -108,8 +110,13 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
 
     void playMusic(List<SongInfo> list, int index, boolean isJustPlay) {
         //先播放再设置列表
+        if (mQueueManager.getCurrentQueueSize() == 0) {
+            mQueueManager.setCurrentQueue(list, index);
+        }
         setCurrentQueueItem(list.get(index), isJustPlay);
-        mQueueManager.setCurrentQueue(list, index);
+        if (mQueueManager.getCurrentQueueSize() != 0) {
+            mQueueManager.setCurrentQueue(list, index);
+        }
     }
 
     void playMusicByInfo(SongInfo info, boolean isJustPlay) {
@@ -164,11 +171,11 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         return mPlaybackManager.getPlayback().getState();
     }
 
-    public   void playNext() {
+    public void playNext() {
         mPlaybackManager.playNextOrPre(1);
     }
 
-    public  void playPre() {
+    public void playPre() {
         mPlaybackManager.playNextOrPre(-1);
     }
 
@@ -223,7 +230,6 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
                 QueueHelper.isNeedToSwitchMusic(mQueueManager, info));
     }
 
-
     @Override
     public void onMetadataChanged(SongInfo songInfo) {
         mMediaSessionManager.updateMetaData(QueueHelper.fetchInfoWithMediaMetadata(songInfo));
@@ -248,7 +254,10 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
     @Override
     public void onPlaybackSwitch(SongInfo info) {
         mNotifyMusicSwitch.notify(info);
-
+        if (mNotificationManager != null) {
+            //  mNotificationCreater.updateModelDetail(info, mNotification);
+            mNotificationManager.startNotification(info);
+        }
     }
 
     @Override
@@ -271,11 +280,19 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         //状态改变
         mNotifyStatusChanged.notify(mQueueManager.getCurrentMusic(), mQueueManager.getCurrentIndex(), state, null);
         mMediaSessionManager.setPlaybackState(newState);
-
+        if (mNotificationManager != null) {
+            if (state == State.STATE_PLAYING) {
+                mNotificationManager.updateViewStateAtStart();
+            } else if (state == State.STATE_PAUSED) {
+                mNotificationManager.updateViewStateAtPause();
+            }
+        }
     }
 
     void releaseMediaSession() {
         mMediaSessionManager.release();
-
+        if (mNotificationManager != null) {
+            mNotificationManager.stopNotification();
+        }
     }
 }

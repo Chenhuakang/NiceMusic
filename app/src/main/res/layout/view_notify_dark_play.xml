@@ -33,7 +33,7 @@
             android:singleLine="true"
             android:text="Nice Music"
             android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent"
-            android:textColor="@color/font_color"
+            android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="normal" />
 
@@ -48,7 +48,7 @@
             android:singleLine="true"
             android:text="听你所想"
             android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent"
-            android:textColor="@color/font_normal"
+            android:textColor="@color/white"
             android:textSize="13sp" />
     </LinearLayout>
 
@@ -66,8 +66,8 @@
             android:layout_height="wrap_content"
             android:contentDescription="@null"
             android:padding="5dp"
-            android:src="@drawable/notify_btn_dark_prev_selector"
-            android:tint="@color/font_color" />
+            android:src="@drawable/notify_btn_light_prev_pressed"
+             />
 
         <ImageView
             android:id="@+id/img_notifyPlayOrPause"
@@ -79,7 +79,7 @@
             android:contentDescription="@null"
             android:scaleType="fitXY"
             android:src="@drawable/notify_btn_dark_play_normal"
-            android:tint="@color/font_color" />
+             />
 
         <ImageView
             android:id="@+id/img_notifyNext"
@@ -87,7 +87,7 @@
             android:layout_height="wrap_content"
             android:contentDescription="@null"
             android:padding="5dp"
-            android:src="@drawable/notify_btn_dark_next_selector"
-            android:tint="@color/font_color" />
+            android:src="@drawable/notify_btn_light_next_selector"
+              />
     </LinearLayout>
 </LinearLayout>

@@ -1,11 +1,10 @@
 package com.lzx.nicemusic.module.play;
 
 import android.animation.ObjectAnimator;
+import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.TextUtils;
@@ -18,9 +17,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.helper.QueueHelper;
@@ -35,8 +31,6 @@ import com.lzx.nicemusic.constans.Constans;
 import com.lzx.nicemusic.listener.SimpleSeekBarChangeListener;
 import com.lzx.nicemusic.module.play.presenter.PlayContract;
 import com.lzx.nicemusic.module.play.presenter.PlayPresenter;
-import com.lzx.nicemusic.utils.BlurBitmap;
-import com.lzx.nicemusic.utils.FastBlurUtil;
 import com.lzx.nicemusic.utils.FormatUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
 import com.lzx.nicemusic.widget.CircleImageView;
@@ -64,6 +58,8 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
     private CircleImageView mMusicCover;
     private ImageView mBlueBg, mBtnPlayPause, mBtnPre, mBtnNext;
     private SeekBar mSeekBar;
+
+    private Notification mNotification;
 
     public static void launch(Context context, List<SongInfo> songInfos, int position) {
         Intent intent = new Intent(context, PlayingDetailActivity.class);
@@ -113,6 +109,11 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         updateUI(mSongInfo);
         initMusicCoverAnim();
         MusicManager.get().addPlayerEventListener(this);
+
+//        mNotification = NotificationCreate.getInstanse(this.getApplicationContext())
+//                .initNotification(this, mSongInfo, HomeActivity.class);
+//        MusicManager.get().setNotification(mNotification);
+
         //播放
         if (MusicManager.isPlaying()) {
             onPlayerStart();
@@ -178,6 +179,7 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         mBtnPlayPause.setImageResource(R.drawable.ic_pause);
         mTimerTaskManager.scheduleSeekBarUpdate();
         startCoverAnim();
+
     }
 
     @Override
