@@ -9,7 +9,7 @@ import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.control.PlayControl;
 import com.lzx.musiclibrary.control.PlayController;
-import com.lzx.musiclibrary.manager.MediaNotificationManager;
+import com.lzx.musiclibrary.notification.MediaNotificationManager;
 import com.lzx.musiclibrary.manager.MusicManager;
 
 /**

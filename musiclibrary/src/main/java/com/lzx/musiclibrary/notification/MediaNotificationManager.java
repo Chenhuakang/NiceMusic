@@ -1,4 +1,4 @@
-package com.lzx.musiclibrary.manager;
+package com.lzx.musiclibrary.notification;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -21,6 +21,7 @@ import com.lzx.musiclibrary.R;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.control.PlayController;
+import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.notification.NotificationColorUtils;
 import com.lzx.musiclibrary.notification.NotificationCreater;
 import com.lzx.musiclibrary.playback.PlaybackManager;

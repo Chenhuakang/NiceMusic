@@ -1,7 +1,5 @@
 package com.lzx.musiclibrary.control;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
@@ -11,7 +9,7 @@ import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.constans.PlayMode;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.helper.QueueHelper;
-import com.lzx.musiclibrary.manager.MediaNotificationManager;
+import com.lzx.musiclibrary.notification.MediaNotificationManager;
 import com.lzx.musiclibrary.manager.MediaSessionManager;
 import com.lzx.musiclibrary.manager.QueueManager;
 import com.lzx.musiclibrary.manager.TimerTaskManager;
