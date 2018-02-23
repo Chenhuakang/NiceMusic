@@ -20,14 +20,10 @@ import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.R;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.constans.State;
-import com.lzx.musiclibrary.control.PlayController;
 import com.lzx.musiclibrary.manager.MusicManager;
-import com.lzx.musiclibrary.notification.NotificationColorUtils;
-import com.lzx.musiclibrary.notification.NotificationCreater;
 import com.lzx.musiclibrary.playback.PlaybackManager;
 import com.lzx.musiclibrary.receiver.PlayerReceiver;
 import com.lzx.musiclibrary.utils.AlbumArtCache;
-import com.lzx.musiclibrary.utils.LogUtil;
 
 /**
  * @author lzx
@@ -54,9 +50,9 @@ public class MediaNotificationManager {
     public static final String ACTION_INTENT_CLICK = "com.lzx.nicemusic.EXTRY_NOTIFICATION_TO_MAINACTIVITY";
     //布局
     private static final String LAYOUT_NOTIFY_DARK_PLAY = "view_notify_dark_play"; //黑色背景布局
-    private static final String LAYOUT_NOTIFY_PLAY = "view_notify_play"; //白色背景布局
+    private static final String LAYOUT_NOTIFY_PLAY = "view_notify_light_play"; //白色背景布局
     private static final String LAYOUT_NOTIFY_BIG_DARK_PLAY = "view_notify_big_dark_play"; //黑色背景大布局
-    private static final String LAYOUT_NOTIFY_BIG_PLAY = "view_notify_big_play"; //白色背景大布局
+    private static final String LAYOUT_NOTIFY_BIG_PLAY = "view_notify_big_light_play"; //白色背景大布局
     //id
     private static final String ID_IMG_NOTIFY_PLAY = "img_notifyPlay"; //播放按钮id
     private static final String ID_IMG_NOTIFY_PAUSE = "img_notifyPause"; //暂停按钮id
@@ -73,16 +69,22 @@ public class MediaNotificationManager {
     private static final String ID_TXT_NOTIFY_ARTISTNAME = "txt_notifyArtistName";//艺术家TextView id
     //资源
     private static final String DRAWABLE_ICON_NOTIFICATION = "icon_notification"; //通知栏 smallIcon 图片资源
-
+    private static final String DRAWABLE_NOTIFY_BTN_FAVORITE = "notify_btn_favorite_checked";//喜欢按钮选中时的图片资源
+    private static final String DRAWABLE_NOTIFY_BTN_LYRICS = "notify_btn_lyrics_checked";//歌词按钮选中时的图片资源
+    //通知栏白色背景资源
     private static final String DRAWABLE_NOTIFY_BTN_LIGHT_PLAY_SELECTOR = "notify_btn_light_play_selector"; //白色背景时播放按钮selector
     private static final String DRAWABLE_NOTIFY_BTN_LIGHT_PAUSE_SELECTOR = "notify_btn_light_pause_selector";//白色背景时暂停按钮selector
+    private static final String DRAWABLE_NOTIFY_BTN_LIGHT_FAVORITE = "notify_btn_light_favorite_normal";//白色背景时喜欢按钮按下时的图片资源
+    private static final String DRAWABLE_NOTIFY_BTN_LIGHT_LYRICS = "notify_btn_light_lyrics_normal";//白色背景时歌词按钮按下时的图片资源
     private static final String DRAWABLE_NOTIFY_BTN_LIGHT_NEXT_PRESSED = "notify_btn_light_next_pressed";   //白色背景时下一首按钮按下时的图片资源
     private static final String DRAWABLE_NOTIFY_BTN_LIGHT_NEXT_SELECTOR = "notify_btn_light_next_selector"; //白色背景时下一首按钮selector
     private static final String DRAWABLE_NOTIFY_BTN_LIGHT_PREV_PRESSED = "notify_btn_light_prev_pressed";   //白色背景时上一首按钮按下时的图片资源
     private static final String DRAWABLE_NOTIFY_BTN_LIGHT_PREV_SELECTOR = "notify_btn_light_prev_selector"; //白色背景时上一首按钮selector
-
+    //通知栏黑色背景资源
     private static final String DRAWABLE_NOTIFY_BTN_DARK_PLAY_SELECTOR = "notify_btn_dark_play_selector"; //黑色背景时播放按钮selector
     private static final String DRAWABLE_NOTIFY_BTN_DARK_PAUSE_SELECTOR = "notify_btn_dark_pause_selector";//黑色背景时暂停按钮selector
+    private static final String DRAWABLE_NOTIFY_BTN_DARK_FAVORITE = "notify_btn_dark_favorite_normal";//黑色背景时喜欢按钮按下时的图片资源
+    private static final String DRAWABLE_NOTIFY_BTN_DARK_LYRICS = "notify_btn_dark_lyrics_normal";//黑色背景时歌词按钮按下时的图片资源
     private static final String DRAWABLE_NOTIFY_BTN_DARK_NEXT_PRESSED = "notify_btn_dark_next_pressed";   //黑色背景时下一首按钮按下时的图片资源
     private static final String DRAWABLE_NOTIFY_BTN_DARK_NEXT_SELECTOR = "notify_btn_dark_next_selector"; //黑色背景时下一首按钮selector
     private static final String DRAWABLE_NOTIFY_BTN_DARK_PREV_PRESSED = "notify_btn_dark_prev_pressed";   //黑色背景时上一首按钮按下时的图片资源
@@ -312,6 +314,12 @@ public class MediaNotificationManager {
             mBigRemoteView.setImageViewResource(getResourceId(ID_IMG_NOTIFY_PLAY_OR_PAUSE, "id"),
                     getResourceId(isDark ? DRAWABLE_NOTIFY_BTN_DARK_PAUSE_SELECTOR :
                             DRAWABLE_NOTIFY_BTN_LIGHT_PAUSE_SELECTOR, "drawable"));
+            mBigRemoteView.setImageViewResource(getResourceId(ID_IMG_NOTIFY_FAVORITE, "id"),
+                    getResourceId(isDark ? DRAWABLE_NOTIFY_BTN_DARK_FAVORITE :
+                            DRAWABLE_NOTIFY_BTN_LIGHT_FAVORITE, "drawable"));
+            mBigRemoteView.setImageViewResource(getResourceId(ID_IMG_NOTIFY_LYRICS, "id"),
+                    getResourceId(isDark ? DRAWABLE_NOTIFY_BTN_DARK_LYRICS :
+                            DRAWABLE_NOTIFY_BTN_LIGHT_LYRICS, "drawable"));
         }
 
         if (mPlaybackManager.hasNextOrPre()) {
@@ -473,6 +481,58 @@ public class MediaNotificationManager {
             int smallIconRes = getResourceId(DRAWABLE_ICON_NOTIFICATION, "drawable");
             if (mRemoteView != null && songInfo != null) {
                 updateRemoteViewUI(mNotification, smallIconRes, isDark);
+            }
+        }
+    }
+
+    /**
+     * 喜欢按钮
+     */
+    public void updateFavorite(boolean isFavorite) {
+        if (mNotification != null) {
+            boolean isDark = NotificationColorUtils.isDarkNotificationBar(mService);
+            mRemoteView = createRemoteViews(isDark, false);
+            mBigRemoteView = createRemoteViews(isDark, true);
+            if (Build.VERSION.SDK_INT >= 16) {
+                mNotification.bigContentView = mBigRemoteView;
+            }
+            mNotification.contentView = mRemoteView;
+            if (mRemoteView != null && mBigRemoteView != null) {
+                if (isFavorite) {
+                    mBigRemoteView.setImageViewResource(getResourceId(ID_IMG_NOTIFY_FAVORITE, "id"),
+                            getResourceId(DRAWABLE_NOTIFY_BTN_FAVORITE, "drawable"));
+                } else {
+                    mBigRemoteView.setImageViewResource(getResourceId(ID_IMG_NOTIFY_FAVORITE, "id"),
+                            getResourceId(isDark ? DRAWABLE_NOTIFY_BTN_DARK_FAVORITE :
+                                    DRAWABLE_NOTIFY_BTN_LIGHT_FAVORITE, "drawable"));
+                }
+                mNotificationManager.notify(NOTIFICATION_ID, mNotification);
+            }
+        }
+    }
+
+    /**
+     * 歌词按钮
+     */
+    public void updateLyrics(boolean isChecked) {
+        if (mNotification != null) {
+            boolean isDark = NotificationColorUtils.isDarkNotificationBar(mService);
+            mRemoteView = createRemoteViews(isDark, false);
+            mBigRemoteView = createRemoteViews(isDark, true);
+            if (Build.VERSION.SDK_INT >= 16) {
+                mNotification.bigContentView = mBigRemoteView;
+            }
+            mNotification.contentView = mRemoteView;
+            if (mRemoteView != null && mBigRemoteView != null) {
+                if (isChecked) {
+                    mBigRemoteView.setImageViewResource(getResourceId(ID_IMG_NOTIFY_LYRICS, "id"),
+                            getResourceId(DRAWABLE_NOTIFY_BTN_LYRICS, "drawable"));
+                } else {
+                    mBigRemoteView.setImageViewResource(getResourceId(ID_IMG_NOTIFY_LYRICS, "id"),
+                            getResourceId(isDark ? DRAWABLE_NOTIFY_BTN_DARK_LYRICS :
+                                    DRAWABLE_NOTIFY_BTN_LIGHT_LYRICS, "drawable"));
+                }
+                mNotificationManager.notify(NOTIFICATION_ID, mNotification);
             }
         }
     }

@@ -1,7 +1,6 @@
 package com.lzx.nicemusic.module.play;
 
 import android.animation.ObjectAnimator;
-import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,7 +18,6 @@ import android.widget.Toast;
 
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
-import com.lzx.musiclibrary.helper.QueueHelper;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.manager.TimerTaskManager;
 import com.lzx.nicemusic.R;
@@ -59,7 +57,6 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
     private ImageView mBlueBg, mBtnPlayPause, mBtnPre, mBtnNext;
     private SeekBar mSeekBar;
 
-    private Notification mNotification;
 
     public static void launch(Context context, List<SongInfo> songInfos, int position) {
         Intent intent = new Intent(context, PlayingDetailActivity.class);
@@ -110,22 +107,18 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         initMusicCoverAnim();
         MusicManager.get().addPlayerEventListener(this);
 
-//        mNotification = NotificationCreate.getInstanse(this.getApplicationContext())
-//                .initNotification(this, mSongInfo, HomeActivity.class);
-//        MusicManager.get().setNotification(mNotification);
-
-        //播放
-        if (MusicManager.isPlaying()) {
-            onPlayerStart();
-        } else {
-            if (songInfos.size() > 0 && QueueHelper.isIndexPlayable(position, songInfos)) {
-                MusicManager.get().playMusic(songInfos, position);
-            } else {
-                if (mSongInfo != null) {
-                    MusicManager.get().playMusicByInfo(mSongInfo);
-                }
-            }
-        }
+//        //播放
+//        if (MusicManager.isPlaying()) {
+//            onPlayerStart();
+//        } else {
+//            if (songInfos.size() > 0 && QueueHelper.isIndexPlayable(position, songInfos)) {
+//                MusicManager.get().playMusic(songInfos, position);
+//            } else {
+//                if (mSongInfo != null) {
+//                    MusicManager.get().playMusicByInfo(mSongInfo);
+//                }
+//            }
+//        }
     }
 
     private void updateUI(SongInfo music) {

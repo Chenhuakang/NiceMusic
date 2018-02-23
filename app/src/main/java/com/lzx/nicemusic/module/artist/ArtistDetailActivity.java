@@ -10,7 +10,6 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
@@ -18,10 +17,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.helper.QueueHelper;
 import com.lzx.musiclibrary.manager.MusicManager;
-import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
@@ -32,19 +31,16 @@ import com.lzx.nicemusic.module.artist.presenter.ArtistPresenter;
 import com.lzx.nicemusic.module.play.PlayingDetailActivity;
 import com.lzx.nicemusic.utils.FormatUtil;
 import com.lzx.nicemusic.utils.GlideUtil;
-import com.lzx.nicemusic.utils.SystemBarHelper;
 import com.lzx.nicemusic.widget.CircleImageView;
 
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 /**
  * @author lzx
  * @date 2018/2/14
  */
 @CreatePresenter(ArtistPresenter.class)
-public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, ArtistPresenter> implements ArtistContract.View, Observer {
+public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, ArtistPresenter> implements ArtistContract.View, OnPlayerEventListener {
 
     public static void launch(Context context, SongInfo info) {
         Intent intent = new Intent(context, ArtistDetailActivity.class);
@@ -62,7 +58,6 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
     private RelativeLayout mCoverLayout, mArtistLayout;
     private AppBarLayout mAppBarLayout;
     private ArtistSongAdapter mAdapter;
-
 
     @Override
     protected int getLayoutId() {
@@ -94,7 +89,7 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
         getPresenter().getArtistSongs(mSongInfo.getArtistId());
         getPresenter().getArtistInfo(mSongInfo.getArtistId());
 
-        MusicManager.get().addStateObservable(this);
+        MusicManager.get().addPlayerEventListener(this);
 
         mAppBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> setViewsTranslation(verticalOffset));
         mFloatingActionButton.setOnClickListener(view -> {
@@ -105,6 +100,7 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
             } else {
                 songInfos.add(mSongInfo);
             }
+            MusicManager.get().playMusic(songInfos,position);
             PlayingDetailActivity.launch(mContext, songInfos, position);
         });
         mAdapter.setOnItemClickListener((info, position) -> {
@@ -114,8 +110,6 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
             } else {
                 MusicManager.get().playMusicByInfo(info);
             }
-            mSongInfo = info;
-            initUI(info);
         });
     }
 
@@ -137,7 +131,6 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
     }
 
     private void showFAB() {
-
         mFloatingActionButton.animate().scaleX(1f).scaleY(1f)
                 .setInterpolator(new OvershootInterpolator())
                 .start();
@@ -165,19 +158,41 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
         mArtistDesc.setText(info.getSongsTotal() + " Song" + desc);
     }
 
-    @Override
-    public void update(Observable observable, Object o) {
-        int msg = (int) o;
-        if (msg == MusicManager.MSG_PLAYER_ERROR) {
-            Toast.makeText(mContext, "播放失败!", Toast.LENGTH_SHORT).show();
-        }else  if (msg == MusicManager.MSG_PLAYER_START || msg == MusicManager.MSG_PLAYER_PAUSE) {
-            mAdapter.notifyDataSetChanged();
-        }
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        MusicManager.get().deleteStateObservable(this);
+        MusicManager.get().removePlayerEventListener(this);
+    }
+
+    @Override
+    public void onMusicSwitch(SongInfo music) {
+        mSongInfo = music;
+        initUI(music);
+    }
+
+    @Override
+    public void onPlayerStart() {
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onPlayerPause() {
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onPlayCompletion() {
+
+    }
+
+    @Override
+    public void onError(String errorMsg) {
+        Toast.makeText(mContext, "播放失败!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBuffering(boolean isFinishBuffer) {
+
     }
 }

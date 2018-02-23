@@ -71,7 +71,7 @@
                 android:layout_toLeftOf="@+id/img_notifyPre"
                 android:contentDescription="@null"
                 android:padding="6dp"
-                android:src="@drawable/img_notifyfavorite" />
+                android:src="@drawable/notify_btn_dark_favorite_normal" />
 
             <ImageView
                 android:id="@+id/img_notifyPre"
@@ -113,7 +113,7 @@
                 android:layout_toRightOf="@+id/img_notifyNext"
                 android:contentDescription="@null"
                 android:padding="6dp"
-                android:src="@drawable/img_notifylyrics" />
+                android:src="@drawable/notify_btn_dark_lyrics_normal" />
         </RelativeLayout>
     </LinearLayout>
 </RelativeLayout>
