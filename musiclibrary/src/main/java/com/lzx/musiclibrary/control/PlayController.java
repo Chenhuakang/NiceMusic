@@ -17,6 +17,7 @@ import com.lzx.musiclibrary.notification.MediaNotificationManager;
 import com.lzx.musiclibrary.notification.NotificationCreater;
 import com.lzx.musiclibrary.playback.PlaybackManager;
 import com.lzx.musiclibrary.playback.player.Playback;
+import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.util.List;
 
@@ -56,9 +57,10 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         mMediaSessionManager = new MediaSessionManager(this.mMusicService.getApplicationContext(), mPlaybackManager);
         mPlaybackManager.updatePlaybackState(null);
 
+        updateNotificationCreater(builder.notificationCreater);
     }
 
-    void setNotificationCreater(NotificationCreater creater) {
+    void updateNotificationCreater(NotificationCreater creater) {
         if (creater != null) {
             mNotificationManager = new MediaNotificationManager(mMusicService, creater, mPlaybackManager);
         }
@@ -71,6 +73,7 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         private NotifyContract.NotifyStatusChanged mNotifyStatusChanged;
         private NotifyContract.NotifyMusicSwitch mNotifyMusicSwitch;
         private boolean isAutoPlayNext;
+        private NotificationCreater notificationCreater;
 
         public Builder(MusicService mService) {
             mMusicService = mService;
@@ -101,6 +104,10 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
             return this;
         }
 
+        Builder setNotificationCreater(NotificationCreater notificationCreater) {
+            this.notificationCreater = notificationCreater;
+            return this;
+        }
 
         public PlayController build() {
             return new PlayController(this);

@@ -2,6 +2,8 @@
 
 ### A Nice MusicPlayer Powered by [MusicLibrary](https://github.com/lizixian18/MusicLibrary)
 
+![](art/ic_launcher.png)
+
 ## Screenshots ：
 <a href="art/image_1.png"><img src="art/image_1.png" width="30%"/></a>
 <a href="art/image_2.png"><img src="art/image_2.png" width="30%"/></a> 

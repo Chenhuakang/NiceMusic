@@ -85,7 +85,7 @@ interface IPlayControl {
     //初始化
     void reset();
 
-    void setNotificationCreater(in NotificationCreater creater);
+    void updateNotificationCreater(in NotificationCreater creater);
 
     void updateNotificationFavorite(boolean isFavorite);
 
@@ -96,4 +96,5 @@ interface IPlayControl {
     void registerPlayerEventListener(IOnPlayerEventListener listener);
 
     void unregisterPlayerEventListener(IOnPlayerEventListener listener);
+
 }

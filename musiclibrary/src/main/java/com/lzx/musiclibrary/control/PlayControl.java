@@ -16,6 +16,7 @@ import com.lzx.musiclibrary.notification.NotificationCreater;
 import com.lzx.musiclibrary.playback.player.ExoPlayback;
 import com.lzx.musiclibrary.playback.player.MediaPlayback;
 import com.lzx.musiclibrary.playback.player.Playback;
+import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.util.List;
 
@@ -54,6 +55,7 @@ public class PlayControl extends IPlayControl.Stub {
                 .setNotifyStatusChanged(mNotifyStatusChanged)
                 .setPlayback(playback)
                 .setPlayMode(mPlayMode)
+                .setNotificationCreater(builder.notificationCreater)
                 .build();
     }
 
@@ -65,6 +67,7 @@ public class PlayControl extends IPlayControl.Stub {
         private MusicService mMusicService;
         private boolean isUseMediaPlayer = false;
         private boolean isAutoPlayNext = true;
+        private NotificationCreater notificationCreater;
 
         public Builder(MusicService mService) {
             mMusicService = mService;
@@ -77,6 +80,11 @@ public class PlayControl extends IPlayControl.Stub {
 
         public Builder setAutoPlayNext(boolean autoPlayNext) {
             isAutoPlayNext = autoPlayNext;
+            return this;
+        }
+
+        public Builder setNotificationCreater(NotificationCreater notificationCreater) {
+            this.notificationCreater = notificationCreater;
             return this;
         }
 
@@ -297,8 +305,8 @@ public class PlayControl extends IPlayControl.Stub {
     }
 
     @Override
-    public void setNotificationCreater(NotificationCreater creater) throws RemoteException {
-        mController.setNotificationCreater(creater);
+    public void updateNotificationCreater(NotificationCreater creater) throws RemoteException {
+        mController.updateNotificationCreater(creater);
     }
 
     @Override
@@ -325,4 +333,6 @@ public class PlayControl extends IPlayControl.Stub {
     public void unregisterPlayerEventListener(IOnPlayerEventListener listener) throws RemoteException {
         mRemoteCallbackList.unregister(listener);
     }
+
+
 }
