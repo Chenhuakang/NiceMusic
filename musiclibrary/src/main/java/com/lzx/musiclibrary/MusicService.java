@@ -1,6 +1,5 @@
 package com.lzx.musiclibrary;
 
-import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
@@ -10,7 +9,6 @@ import android.os.RemoteException;
 import android.support.annotation.Nullable;
 
 import com.lzx.musiclibrary.control.PlayControl;
-import com.lzx.musiclibrary.notification.NotificationCreater;
 
 import java.lang.ref.WeakReference;
 
@@ -37,12 +35,10 @@ public class MusicService extends Service {
     public IBinder onBind(Intent intent) {
         boolean isUseMediaPlayer = intent.getBooleanExtra("isUseMediaPlayer", false);
         boolean isAutoPlayNext = intent.getBooleanExtra("isAutoPlayNext", true);
-        NotificationCreater notificationCreater = intent.getParcelableExtra("notificationCreater");
         mBinder = new PlayControl
                 .Builder(this)
                 .setAutoPlayNext(isAutoPlayNext)
                 .setUseMediaPlayer(isUseMediaPlayer)
-                .setNotificationCreater(notificationCreater)
                 .build();
         return mBinder;
     }

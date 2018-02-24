@@ -56,7 +56,12 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         mMediaSessionManager = new MediaSessionManager(this.mMusicService.getApplicationContext(), mPlaybackManager);
         mPlaybackManager.updatePlaybackState(null);
 
-        mNotificationManager = new MediaNotificationManager(mMusicService, builder.notificationCreater, mPlaybackManager);
+    }
+
+    void setNotificationCreater(NotificationCreater creater) {
+        if (creater != null) {
+            mNotificationManager = new MediaNotificationManager(mMusicService, creater, mPlaybackManager);
+        }
     }
 
     public static class Builder {
@@ -66,7 +71,6 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         private NotifyContract.NotifyStatusChanged mNotifyStatusChanged;
         private NotifyContract.NotifyMusicSwitch mNotifyMusicSwitch;
         private boolean isAutoPlayNext;
-        private NotificationCreater notificationCreater;
 
         public Builder(MusicService mService) {
             mMusicService = mService;
@@ -97,10 +101,6 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
             return this;
         }
 
-        Builder setNotificationCreater(NotificationCreater notificationCreater) {
-            this.notificationCreater = notificationCreater;
-            return this;
-        }
 
         public PlayController build() {
             return new PlayController(this);

@@ -7,6 +7,7 @@ import android.content.Intent;
 
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.notification.NotificationCreater;
+import com.lzx.musiclibrary.utils.BaseUtil;
 import com.lzx.nicemusic.receiver.MyPlayerReceiver;
 import com.lzx.nicemusic.utils.CrashHandler;
 import com.lzx.nicemusic.utils.SpUtil;
@@ -32,18 +33,17 @@ public class NiceMusicApplication extends Application {
         SpUtil.getInstance().init(this);
         CrashHandler.getInstance().init(this);
 
-        NotificationCreater creater = new NotificationCreater.Builder()
-                .setTargetClass("com.lzx.nicemusic.module.main.HomeActivity")
-//                .setCloseIntent(getPendingIntent(closeActionName))
-                .setFavoriteIntent(getPendingIntent(favoriteActionName))
-                .setLyricsIntent(getPendingIntent(lyricsActionName))
-                .build();
+        if (!BaseUtil.getCurProcessName(this).contains(":player")) {
+            MusicManager.get().setContext(this).init();
 
-        MusicManager.get()
-                .setContext(this)
-                //.setUseMediaPlayer(true)
-                .setNotificationCreater(creater)
-                .init();
+            NotificationCreater creater = new NotificationCreater.Builder()
+                    .setTargetClass("com.lzx.nicemusic.module.main.HomeActivity")
+//                 .setCloseIntent(getPendingIntent(closeActionName))
+                    .setFavoriteIntent(getPendingIntent(favoriteActionName))
+                    .setLyricsIntent(getPendingIntent(lyricsActionName))
+                    .build();
+            MusicManager.get().setNotificationCreater(creater);
+        }
     }
 
     private PendingIntent getPendingIntent(String action) {
@@ -55,4 +55,6 @@ public class NiceMusicApplication extends Application {
     public static Context getContext() {
         return sContext;
     }
+
+
 }

@@ -97,6 +97,7 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
                 MusicManager.get().seekTo(seekBar.getProgress());
             }
         });
+        MusicManager.get().addPlayerEventListener(this);
 
         mTimerTaskManager = new TimerTaskManager();
         mTimerTaskManager.setUpdateProgressTask(this::updateProgress);
@@ -108,7 +109,6 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         if (MusicManager.isPaused()) {
             MusicManager.get().resumeMusic();
         }
-        MusicManager.get().addPlayerEventListener(this);
     }
 
     private void updateUI(SongInfo music) {
@@ -200,7 +200,11 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_play_pause:
-                MusicManager.get().playMusicByInfo(mSongInfo);
+                if (MusicManager.isPlaying()) {
+                    MusicManager.get().pauseMusic();
+                } else {
+                    MusicManager.get().resumeMusic();
+                }
                 break;
             case R.id.btn_pre:
                 MusicManager.get().playPre();
