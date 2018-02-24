@@ -105,20 +105,10 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         }
         updateUI(mSongInfo);
         initMusicCoverAnim();
+        if (MusicManager.isPaused()) {
+            MusicManager.get().resumeMusic();
+        }
         MusicManager.get().addPlayerEventListener(this);
-
-//        //播放
-//        if (MusicManager.isPlaying()) {
-//            onPlayerStart();
-//        } else {
-//            if (songInfos.size() > 0 && QueueHelper.isIndexPlayable(position, songInfos)) {
-//                MusicManager.get().playMusic(songInfos, position);
-//            } else {
-//                if (mSongInfo != null) {
-//                    MusicManager.get().playMusicByInfo(mSongInfo);
-//                }
-//            }
-//        }
     }
 
     private void updateUI(SongInfo music) {
@@ -185,6 +175,8 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
     @Override
     public void onPlayCompletion() {
         mBtnPlayPause.setImageResource(R.drawable.ic_play);
+        mSeekBar.setProgress(0);
+        mStartTime.setText("00:00");
         resetCoverAnim();
     }
 

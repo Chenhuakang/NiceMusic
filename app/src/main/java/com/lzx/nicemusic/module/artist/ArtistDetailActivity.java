@@ -21,6 +21,7 @@ import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.helper.QueueHelper;
 import com.lzx.musiclibrary.manager.MusicManager;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
@@ -100,7 +101,7 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
             } else {
                 songInfos.add(mSongInfo);
             }
-            MusicManager.get().playMusic(songInfos,position);
+            MusicManager.get().playMusic(songInfos, position);
             PlayingDetailActivity.launch(mContext, songInfos, position);
         });
         mAdapter.setOnItemClickListener((info, position) -> {
@@ -111,6 +112,21 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
                 MusicManager.get().playMusicByInfo(info);
             }
         });
+
+
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        SongInfo info = intent.getParcelableExtra("SongInfo");
+        Bundle bundle = intent.getExtras();
+        if (info != null) {
+            LogUtil.i("onNewIntent#info = " + info.getSongName());
+        }
+        if (bundle != null) {
+            LogUtil.i("onNewIntent#undle = " + bundle.getString("flag"));
+        }
     }
 
     private void initUI(SongInfo info) {

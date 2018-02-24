@@ -34,13 +34,14 @@ public class NiceMusicApplication extends Application {
 
         NotificationCreater creater = new NotificationCreater.Builder()
                 .setTargetClass("com.lzx.nicemusic.module.main.HomeActivity")
-                .setCloseIntent(getPendingIntent(closeActionName))
+//                .setCloseIntent(getPendingIntent(closeActionName))
                 .setFavoriteIntent(getPendingIntent(favoriteActionName))
                 .setLyricsIntent(getPendingIntent(lyricsActionName))
                 .build();
 
         MusicManager.get()
                 .setContext(this)
+                //.setUseMediaPlayer(true)
                 .setNotificationCreater(creater)
                 .init();
     }

@@ -43,6 +43,8 @@ public class HomeActivity extends BaseMvpActivity<SongListContract.View, SongLis
         mAdapter = new SectionedRecyclerViewAdapter();
         mRecyclerView.setAdapter(mAdapter);
         getPresenter().requestSongList("热歌榜");
+
+
     }
 
     @Override
