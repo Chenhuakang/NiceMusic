@@ -13,9 +13,8 @@
 <a href="art/ic_gif.gif"><img src="art/ic_gif.gif" width="30%"/></a>
 
 ## Statement
-本项目现阶段旨在尽量模拟各种场景来测试[MusicLibrary](https://github.com/lizixian18/MusicLibrary)的
-稳定性和健壮性，并作为一个例子去使用[MusicLibrary](https://github.com/lizixian18/MusicLibrary)，
-所以暂不提供Apk下，有兴趣可以下载代码一起学习。
+本项目现阶段旨在尽量模拟各种场景来测试[MusicLibrary](https://github.com/lizixian18/MusicLibrary)，并作为一个例子去使用[MusicLibrary](https://github.com/lizixian18/MusicLibrary)，
+所以做得比较粗糙，界面也不多，以后会慢慢完善起来，暂不提供Apk下载，有兴趣可以下载代码运行一下，一起学习。
 
 
 如果你有想法或者意见和建议，欢迎提issue，喜欢点个star。

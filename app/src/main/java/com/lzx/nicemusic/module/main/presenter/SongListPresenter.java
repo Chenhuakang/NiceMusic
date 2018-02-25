@@ -1,4 +1,4 @@
-package com.lzx.nicemusic.module.songlist.presenter;
+package com.lzx.nicemusic.module.main.presenter;
 
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.utils.LogUtil;
@@ -90,23 +90,9 @@ public class SongListPresenter extends BasePresenter<SongListContract.View> impl
     }
 
 
-    private Integer[] songCoverArray = new Integer[]{
-            R.drawable.image_song_list,
-            R.drawable.image_new_song,
-            R.drawable.image_hot_song,
-            R.drawable.image_rock,
-            R.drawable.image_jazz,
-            R.drawable.image_popular,
-            R.drawable.image_europe,
-            R.drawable.image_classic,
-            R.drawable.image_love_song,
-            R.drawable.image_television,
-            R.drawable.image_internet
-    };
-
     @Override
     public int getAlbumCover(String title) {
-        return songCoverArray[getListTypeIndex(title)];
+        return -1;
     }
 
     private int getListTypeIndex(String title) {

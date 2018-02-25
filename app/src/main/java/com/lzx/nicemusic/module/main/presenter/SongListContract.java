@@ -1,4 +1,4 @@
-package com.lzx.nicemusic.module.songlist.presenter;
+package com.lzx.nicemusic.module.main.presenter;
 
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.nicemusic.base.mvp.BaseContract;

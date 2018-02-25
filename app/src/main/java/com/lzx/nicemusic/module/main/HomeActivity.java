@@ -12,8 +12,8 @@ import com.lzx.nicemusic.module.main.sectioned.BannerSectioned;
 import com.lzx.nicemusic.module.main.sectioned.ChartTopSectioned;
 import com.lzx.nicemusic.module.main.sectioned.HomeSongSection;
 import com.lzx.nicemusic.module.main.sectioned.TitleSectioned;
-import com.lzx.nicemusic.module.songlist.presenter.SongListContract;
-import com.lzx.nicemusic.module.songlist.presenter.SongListPresenter;
+import com.lzx.nicemusic.module.main.presenter.SongListContract;
+import com.lzx.nicemusic.module.main.presenter.SongListPresenter;
 
 import java.util.List;
 

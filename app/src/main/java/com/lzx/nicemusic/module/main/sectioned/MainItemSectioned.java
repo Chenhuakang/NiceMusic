@@ -33,19 +33,6 @@ public class MainItemSectioned extends StatelessSection {
             "网络歌曲榜"
     };
 
-    private Integer[] songCoverArray = new Integer[]{
-            R.drawable.image_song_list,
-            R.drawable.image_new_song,
-            R.drawable.image_hot_song,
-            R.drawable.image_rock,
-            R.drawable.image_jazz,
-            R.drawable.image_popular,
-            R.drawable.image_europe,
-            R.drawable.image_classic,
-            R.drawable.image_love_song,
-            R.drawable.image_television,
-            R.drawable.image_internet
-    };
 
     private OnItemClickListener mOnItemClickListener;
 
@@ -73,11 +60,9 @@ public class MainItemSectioned extends StatelessSection {
         ItemHolder holder = (ItemHolder) viewHolder;
         String title = songListArray[position];
         holder.mAlbumTitle.setText(title);
-        GlideUtil.loadImageByUrl(mContext, songCoverArray[position], holder.mAlbumCover);
+
         holder.itemView.setOnClickListener(v -> {
-//            Intent intent = new Intent(mContext, SongListActivity.class);
-//            intent.putExtra("title", title);
-//            mContext.startActivity(intent);
+
             if (mOnItemClickListener != null) {
                 mOnItemClickListener.onItemClick(title);
             }

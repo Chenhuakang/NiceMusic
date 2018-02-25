@@ -33,7 +33,7 @@ public class NiceMusicApplication extends Application {
         SpUtil.getInstance().init(this);
         CrashHandler.getInstance().init(this);
 
-        if (!BaseUtil.getCurProcessName(this).contains(":player")) {
+        if (!BaseUtil.getCurProcessName(this).contains(":musicLibrary")) {
             NotificationCreater creater = new NotificationCreater.Builder()
                     .setTargetClass("com.lzx.nicemusic.module.main.HomeActivity")
                     .setFavoriteIntent(getPendingIntent(favoriteActionName))
