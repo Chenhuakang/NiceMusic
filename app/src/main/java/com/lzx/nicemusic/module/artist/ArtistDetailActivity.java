@@ -45,7 +45,7 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
 
     public static void launch(Context context, SongInfo info) {
         Intent intent = new Intent(context, ArtistDetailActivity.class);
-        intent.putExtra("SongInfo", info);
+        intent.putExtra("songInfo", info);
         context.startActivity(intent);
     }
 
@@ -67,7 +67,7 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        mSongInfo = getIntent().getParcelableExtra("SongInfo");
+        mSongInfo = getIntent().getParcelableExtra("songInfo");
         mSongName = findViewById(R.id.song_name);
         mArtistName = findViewById(R.id.artist_name);
         mSongCover = findViewById(R.id.song_cover);
@@ -113,20 +113,9 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
             }
         });
 
-
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        SongInfo info = intent.getParcelableExtra("SongInfo");
-        Bundle bundle = intent.getExtras();
-        if (info != null) {
-            LogUtil.i("onNewIntent#info = " + info.getSongName());
-        }
-        if (bundle != null) {
-            LogUtil.i("onNewIntent#undle = " + bundle.getString("flag"));
-        }
+        Bundle bundle = new Bundle();
+        bundle.putString("name", "大妈的");
+        MusicManager.get().updateNotificationContentIntent(bundle, null);
     }
 
     private void initUI(SongInfo info) {

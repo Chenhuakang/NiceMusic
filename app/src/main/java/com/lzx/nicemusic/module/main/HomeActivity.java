@@ -1,10 +1,12 @@
 package com.lzx.nicemusic.module.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.lzx.musiclibrary.aidl.model.SongInfo;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
@@ -36,7 +38,6 @@ public class HomeActivity extends BaseMvpActivity<SongListContract.View, SongLis
 
     @Override
     protected void init(Bundle savedInstanceState) {
-
         mRecyclerView = findViewById(R.id.recycle_view);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -44,7 +45,28 @@ public class HomeActivity extends BaseMvpActivity<SongListContract.View, SongLis
         mRecyclerView.setAdapter(mAdapter);
         getPresenter().requestSongList("热歌榜");
 
+        getNotificationIntentData(getIntent());
+    }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        getNotificationIntentData(intent);
+    }
+
+    /**
+     * 示例：
+     * 获取点击通知栏传递过来的信息
+     */
+    private void getNotificationIntentData(Intent intent) {
+        SongInfo songInfo = intent.getParcelableExtra("songInfo");
+        if (songInfo != null) {
+            LogUtil.i("songInfo = " + songInfo.getSongName());
+        }
+        Bundle bundle = intent.getBundleExtra("bundleInfo");
+        if (bundle != null) {
+            LogUtil.i("bundle = " + bundle.getString("name"));
+        }
     }
 
     @Override
