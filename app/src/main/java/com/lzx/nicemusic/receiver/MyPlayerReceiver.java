@@ -26,7 +26,8 @@ public class MyPlayerReceiver extends BroadcastReceiver {
         switch (action) {
             case NiceMusicApplication.closeActionName:
                 //自定义实现关闭按钮功能
-                Toast.makeText(context, "点击了关闭", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "开始定时", Toast.LENGTH_SHORT).show();
+                MusicManager.get().pausePlayInMillis(10 * 1000);
                 break;
             case NiceMusicApplication.favoriteActionName:
                 //模拟收藏功能
