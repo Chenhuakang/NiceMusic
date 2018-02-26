@@ -71,14 +71,23 @@ public class HomeActivity extends BaseMvpActivity<SongListContract.View, SongLis
 
     @Override
     public void onGetSongListSuccess(List<SongInfo> list, String title) {
-        if (title.equals("热歌榜")) {
-            mAdapter.addSection(new BannerSectioned(this));
-            mAdapter.addSection(new TitleSectioned(this, "Chart Top 10"));
-            mAdapter.addSection(new ChartTopSectioned(this, list));
-            mAdapter.addSection(new TitleSectioned(this, "New Songs"));
-            getPresenter().requestSongList("新歌榜");
-        } else if (title.equals("新歌榜")) {
-            mAdapter.addSection(new HomeSongSection(this, list));
+        switch (title) {
+            case "热歌榜":
+                mAdapter.addSection(new BannerSectioned(this));
+                mAdapter.addSection(new TitleSectioned(this, "Chart Top 10"));
+                mAdapter.addSection(new ChartTopSectioned(this, list));
+                mAdapter.addSection(new TitleSectioned(this, "New Songs"));
+                getPresenter().requestSongList("新歌榜");
+                break;
+            case "新歌榜":
+                mAdapter.addSection(new HomeSongSection(this, list));
+//                mAdapter.addSection(new TitleSectioned(this, "Live"));
+                getPresenter().requestLiveList("Live");
+                break;
+//            case "Live":
+//                mAdapter.addSection(new HomeSongSection(this, list));
+//                mAdapter.notifyDataSetChanged();
+//                break;
         }
         mAdapter.notifyDataSetChanged();
     }

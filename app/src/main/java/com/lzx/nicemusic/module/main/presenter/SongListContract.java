@@ -23,6 +23,8 @@ public interface SongListContract {
     interface Presenter<T> extends BaseContract.BasePresenter<T> {
         void requestSongList(String title);
 
+        void requestLiveList(String title);
+
         void loadMoreSongList(String title);
 
         int getAlbumCover(String title);

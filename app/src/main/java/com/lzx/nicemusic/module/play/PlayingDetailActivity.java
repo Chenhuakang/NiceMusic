@@ -101,6 +101,7 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
 
         mTimerTaskManager = new TimerTaskManager();
         mTimerTaskManager.setUpdateProgressTask(this::updateProgress);
+
         if (mSongInfo != null) {
             getPresenter().getLrcInfo(mSongInfo.getSongId());
         }
@@ -296,20 +297,5 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         MusicManager.get().removePlayerEventListener(this);
     }
 
-    //    @Override
-//    public void onBackPressed() {
-//        if (mUIController.isPlayListVisible()) {
-//            mUIController.hidePlayListLayout();
-//        } else {
-//            super.onBackPressed();
-//        }
-//    }
 
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        mUIController.onDestroy();
-//        unregisterReceiver(mSongListReceiver);
-//        MusicManager.get().removePlayerEventListener(this);
-//    }
 }

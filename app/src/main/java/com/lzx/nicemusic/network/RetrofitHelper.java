@@ -38,9 +38,14 @@ public class RetrofitHelper {
         return createApi(NewsApi.class, url);
     }
 
-    public static BaiSiBuDeJieApi getBaiSiBuDeJieApi(){
+    public static BaiSiBuDeJieApi getBaiSiBuDeJieApi() {
         String url = "http://route.showapi.com/";
         return createApi(BaiSiBuDeJieApi.class, url);
+    }
+
+    public static LiveApi getLiveApi() {
+        String url = "http://api.ximalaya.com/openapi-gateway-app/";
+        return createApi(LiveApi.class, url);
     }
 
     /**
@@ -121,9 +126,13 @@ public class RetrofitHelper {
 
     public static class CommonInterceptor implements Interceptor {
 
-        @Override public Response intercept(Interceptor.Chain chain) throws IOException {
+        @Override
+        public Response intercept(Interceptor.Chain chain) throws IOException {
             Request oldRequest = chain.request();
-
+            String url = oldRequest.url().url().toString();
+            if (url.contains("http://api.ximalaya.com")) {
+                return chain.proceed(oldRequest);
+            }
             // 添加新的参数
             HttpUrl.Builder authorizedUrlBuilder = oldRequest.url()
                     .newBuilder()
@@ -135,7 +144,7 @@ public class RetrofitHelper {
 
             // 新的请求
             Request newRequest = oldRequest.newBuilder()
-                    .addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+                    .addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
                     .method(oldRequest.method(), oldRequest.body())
                     .url(authorizedUrlBuilder.build())
                     .build();
@@ -143,4 +152,6 @@ public class RetrofitHelper {
             return chain.proceed(newRequest);
         }
     }
+
+
 }

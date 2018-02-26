@@ -202,7 +202,6 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
 
             MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(source), dataSourceFactory, extractorsFactory, null, null);
 
-
             mExoPlayer.prepare(mediaSource);
 
             mFocusAndLockManager.acquireWifiLock();
