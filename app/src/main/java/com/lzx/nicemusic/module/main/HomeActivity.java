@@ -82,7 +82,7 @@ public class HomeActivity extends BaseMvpActivity<SongListContract.View, SongLis
             case "新歌榜":
                 mAdapter.addSection(new HomeSongSection(this, list));
 //                mAdapter.addSection(new TitleSectioned(this, "Live"));
-                getPresenter().requestLiveList("Live");
+//                getPresenter().requestLiveList("Live");
                 break;
 //            case "Live":
 //                mAdapter.addSection(new HomeSongSection(this, list));
