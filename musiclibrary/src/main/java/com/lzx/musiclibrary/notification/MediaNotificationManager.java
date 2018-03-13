@@ -252,8 +252,6 @@ public class MediaNotificationManager {
         String contentTitle = mSongInfo != null ? mSongInfo.getSongName() : mNotificationCreater.getContentTitle();
         String contentText = mSongInfo != null ? mSongInfo.getArtist() : mNotificationCreater.getContentText();
 
-        changeTextColor(mRemoteView, mBigRemoteView);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel();
         }
@@ -266,9 +264,6 @@ public class MediaNotificationManager {
                 .setContentIntent(contentIntent)
                 .setContentTitle(contentTitle)
                 .setContentText(contentText);
-
-        NotificationColorUtils.NOTIFICATION_TITLE = contentTitle;
-        NotificationColorUtils.NOTIFICATION_CONTENT = contentText;
 
         if (Build.VERSION.SDK_INT >= 16) {
             notificationBuilder.setPriority(2);
@@ -294,6 +289,7 @@ public class MediaNotificationManager {
             }
         }
 
+        // changeTextColor(mRemoteView,mBigRemoteView,notification); 暂时不需要
         updateRemoteViewUI(notification, smallIconRes);
 
         return notification;
@@ -640,12 +636,12 @@ public class MediaNotificationManager {
         return res.getIdentifier(name, className, packageName);
     }
 
-    private void changeTextColor(RemoteViews remoteView, RemoteViews bigRemoteView) {
+    private void changeTextColor(RemoteViews remoteView, RemoteViews bigRemoteView, Notification notification) {
         if (bigRemoteView != null) {
-            NotificationColorUtils.setTitleTextColor(mService, bigRemoteView, this.getResourceId(ID_TXT_NOTIFY_SONGNAME, "id"), mNotification);
-            NotificationColorUtils.setContentTextColor(mService, bigRemoteView, this.getResourceId(ID_TXT_NOTIFY_ARTISTNAME, "id"), mNotification);
+            NotificationColorUtils.setTitleTextColor(mService, bigRemoteView, this.getResourceId(ID_TXT_NOTIFY_SONGNAME, "id"), notification);
+            NotificationColorUtils.setContentTextColor(mService, bigRemoteView, this.getResourceId(ID_TXT_NOTIFY_ARTISTNAME, "id"), notification);
         }
-        NotificationColorUtils.setTitleTextColor(mService, remoteView, this.getResourceId(ID_TXT_NOTIFY_SONGNAME, "id"), mNotification);
-        NotificationColorUtils.setContentTextColor(mService, remoteView, this.getResourceId(ID_TXT_NOTIFY_ARTISTNAME, "id"), mNotification);
+        NotificationColorUtils.setTitleTextColor(mService, remoteView, this.getResourceId(ID_TXT_NOTIFY_SONGNAME, "id"), notification);
+        NotificationColorUtils.setContentTextColor(mService, remoteView, this.getResourceId(ID_TXT_NOTIFY_ARTISTNAME, "id"), notification);
     }
 }

@@ -21,8 +21,8 @@ import java.util.concurrent.CountDownLatch;
  */
 
 public class NotificationColorUtils {
-    public static String NOTIFICATION_TITLE = "nice_music_title";
-    public static String NOTIFICATION_CONTENT = "nice_music_content";
+    public static String NOTIFICATION_TITLE = "notification_music_title";
+    public static String NOTIFICATION_CONTENT = "notification_music_content";
     public static int COLOR_UNDEF = 987654321;
     private static final double COLOR_THRESHOLD = 180.0D;
     public static int NOTIFICATION_TITLE_COLOR = Color.parseColor("#de000000");
@@ -81,7 +81,6 @@ public class NotificationColorUtils {
             Runnable runnable = new Runnable() {
                 public void run() {
                     try {
-                        LogUtil.i("notification = "+notification);
                         int notiTextColor = getNotificationColor(context, notification);
                         if (notiTextColor == COLOR_UNDEF) {
                             mNotificationColorModel.setTitleColor(COLOR_UNDEF);
@@ -141,7 +140,7 @@ public class NotificationColorUtils {
         LinearLayout layout = new LinearLayout(context);
         layout.setLayoutParams(new LinearLayout.LayoutParams(-2, -2));
         ViewGroup viewGroup = (ViewGroup) notification.contentView.apply(context, layout);
-        getTextView(viewGroup, NOTIFICATION_TITLE, NOTIFICATION_CONTENT);
+        getTextView(viewGroup,false);
         if (titleView == null) {
             return COLOR_UNDEF;
         } else {
@@ -156,27 +155,28 @@ public class NotificationColorUtils {
         }
     }
 
-    private static TextView getTextView(ViewGroup viewGroup, String textTitle, String content) {
+    private static TextView getTextView(ViewGroup viewGroup, boolean isSetTextColor) {
         if (viewGroup == null) {
             return null;
         } else {
             int count = viewGroup.getChildCount();
-
             for (int i = 0; i < count; ++i) {
                 View view = viewGroup.getChildAt(i);
                 if (view instanceof TextView) {
                     TextView newDtv = (TextView) view;
-                    LogUtil.i("newDtv.getText() = "+newDtv.getText().toString());
-
-                    if (newDtv.getText().equals(NOTIFICATION_TITLE)) {
+                    if (isSetTextColor) {
+                        if (newDtv.getText().equals(NOTIFICATION_TITLE)) {
+                            titleView = newDtv;
+                        }
+                        if (newDtv.getText().equals(NOTIFICATION_CONTENT)) {
+                            contentView = newDtv;
+                        }
+                    } else {
                         titleView = newDtv;
-                    }
-
-                    if (newDtv.getText().equals(NOTIFICATION_CONTENT)) {
                         contentView = newDtv;
                     }
                 } else if (view instanceof ViewGroup) {
-                    getTextView((ViewGroup) view, textTitle, content);
+                    getTextView((ViewGroup) view, isSetTextColor);
                 }
             }
 
