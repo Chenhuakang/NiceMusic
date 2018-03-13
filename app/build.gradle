@@ -53,6 +53,6 @@ dependencies {
     compile 'com.miguelcatalan:materialsearchview:1.4.0'
     compile 'com.plattysoft.leonids:LeonidsLib:1.3.2'
 
-    //compile project(':musiclibrary')
-    compile 'com.github.lizixian18:MusicLibrary:v1.2'
+    compile project(':musiclibrary')
+    //compile 'com.github.lizixian18:MusicLibrary:v1.2'
 }
