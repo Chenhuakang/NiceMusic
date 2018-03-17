@@ -1,7 +1,9 @@
 package com.lzx.nicemusic.base;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -11,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.lzx.musiclibrary.helper.ResourceHelper;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.mvp.BaseContract;
 import com.lzx.nicemusic.base.mvp.BaseMvpProxy;
@@ -41,6 +44,7 @@ public abstract class BaseMvpActivity<V extends BaseContract.BaseView, P extends
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(getLayoutId());
         mContext = this;
         mProxy = new BaseMvpProxy<>(PresenterMvpFactoryImpl.<V, P>createFactory(getClass()), this);

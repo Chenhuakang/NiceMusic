@@ -36,9 +36,9 @@ public class NiceMusicApplication extends Application {
         if (!BaseUtil.getCurProcessName(this).contains(":musicLibrary")) {
             NotificationCreater creater = new NotificationCreater.Builder()
                     .setTargetClass("com.lzx.nicemusic.module.main.HomeActivity")
-             //       .setCloseIntent(getPendingIntent(closeActionName))
                     .setFavoriteIntent(getPendingIntent(favoriteActionName))
                     .setLyricsIntent(getPendingIntent(lyricsActionName))
+                    .setCreateSystemNotification(true)
                     .build();
             MusicManager.get()
                     .setContext(this)

@@ -35,7 +35,6 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:singleLine="true"
-                android:text="Nice Music"
                 android:textSize="16sp"
                 android:textStyle="normal"/>
 
@@ -63,7 +62,6 @@
             android:fadingEdge="horizontal"
             android:lines="1"
             android:singleLine="true"
-            android:text="听你所想"
             android:textSize="13sp"/>
 
         <TextView
