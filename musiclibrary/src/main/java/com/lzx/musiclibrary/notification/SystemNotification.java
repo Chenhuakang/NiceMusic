@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
 
 import com.lzx.musiclibrary.MusicService;
@@ -26,6 +27,9 @@ import com.lzx.musiclibrary.playback.PlaybackManager;
 import com.lzx.musiclibrary.receiver.PlayerReceiver;
 import com.lzx.musiclibrary.utils.AlbumArtCache;
 import com.lzx.musiclibrary.utils.LogUtil;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 系统通知栏
@@ -53,7 +57,9 @@ public class SystemNotification implements IMediaNotification {
     private Notification mNotification;
     private NotificationCompat.Builder notificationBuilder;
     private PlaybackManager mPlaybackManager;
-    private final int mNotificationColor;
+    private int mNotificationColor;
+
+    private Map<Bitmap, Integer> notificationColorCache = new HashMap<>();
 
     public SystemNotification(MusicService musicService, NotificationCreater creater, PlaybackManager playbackManager) {
         mService = musicService;
@@ -79,19 +85,25 @@ public class SystemNotification implements IMediaNotification {
 
     @Override
     public void startNotification(SongInfo songInfo) {
-        if (mSongInfo == null && songInfo == null) {
-            return;
-        }
-        if (songInfo != null) {
-            mSongInfo = songInfo;
-        }
-        if (!mStarted) {
-            mNotification = createNotification();
-            if (mNotification != null) {
-                mService.startForeground(NOTIFICATION_ID, mNotification);
-                mStarted = true;
+        try {
+            if (mSongInfo == null && songInfo == null) {
+                return;
             }
+            if (songInfo != null) {
+                mSongInfo = songInfo;
+            }
+            if (!mStarted) {
+                mNotification = createNotification();
+                if (mNotification != null) {
+                    mService.startForeground(NOTIFICATION_ID, mNotification);
+                    mStarted = true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogUtil.i("e = " + e.getMessage());
         }
+
     }
 
     @Override
@@ -180,6 +192,16 @@ public class SystemNotification implements IMediaNotification {
                     art = BitmapFactory.decodeResource(res, R.drawable.icon_notification);
                 }
             }
+
+            int cacheColor;
+            if (notificationColorCache.get(art) != null) {
+                cacheColor = notificationColorCache.get(art);
+                if (cacheColor == 0) {
+                    cacheColor = mNotificationColor;
+                }
+            } else {
+                cacheColor = mNotificationColor;
+            }
             String contentTitle = mSongInfo != null ? mSongInfo.getSongName() : mNotificationCreater.getContentTitle();
             String contentText = mSongInfo != null ? mSongInfo.getArtist() : mNotificationCreater.getContentText();
             //创建NotificationChannel
@@ -206,8 +228,9 @@ public class SystemNotification implements IMediaNotification {
                             .setShowCancelButton(true)
                             .setCancelButtonIntent(stopIntent)
                     )
-                    .setDeleteIntent(closeIntent)
-                    .setColor(mNotificationColor)
+                    .setDeleteIntent(closeIntent) //当用户点击”Clear All Notifications”按钮区删除所有的通知的时候，这个被设置的Intent被执行
+                    .setColor(cacheColor)
+                    .setColorized(true)
                     .setSmallIcon(R.drawable.icon_notification)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                     .setOnlyAlertOnce(true)
@@ -222,13 +245,7 @@ public class SystemNotification implements IMediaNotification {
                 fetchBitmapFromURLAsync(fetchArtUrl, notificationBuilder);
             }
             //创建Notification
-            Notification notification;
-            if (Build.VERSION.SDK_INT >= 16) {
-                notification = notificationBuilder.build();
-            } else {
-                notification = notificationBuilder.getNotification();
-            }
-            return notification;
+            return notificationBuilder.build();
         }
         return null;
     }
@@ -252,7 +269,7 @@ public class SystemNotification implements IMediaNotification {
         String label;
         int icon;
         PendingIntent intent;
-        if (mPlaybackManager.getPlayback().getState() == State.STATE_PLAYING) {
+        if (mPlaybackManager.getPlayback().getState() == State.STATE_PLAYING || mPlaybackManager.getPlayback().getState() == State.STATE_BUFFERING) {
             label = mService.getString(R.string.label_pause);
             icon = R.drawable.uamp_ic_pause_white_24dp;
             intent = startOrPauseIntent;
@@ -282,9 +299,10 @@ public class SystemNotification implements IMediaNotification {
             mService.stopForeground(true);
             return;
         }
-        if (mPlaybackManager.getPlayback().getState() == State.STATE_PLAYING
-                && mPlaybackManager.getCurrentPosition() >= 0) {
-            builder.setWhen(System.currentTimeMillis() - mPlaybackManager.getCurrentPosition()).setShowWhen(true).setUsesChronometer(true);
+        if (mPlaybackManager.getPlayback().getState() == State.STATE_PLAYING && mPlaybackManager.getCurrentPosition() >= 0) {
+            builder.setWhen(System.currentTimeMillis() - mPlaybackManager.getCurrentPosition())
+                    .setShowWhen(true)
+                    .setUsesChronometer(true);
         } else {
             builder.setWhen(0).setShowWhen(false).setUsesChronometer(false);
         }
@@ -298,6 +316,21 @@ public class SystemNotification implements IMediaNotification {
             public void onFetched(String artUrl, Bitmap bitmap, Bitmap icon) {
                 if (!TextUtils.isEmpty(mSongInfo.getSongCover()) && mSongInfo.getSongCover().equals(artUrl)) {
                     builder.setLargeIcon(bitmap);
+                    //获取图片主调颜色
+                    fetchPictureColor(bitmap, builder);
+                }
+            }
+        });
+    }
+
+    private void fetchPictureColor(final Bitmap bitmap, final NotificationCompat.Builder builder) {
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            @Override
+            public void onGenerated(Palette palette) {
+                Palette.Swatch swatch = palette.getMutedSwatch();
+                if (swatch != null) {
+                    notificationColorCache.put(bitmap, swatch.getRgb());
+                    builder.setColor(swatch.getRgb());
                     mNotificationManager.notify(NOTIFICATION_ID, builder.build());
                 }
             }
