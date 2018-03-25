@@ -263,11 +263,11 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
         return buildDataSourceFactory(useBandwidthMeter ? BANDWIDTH_METER : null);
     }
 
-    public DataSource.Factory buildDataSourceFactory(TransferListener<? super DataSource> listener) {
+    private DataSource.Factory buildDataSourceFactory(TransferListener<? super DataSource> listener) {
         return new DefaultDataSourceFactory(mContext, listener, buildHttpDataSourceFactory(listener));
     }
 
-    public HttpDataSource.Factory buildHttpDataSourceFactory(
+    private HttpDataSource.Factory buildHttpDataSourceFactory(
             TransferListener<? super DataSource> listener) {
         return new DefaultHttpDataSourceFactory(userAgent, listener);
     }

@@ -2,6 +2,7 @@ package com.lzx.nicemusic.module.play.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -59,7 +60,7 @@ public class DialogMusicListAdapter extends RecyclerView.Adapter<DialogMusicList
         holder.mMusicTitle.setText(info.getSongName() + "(" + info.getAlbumInfo().getAlbumName() + ")" + " - " + info.getArtist());
         AnimationDrawable animationDrawable = (AnimationDrawable) holder.mImageAnim.getDrawable();
         if (MusicManager.isCurrMusicIsPlayingMusic(info)) {
-            holder.mMusicTitle.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
+            holder.mMusicTitle.setTextColor(Color.parseColor("#BE0D36"));
             holder.mImageAnim.setVisibility(View.VISIBLE);
             if (MusicManager.isPlaying()) {
                 animationDrawable.start();

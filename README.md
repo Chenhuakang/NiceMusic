@@ -8,6 +8,11 @@
 <a href="art/image_1.png"><img src="art/image_1.png" width="30%"/></a>
 <a href="art/image_2.png"><img src="art/image_2.png" width="30%"/></a> 
 <a href="art/image_3.png"><img src="art/image_3.png" width="30%"/></a>
+
+<a href="art/live.png"><img src="art/live.png" width="30%"/></a>
+<a href="art/notif_sys.png"><img src="art/notif_sys.png" width="30%"/></a>
+<a href="art/notif_user.png"><img src="art/notif_user.png" width="30%"/></a>
+
 <a href="art/image_4.png"><img src="art/image_4.png" width="30%"/></a>
 <a href="art/image_5.png"><img src="art/image_5.png" width="30%"/></a> 
 <a href="art/ic_gif.gif"><img src="art/ic_gif.gif" width="30%"/></a>

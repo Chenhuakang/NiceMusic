@@ -2,6 +2,7 @@ package com.lzx.nicemusic.widget;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -36,7 +37,7 @@ public class SimpleProgress extends View {
 
     private void init() {
         mPaint = new Paint();
-        mPaint.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+        mPaint.setColor(Color.parseColor("#BE0D36"));
         mPaint.setAntiAlias(true);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
     }
