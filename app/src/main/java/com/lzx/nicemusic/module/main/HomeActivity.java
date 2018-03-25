@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.utils.LogUtil;
@@ -81,15 +82,22 @@ public class HomeActivity extends BaseMvpActivity<SongListContract.View, SongLis
                 break;
             case "新歌榜":
                 mAdapter.addSection(new HomeSongSection(this, list));
-//                mAdapter.addSection(new TitleSectioned(this, "Live"));
-//                getPresenter().requestLiveList("Live");
+                mAdapter.addSection(new TitleSectioned(this, "Live"));
+                getPresenter().requestLiveList("Live");
                 break;
-//            case "Live":
-//                mAdapter.addSection(new HomeSongSection(this, list));
-//                mAdapter.notifyDataSetChanged();
-//                break;
+            case "Live":
+                mAdapter.addSection(new HomeSongSection(this, list));
+                mAdapter.notifyDataSetChanged();
+                break;
         }
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onGetLiveSongSuccess(List<SongInfo> list) {
+        for (SongInfo songInfo : list) {
+            LogUtil.i("直播地址 = " + songInfo.getSongUrl());
+        }
     }
 
     @Override

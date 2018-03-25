@@ -43,10 +43,7 @@ public class RetrofitHelper {
         return createApi(BaiSiBuDeJieApi.class, url);
     }
 
-    public static LiveApi getLiveApi() {
-        String url = "http://api.ximalaya.com/openapi-gateway-app/";
-        return createApi(LiveApi.class, url);
-    }
+
 
     /**
      * 根据传入的baseUrl，和api创建retrofit

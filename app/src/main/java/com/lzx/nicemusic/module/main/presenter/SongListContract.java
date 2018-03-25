@@ -15,6 +15,8 @@ public interface SongListContract {
     interface View extends BaseContract.BaseView {
         void onGetSongListSuccess(List<SongInfo> list,String title);
 
+        void onGetLiveSongSuccess(List<SongInfo> list);
+
         void loadMoreSongListSuccess(List<SongInfo> list,String title);
 
         void loadFinishAllData();
