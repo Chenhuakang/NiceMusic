@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.lzx.musiclibrary.aidl.model.SongInfo;
+import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
@@ -47,6 +48,8 @@ public class HomeActivity extends BaseMvpActivity<SongListContract.View, SongLis
         getPresenter().requestSongList("热歌榜");
 
         getNotificationIntentData(getIntent());
+
+        MusicManager.get().openCacheWhenPlaying(true);
     }
 
     @Override
@@ -95,9 +98,7 @@ public class HomeActivity extends BaseMvpActivity<SongListContract.View, SongLis
 
     @Override
     public void onGetLiveSongSuccess(List<SongInfo> list) {
-        for (SongInfo songInfo : list) {
-            LogUtil.i("直播地址 = " + songInfo.getSongUrl());
-        }
+
     }
 
     @Override

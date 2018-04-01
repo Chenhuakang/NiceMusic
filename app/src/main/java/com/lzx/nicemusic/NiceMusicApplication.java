@@ -34,14 +34,14 @@ public class NiceMusicApplication extends Application {
         SpUtil.getInstance().init(this);
         CrashHandler.getInstance().init(this);
 
-        //直播链接在喜马拉雅获取，需要集成他们的sdk
-        CommonRequest mXimalaya = CommonRequest.getInstanse();
-        String mAppSecret = "8646d66d6abe2efd14f2891f9fd1c8af";
-        mXimalaya.setAppkey("9f9ef8f10bebeaa83e71e62f935bede8");
-        mXimalaya.setPackid("com.app.test.android");
-        mXimalaya.init(this ,mAppSecret);
-
         if (!BaseUtil.getCurProcessName(this).contains(":musicLibrary")) {
+            //直播链接在喜马拉雅获取，需要集成他们的sdk
+            CommonRequest mXimalaya = CommonRequest.getInstanse();
+            String mAppSecret = "8646d66d6abe2efd14f2891f9fd1c8af";
+            mXimalaya.setAppkey("9f9ef8f10bebeaa83e71e62f935bede8");
+            mXimalaya.setPackid("com.app.test.android");
+            mXimalaya.init(this ,mAppSecret);
+
             NotificationCreater creater = new NotificationCreater.Builder()
                     .setTargetClass("com.lzx.nicemusic.module.main.HomeActivity")
                     .setFavoriteIntent(getPendingIntent(favoriteActionName))
@@ -52,6 +52,8 @@ public class NiceMusicApplication extends Application {
                     .setContext(this)
                     .setNotificationCreater(creater)
                     .init();
+
+
         }
     }
 

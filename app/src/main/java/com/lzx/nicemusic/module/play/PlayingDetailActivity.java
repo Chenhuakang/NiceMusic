@@ -208,10 +208,18 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
                 }
                 break;
             case R.id.btn_pre:
-                MusicManager.get().playPre();
+                if (MusicManager.get().hasPre()) {
+                    MusicManager.get().playPre();
+                }else {
+                    Toast.makeText(mContext, "没有上一首了", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.btn_next:
-                MusicManager.get().playNext();
+                if (MusicManager.get().hasNext()) {
+                    MusicManager.get().playNext();
+                }else {
+                    Toast.makeText(mContext, "没有下一首了", Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }
