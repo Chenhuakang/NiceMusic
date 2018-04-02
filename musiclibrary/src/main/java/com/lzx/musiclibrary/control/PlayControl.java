@@ -4,12 +4,17 @@ import android.os.Bundle;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 
+import com.danikula.videocache.ProxyCacheUtils;
+import com.danikula.videocache.file.FileNameGenerator;
 import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.aidl.listener.NotifyContract;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
+import com.lzx.musiclibrary.aidl.source.IFileNameGenerator;
 import com.lzx.musiclibrary.aidl.source.IOnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.source.IOnTimerTaskListener;
 import com.lzx.musiclibrary.aidl.source.IPlayControl;
+import com.lzx.musiclibrary.cache.CacheConfig;
+import com.lzx.musiclibrary.cache.MusicMd5Generator;
 import com.lzx.musiclibrary.constans.PlayMode;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.helper.QueueHelper;
@@ -17,6 +22,7 @@ import com.lzx.musiclibrary.notification.NotificationCreater;
 import com.lzx.musiclibrary.playback.player.ExoPlayback;
 import com.lzx.musiclibrary.playback.player.MediaPlayback;
 import com.lzx.musiclibrary.playback.player.Playback;
+import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.util.List;
 
@@ -51,8 +57,10 @@ public class PlayControl extends IPlayControl.Stub {
         mOnTimerTaskListenerList = new RemoteCallbackList<>();
 
         mPlayMode = new PlayMode();
-        playback = builder.isUseMediaPlayer ? new MediaPlayback(mService.getApplicationContext())
-                : new ExoPlayback(mService.getApplicationContext());
+        playback = builder.isUseMediaPlayer
+                ? new MediaPlayback(mService.getApplicationContext(), builder.cacheConfig)
+                : new ExoPlayback(mService.getApplicationContext(), builder.cacheConfig);
+
         mController = new PlayController.Builder(mService)
                 .setAutoPlayNext(builder.isAutoPlayNext)
                 .setNotifyMusicSwitch(mNotifyMusicSwitch)
@@ -72,6 +80,7 @@ public class PlayControl extends IPlayControl.Stub {
         private boolean isUseMediaPlayer = false;
         private boolean isAutoPlayNext = true;
         private NotificationCreater notificationCreater;
+        private CacheConfig cacheConfig;
 
         public Builder(MusicService mService) {
             mMusicService = mService;
@@ -89,6 +98,11 @@ public class PlayControl extends IPlayControl.Stub {
 
         public Builder setNotificationCreater(NotificationCreater notificationCreater) {
             this.notificationCreater = notificationCreater;
+            return this;
+        }
+
+        public Builder setCacheConfig(CacheConfig cacheConfig) {
+            this.cacheConfig = cacheConfig;
             return this;
         }
 
@@ -377,6 +391,23 @@ public class PlayControl extends IPlayControl.Stub {
     @Override
     public void unregisterTimerTaskListener(IOnTimerTaskListener listener) throws RemoteException {
         mOnTimerTaskListenerList.unregister(listener);
+    }
+
+    @Override
+    public void setCacheFileNameGenerator(final IFileNameGenerator generator) throws RemoteException {
+        LogUtil.i("IFileNameGenerator = "+generator);
+        FileNameGenerator fileNameGenerator = new FileNameGenerator() {
+            @Override
+            public String generate(String url) {
+                try {
+                    return generator.generate(url);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                    return ProxyCacheUtils.computeMD5(url);
+                }
+            }
+        };
+        playback.setFileNameGenerator(fileNameGenerator);
     }
 
 

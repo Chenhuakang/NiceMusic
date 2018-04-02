@@ -366,6 +366,14 @@ public interface IPlayControl extends android.os.IInterface {
                     reply.writeNoException();
                     return true;
                 }
+                case TRANSACTION_setCacheFileNameGenerator: {
+                    data.enforceInterface(DESCRIPTOR);
+                    IFileNameGenerator _arg0;
+                    _arg0 = IFileNameGenerator.Stub.asInterface(data.readStrongBinder());
+                    this.setCacheFileNameGenerator(_arg0);
+                    reply.writeNoException();
+                    return true;
+                }
             }
             return super.onTransact(code, data, reply, flags);
         }
@@ -1090,6 +1098,21 @@ public interface IPlayControl extends android.os.IInterface {
                     _data.recycle();
                 }
             }
+
+            @Override
+            public void setCacheFileNameGenerator(IFileNameGenerator generator) throws RemoteException {
+                android.os.Parcel _data = android.os.Parcel.obtain();
+                android.os.Parcel _reply = android.os.Parcel.obtain();
+                try {
+                    _data.writeInterfaceToken(DESCRIPTOR);
+                    _data.writeStrongBinder((((generator != null)) ? (generator.asBinder()) : (null)));
+                    mRemote.transact(Stub.TRANSACTION_setCacheFileNameGenerator, _data, _reply, 0);
+                    _reply.readException();
+                } finally {
+                    _reply.recycle();
+                    _data.recycle();
+                }
+            }
         }
 
         static final int TRANSACTION_playMusic = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);
@@ -1128,6 +1151,7 @@ public interface IPlayControl extends android.os.IInterface {
         static final int TRANSACTION_unregisterPlayerEventListener = (android.os.IBinder.FIRST_CALL_TRANSACTION + 33);
         static final int TRANSACTION_registerTimerTaskListener = (android.os.IBinder.FIRST_CALL_TRANSACTION + 34);
         static final int TRANSACTION_unregisterTimerTaskListener = (android.os.IBinder.FIRST_CALL_TRANSACTION + 35);
+        static final int TRANSACTION_setCacheFileNameGenerator = (android.os.IBinder.FIRST_CALL_TRANSACTION + 36);
     }
 
     //播放，并设置播放列表
@@ -1235,4 +1259,7 @@ public interface IPlayControl extends android.os.IInterface {
 
     //解注册一个定时播放监听器
     void unregisterTimerTaskListener(IOnTimerTaskListener listener) throws android.os.RemoteException;
+
+    //设置缓存文件名
+    void setCacheFileNameGenerator(IFileNameGenerator generator) throws android.os.RemoteException;
 }

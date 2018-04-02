@@ -15,9 +15,11 @@ import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.listener.OnTimerTaskListener;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
+import com.lzx.musiclibrary.aidl.source.IFileNameGenerator;
 import com.lzx.musiclibrary.aidl.source.IOnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.source.IOnTimerTaskListener;
 import com.lzx.musiclibrary.aidl.source.IPlayControl;
+import com.lzx.musiclibrary.cache.CacheConfig;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.notification.NotificationCreater;
 import com.lzx.musiclibrary.playback.PlayStateObservable;
@@ -47,6 +49,7 @@ public class MusicManager implements IPlayControl {
     private boolean isUseMediaPlayer = false;
     private boolean isAutoPlayNext = true;
     private NotificationCreater mNotificationCreater;
+    private CacheConfig mCacheConfig;
 
     private IPlayControl control;
     private ClientHandler mClientHandler;
@@ -94,6 +97,11 @@ public class MusicManager implements IPlayControl {
         return this;
     }
 
+    public MusicManager setCacheConfig(CacheConfig cacheConfig) {
+        mCacheConfig = cacheConfig;
+        return this;
+    }
+
     public void init() {
         init(true);
     }
@@ -107,6 +115,7 @@ public class MusicManager implements IPlayControl {
         intent.putExtra("isUseMediaPlayer", isUseMediaPlayer);
         intent.putExtra("isAutoPlayNext", isAutoPlayNext);
         intent.putExtra("notificationCreater", mNotificationCreater);
+        intent.putExtra("cacheConfig", mCacheConfig);
         if (isStartService) {
             mContext.startService(intent);
         }
@@ -120,6 +129,9 @@ public class MusicManager implements IPlayControl {
             try {
                 control.registerPlayerEventListener(mOnPlayerEventListener);
                 control.registerTimerTaskListener(mOnTimerTaskListener);
+                if (mCacheConfig != null && mCacheConfig.getIFileNameGenerator() != null) {
+                    control.setCacheFileNameGenerator(mCacheConfig.getIFileNameGenerator());
+                }
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -651,7 +663,7 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public void openCacheWhenPlaying(boolean isOpen)   {
+    public void openCacheWhenPlaying(boolean isOpen) {
         if (control != null) {
             try {
                 control.openCacheWhenPlaying(isOpen);
@@ -748,22 +760,27 @@ public class MusicManager implements IPlayControl {
 
     @Override
     public void registerPlayerEventListener(IOnPlayerEventListener listener) {
-
+        //Do nothing
     }
 
     @Override
     public void unregisterPlayerEventListener(IOnPlayerEventListener listener) {
-
+        //Do nothing
     }
 
     @Override
     public void registerTimerTaskListener(IOnTimerTaskListener listener) throws RemoteException {
-
+        //Do nothing
     }
 
     @Override
     public void unregisterTimerTaskListener(IOnTimerTaskListener listener) throws RemoteException {
+        //Do nothing
+    }
 
+    @Override
+    public void setCacheFileNameGenerator(IFileNameGenerator generator) throws RemoteException {
+        //Do nothing
     }
 
 

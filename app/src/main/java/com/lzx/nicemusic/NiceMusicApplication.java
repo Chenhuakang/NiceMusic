@@ -4,7 +4,13 @@ import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.IBinder;
+import android.os.RemoteException;
 
+import com.danikula.videocache.ProxyCacheUtils;
+import com.lzx.musiclibrary.aidl.source.IFileNameGenerator;
+import com.lzx.musiclibrary.cache.CacheConfig;
+import com.lzx.musiclibrary.cache.CacheUtils;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.notification.NotificationCreater;
 import com.lzx.musiclibrary.utils.BaseUtil;
@@ -40,20 +46,33 @@ public class NiceMusicApplication extends Application {
             String mAppSecret = "8646d66d6abe2efd14f2891f9fd1c8af";
             mXimalaya.setAppkey("9f9ef8f10bebeaa83e71e62f935bede8");
             mXimalaya.setPackid("com.app.test.android");
-            mXimalaya.init(this ,mAppSecret);
+            mXimalaya.init(this, mAppSecret);
 
+            //通知栏配置
             NotificationCreater creater = new NotificationCreater.Builder()
                     .setTargetClass("com.lzx.nicemusic.module.main.HomeActivity")
                     .setFavoriteIntent(getPendingIntent(favoriteActionName))
                     .setLyricsIntent(getPendingIntent(lyricsActionName))
                     .setCreateSystemNotification(true)
                     .build();
+
+            //边播边存配置
+            CacheConfig cacheConfig = new CacheConfig.Builder()
+                    .setOpenCacheWhenPlaying(true)
+                    .setCachePath(CacheUtils.getStorageDirectoryPath() + "/NiceMusic/Cache/")
+                    .setIFileNameGenerator(new IFileNameGenerator.Stub() {
+                        @Override
+                        public String generate(String url) throws RemoteException {
+                            return "lzx_" + ProxyCacheUtils.computeMD5(url);
+                        }
+                    })
+                    .build();
+
             MusicManager.get()
                     .setContext(this)
                     .setNotificationCreater(creater)
+                    .setCacheConfig(cacheConfig)
                     .init();
-
-
         }
     }
 

@@ -49,7 +49,6 @@ public class HomeActivity extends BaseMvpActivity<SongListContract.View, SongLis
 
         getNotificationIntentData(getIntent());
 
-        MusicManager.get().openCacheWhenPlaying(true);
     }
 
     @Override
