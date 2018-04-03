@@ -9,12 +9,10 @@ import com.danikula.videocache.file.FileNameGenerator;
 import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.aidl.listener.NotifyContract;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
-import com.lzx.musiclibrary.aidl.source.IFileNameGenerator;
 import com.lzx.musiclibrary.aidl.source.IOnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.source.IOnTimerTaskListener;
 import com.lzx.musiclibrary.aidl.source.IPlayControl;
 import com.lzx.musiclibrary.cache.CacheConfig;
-import com.lzx.musiclibrary.cache.MusicMd5Generator;
 import com.lzx.musiclibrary.constans.PlayMode;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.helper.QueueHelper;
@@ -393,22 +391,7 @@ public class PlayControl extends IPlayControl.Stub {
         mOnTimerTaskListenerList.unregister(listener);
     }
 
-    @Override
-    public void setCacheFileNameGenerator(final IFileNameGenerator generator) throws RemoteException {
-        LogUtil.i("IFileNameGenerator = "+generator);
-        FileNameGenerator fileNameGenerator = new FileNameGenerator() {
-            @Override
-            public String generate(String url) {
-                try {
-                    return generator.generate(url);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                    return ProxyCacheUtils.computeMD5(url);
-                }
-            }
-        };
-        playback.setFileNameGenerator(fileNameGenerator);
-    }
+
 
 
 }

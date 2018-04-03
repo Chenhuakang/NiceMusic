@@ -96,6 +96,7 @@ public class CacheUtils {
             if (configMaxFileCount != 0) {
                 builder.maxCacheFilesCount(configMaxFileCount);
             }
+            builder.fileNameGenerator(new MusicMd5Generator());
         }
         return builder;
     }

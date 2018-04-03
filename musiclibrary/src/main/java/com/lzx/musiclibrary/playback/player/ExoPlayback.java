@@ -361,14 +361,7 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
         isOpenCacheWhenPlaying = isOpen;
     }
 
-    @Override
-    public void setFileNameGenerator(FileNameGenerator fileNameGenerator) {
 
-        LogUtil.i("setFileNameGenerator = ");
-
-        builder.fileNameGenerator(fileNameGenerator);
-        builder.build();
-    }
 
     @Override
     public void setCallback(Callback callback) {

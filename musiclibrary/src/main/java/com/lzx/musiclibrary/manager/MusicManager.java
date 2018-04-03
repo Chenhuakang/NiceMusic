@@ -15,7 +15,6 @@ import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.listener.OnTimerTaskListener;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
-import com.lzx.musiclibrary.aidl.source.IFileNameGenerator;
 import com.lzx.musiclibrary.aidl.source.IOnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.source.IOnTimerTaskListener;
 import com.lzx.musiclibrary.aidl.source.IPlayControl;
@@ -129,9 +128,6 @@ public class MusicManager implements IPlayControl {
             try {
                 control.registerPlayerEventListener(mOnPlayerEventListener);
                 control.registerTimerTaskListener(mOnTimerTaskListener);
-                if (mCacheConfig != null && mCacheConfig.getIFileNameGenerator() != null) {
-                    control.setCacheFileNameGenerator(mCacheConfig.getIFileNameGenerator());
-                }
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -777,12 +773,6 @@ public class MusicManager implements IPlayControl {
     public void unregisterTimerTaskListener(IOnTimerTaskListener listener) throws RemoteException {
         //Do nothing
     }
-
-    @Override
-    public void setCacheFileNameGenerator(IFileNameGenerator generator) throws RemoteException {
-        //Do nothing
-    }
-
 
     @Override
     public IBinder asBinder() {

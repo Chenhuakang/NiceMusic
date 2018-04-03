@@ -295,11 +295,7 @@ public class MediaPlayback implements Playback,
         isOpenCacheWhenPlaying = isOpen;
     }
 
-    @Override
-    public void setFileNameGenerator(FileNameGenerator fileNameGenerator) {
-        builder.fileNameGenerator(fileNameGenerator);
-        builder.build();
-    }
+
 
     @Override
     public void setCallback(Callback callback) {

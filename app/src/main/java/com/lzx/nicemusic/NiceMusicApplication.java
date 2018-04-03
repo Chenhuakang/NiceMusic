@@ -4,11 +4,9 @@ import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.IBinder;
 import android.os.RemoteException;
 
 import com.danikula.videocache.ProxyCacheUtils;
-import com.lzx.musiclibrary.aidl.source.IFileNameGenerator;
 import com.lzx.musiclibrary.cache.CacheConfig;
 import com.lzx.musiclibrary.cache.CacheUtils;
 import com.lzx.musiclibrary.manager.MusicManager;
@@ -60,12 +58,6 @@ public class NiceMusicApplication extends Application {
             CacheConfig cacheConfig = new CacheConfig.Builder()
                     .setOpenCacheWhenPlaying(true)
                     .setCachePath(CacheUtils.getStorageDirectoryPath() + "/NiceMusic/Cache/")
-                    .setIFileNameGenerator(new IFileNameGenerator.Stub() {
-                        @Override
-                        public String generate(String url) throws RemoteException {
-                            return "lzx_" + ProxyCacheUtils.computeMD5(url);
-                        }
-                    })
                     .build();
 
             MusicManager.get()

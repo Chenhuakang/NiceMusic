@@ -71,7 +71,7 @@ public interface Playback {
 
     void openCacheWhenPlaying(boolean isOpen);
 
-    void setFileNameGenerator(FileNameGenerator fileNameGenerator);
+
 
     interface Callback {
         /**
