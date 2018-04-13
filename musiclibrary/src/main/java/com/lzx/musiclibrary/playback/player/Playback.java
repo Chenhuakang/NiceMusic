@@ -1,6 +1,5 @@
 package com.lzx.musiclibrary.playback.player;
 
-import com.danikula.videocache.file.FileNameGenerator;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 
 /**
@@ -71,7 +70,7 @@ public interface Playback {
 
     void openCacheWhenPlaying(boolean isOpen);
 
-
+    void setPlaybackParameters(float speed, float pitch);
 
     interface Callback {
         /**

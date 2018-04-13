@@ -673,10 +673,23 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public void stopNotification()   {
+    public void stopNotification() {
         if (control != null) {
             try {
                 control.stopNotification();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void setPlaybackParameters(float speed, float pitch) throws RemoteException {
+        if (control != null) {
+            try {
+                if (speed > 0 && pitch > 0) {
+                    control.setPlaybackParameters(speed, pitch);
+                }
             } catch (RemoteException e) {
                 e.printStackTrace();
             }

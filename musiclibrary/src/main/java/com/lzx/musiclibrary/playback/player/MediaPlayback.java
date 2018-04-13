@@ -6,18 +6,18 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.PlaybackParams;
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.danikula.videocache.HttpProxyCacheServer;
-import com.danikula.videocache.file.FileNameGenerator;
 import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.cache.CacheConfig;
+import com.lzx.musiclibrary.cache.CacheUtils;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.manager.FocusAndLockManager;
 import com.lzx.musiclibrary.utils.BaseUtil;
-import com.lzx.musiclibrary.cache.CacheUtils;
-import com.lzx.musiclibrary.cache.MusicMd5Generator;
 
 import java.io.IOException;
 
@@ -295,6 +295,15 @@ public class MediaPlayback implements Playback,
         isOpenCacheWhenPlaying = isOpen;
     }
 
+    @Override
+    public void setPlaybackParameters(float speed, float pitch) {
+        if (mMediaPlayer != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PlaybackParams params = new PlaybackParams();
+            params.setSpeed(speed);
+            params.setPitch(pitch);
+            mMediaPlayer.setPlaybackParams(params);
+        }
+    }
 
 
     @Override

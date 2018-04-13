@@ -355,6 +355,11 @@ public class PlayControl extends IPlayControl.Stub {
     }
 
     @Override
+    public void setPlaybackParameters(float speed, float pitch) throws RemoteException {
+        mController.setPlaybackParameters(speed, pitch);
+    }
+
+    @Override
     public void updateNotificationCreater(NotificationCreater creater) throws RemoteException {
         mController.updateNotificationCreater(creater);
     }
