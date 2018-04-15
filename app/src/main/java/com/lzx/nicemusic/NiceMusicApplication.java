@@ -51,6 +51,7 @@ public class NiceMusicApplication extends Application {
                     .setTargetClass("com.lzx.nicemusic.module.main.HomeActivity")
                     .setFavoriteIntent(getPendingIntent(favoriteActionName))
                     .setLyricsIntent(getPendingIntent(lyricsActionName))
+                    .setCloseIntent(getPendingIntent(closeActionName))
                     .setCreateSystemNotification(true)
                     .build();
 
@@ -64,6 +65,7 @@ public class NiceMusicApplication extends Application {
                     .setContext(this)
                     .setNotificationCreater(creater)
                     .setCacheConfig(cacheConfig)
+                    .setUseMediaPlayer(true)
                     .init();
         }
     }

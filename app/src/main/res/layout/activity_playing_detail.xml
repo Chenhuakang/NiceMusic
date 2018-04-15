@@ -325,6 +325,7 @@
             android:paddingEnd="7.5dp"
             android:paddingLeft="7.5dp"
             android:paddingRight="7.5dp"
+            android:secondaryProgressTint="@color/red"
             android:paddingStart="7.5dp"
             android:progressDrawable="@drawable/seekbar_progress"
             android:thumb="@drawable/seekbar_thumb" />

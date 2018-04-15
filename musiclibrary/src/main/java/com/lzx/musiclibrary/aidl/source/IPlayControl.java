@@ -308,6 +308,13 @@ public interface IPlayControl extends android.os.IInterface {
                     reply.writeNoException();
                     return true;
                 }
+                case TRANSACTION_getBufferedPosition: {
+                    data.enforceInterface(DESCRIPTOR);
+                    long _result = this.getBufferedPosition();
+                    reply.writeNoException();
+                    reply.writeLong(_result);
+                    return true;
+                }
                 case TRANSACTION_updateNotificationCreater: {
                     data.enforceInterface(DESCRIPTOR);
                     NotificationCreater _arg0;
@@ -988,6 +995,23 @@ public interface IPlayControl extends android.os.IInterface {
                 }
             }
 
+            @Override
+            public long getBufferedPosition() throws RemoteException {
+                android.os.Parcel _data = android.os.Parcel.obtain();
+                android.os.Parcel _reply = android.os.Parcel.obtain();
+                long _result;
+                try {
+                    _data.writeInterfaceToken(DESCRIPTOR);
+                    mRemote.transact(Stub.TRANSACTION_getBufferedPosition, _data, _reply, 0);
+                    _reply.readException();
+                    _result = _reply.readLong();
+                } finally {
+                    _reply.recycle();
+                    _data.recycle();
+                }
+                return _result;
+            }
+
             /**
              * 更新通知栏
              */
@@ -1176,14 +1200,15 @@ public interface IPlayControl extends android.os.IInterface {
         static final int TRANSACTION_stopNotification = (android.os.IBinder.FIRST_CALL_TRANSACTION + 27);
         static final int TRANSACTION_openCacheWhenPlaying = (android.os.IBinder.FIRST_CALL_TRANSACTION + 28);
         static final int TRANSACTION_setPlaybackParameters = (android.os.IBinder.FIRST_CALL_TRANSACTION + 29);
-        static final int TRANSACTION_updateNotificationCreater = (android.os.IBinder.FIRST_CALL_TRANSACTION + 30);
-        static final int TRANSACTION_updateNotificationFavorite = (android.os.IBinder.FIRST_CALL_TRANSACTION + 31);
-        static final int TRANSACTION_updateNotificationLyrics = (android.os.IBinder.FIRST_CALL_TRANSACTION + 32);
-        static final int TRANSACTION_updateNotificationContentIntent = (android.os.IBinder.FIRST_CALL_TRANSACTION + 33);
-        static final int TRANSACTION_registerPlayerEventListener = (android.os.IBinder.FIRST_CALL_TRANSACTION + 34);
-        static final int TRANSACTION_unregisterPlayerEventListener = (android.os.IBinder.FIRST_CALL_TRANSACTION + 35);
-        static final int TRANSACTION_registerTimerTaskListener = (android.os.IBinder.FIRST_CALL_TRANSACTION + 36);
-        static final int TRANSACTION_unregisterTimerTaskListener = (android.os.IBinder.FIRST_CALL_TRANSACTION + 37);
+        static final int TRANSACTION_getBufferedPosition = (android.os.IBinder.FIRST_CALL_TRANSACTION + 30);
+        static final int TRANSACTION_updateNotificationCreater = (android.os.IBinder.FIRST_CALL_TRANSACTION + 31);
+        static final int TRANSACTION_updateNotificationFavorite = (android.os.IBinder.FIRST_CALL_TRANSACTION + 32);
+        static final int TRANSACTION_updateNotificationLyrics = (android.os.IBinder.FIRST_CALL_TRANSACTION + 33);
+        static final int TRANSACTION_updateNotificationContentIntent = (android.os.IBinder.FIRST_CALL_TRANSACTION + 34);
+        static final int TRANSACTION_registerPlayerEventListener = (android.os.IBinder.FIRST_CALL_TRANSACTION + 35);
+        static final int TRANSACTION_unregisterPlayerEventListener = (android.os.IBinder.FIRST_CALL_TRANSACTION + 36);
+        static final int TRANSACTION_registerTimerTaskListener = (android.os.IBinder.FIRST_CALL_TRANSACTION + 37);
+        static final int TRANSACTION_unregisterTimerTaskListener = (android.os.IBinder.FIRST_CALL_TRANSACTION + 38);
     }
 
     //播放，并设置播放列表
@@ -1273,6 +1298,8 @@ public interface IPlayControl extends android.os.IInterface {
 
     //变速
     void setPlaybackParameters(float speed, float pitch) throws RemoteException;
+
+    long getBufferedPosition() throws RemoteException;
 
     //更新通知栏
     void updateNotificationCreater(NotificationCreater creater) throws android.os.RemoteException;

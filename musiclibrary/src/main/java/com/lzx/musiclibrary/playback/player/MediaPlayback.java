@@ -18,6 +18,7 @@ import com.lzx.musiclibrary.cache.CacheUtils;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.manager.FocusAndLockManager;
 import com.lzx.musiclibrary.utils.BaseUtil;
+import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.io.IOException;
 
@@ -34,13 +35,14 @@ public class MediaPlayback implements Playback,
         FocusAndLockManager.AudioFocusChangeListener,
         MediaPlayer.OnPreparedListener,
         MediaPlayer.OnCompletionListener,
-        MediaPlayer.OnErrorListener {
+        MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener {
 
     private boolean isOpenCacheWhenPlaying = false;
     private boolean mPlayOnFocusGain;
     private boolean mAudioNoisyReceiverRegistered;
     private boolean mExoPlayerNullIsStopped = false;
     private String mCurrentMediaId; //当前播放的媒体id
+    private long currbufferedPosition = 0;
     private SongInfo mCurrentMediaSongInfo;
 
     private MediaPlayer mMediaPlayer;
@@ -108,17 +110,14 @@ public class MediaPlayback implements Playback,
 
     private void configurePlayerState() {
         if (mFocusAndLockManager.getCurrentAudioFocusState() == AUDIO_NO_FOCUS_NO_DUCK) {
-            // We don't have audio focus and can't duck, so we have to pause
             pause();
         } else {
             registerAudioNoisyReceiver();
             if (mFocusAndLockManager.getCurrentAudioFocusState() == AUDIO_NO_FOCUS_CAN_DUCK) {
-                // We're permitted to play, but only if we 'duck', ie: play softly
                 mMediaPlayer.setVolume(VOLUME_DUCK, VOLUME_DUCK);
             } else {
                 mMediaPlayer.setVolume(VOLUME_NORMAL, VOLUME_NORMAL);
             }
-            // If we were playing when we lost focus, we need to resume playing.
             if (mPlayOnFocusGain) {
                 mMediaPlayer.start();
                 mPlayState = State.STATE_PLAYING;
@@ -175,6 +174,12 @@ public class MediaPlayback implements Playback,
     }
 
     @Override
+    public long getBufferedPosition() {
+        LogUtil.i("currbufferedPosition = " + currbufferedPosition);
+        return currbufferedPosition;
+    }
+
+    @Override
     public void updateLastKnownStreamPosition() {
 
     }
@@ -216,6 +221,8 @@ public class MediaPlayback implements Playback,
                 return;
             }
 
+            LogUtil.i("isOpenCacheWhenPlaying = " + isOpenCacheWhenPlaying + " playUri = " + playUrl);
+
             if (mMediaPlayer == null) {
                 mMediaPlayer = new MediaPlayer();
                 //当装载流媒体完毕的时候回调
@@ -224,13 +231,14 @@ public class MediaPlayback implements Playback,
                 mMediaPlayer.setOnCompletionListener(this);
                 //当播放中发生错误的时候回调
                 mMediaPlayer.setOnErrorListener(this);
+                mMediaPlayer.setOnBufferingUpdateListener(this);
             }
 
             try {
                 mMediaPlayer.reset();
                 mMediaPlayer.setDataSource(playUrl);
                 mMediaPlayer.prepareAsync();
-                mPlayState = State.STATE_BUFFERING;
+                mPlayState = State.STATE_ASYNC_LOADING;
                 if (mCallback != null) {
                     mCallback.onPlaybackStatusChanged(mPlayState);
                 }
@@ -338,5 +346,15 @@ public class MediaPlayback implements Playback,
             mCallback.onError("MediaPlayer error " + what);
         }
         return false;
+    }
+
+    @Override
+    public void onBufferingUpdate(MediaPlayer mp, int percent) {
+        if (isOpenCacheWhenPlaying && mCurrentMediaSongInfo != null) {
+            boolean fullyCached = mProxyCacheServer.isCached(mCurrentMediaSongInfo.getSongUrl());
+            currbufferedPosition =  fullyCached ? getDuration() : percent * getDuration();
+        } else {
+            currbufferedPosition = percent * getDuration();
+        }
     }
 }

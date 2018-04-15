@@ -72,7 +72,6 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         }
     }
 
-
     public static class Builder {
         private MusicService mMusicService;
         private PlayMode mPlayMode;
@@ -223,6 +222,10 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
 
     long getProgress() {
         return mPlaybackManager.getCurrentPosition();
+    }
+
+    public long getBufferedPosition() {
+        return mPlaybackManager.getBufferedPosition();
     }
 
     void seekTo(int position) {

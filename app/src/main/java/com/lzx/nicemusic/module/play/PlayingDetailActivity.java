@@ -18,8 +18,10 @@ import android.widget.Toast;
 
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
+import com.lzx.musiclibrary.cache.MusicMd5Generator;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.manager.TimerTaskManager;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
@@ -128,7 +130,12 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
      */
     private void updateProgress() {
         long progress = MusicManager.get().getProgress();
+        long bufferProgress = MusicManager.get().getBufferedPosition();
         mSeekBar.setProgress((int) progress);
+        mSeekBar.setSecondaryProgress((int) bufferProgress);
+
+  //     LogUtil.i("bufferProgress = " + bufferProgress);
+
         mStartTime.setText(FormatUtil.formatMusicTime(progress));
         if (lrcList != null && lrcList.size() > 0) {
             mTextLyrics.setText(getLrc(progress));
@@ -188,7 +195,7 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
     }
 
     @Override
-    public void onBuffering(boolean isFinishBuffer) {
+    public void onAsyncLoading(boolean isFinishLoading) {
 
     }
 
@@ -210,14 +217,14 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
             case R.id.btn_pre:
                 if (MusicManager.get().hasPre()) {
                     MusicManager.get().playPre();
-                }else {
+                } else {
                     Toast.makeText(mContext, "没有上一首了", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.btn_next:
                 if (MusicManager.get().hasNext()) {
                     MusicManager.get().playNext();
-                }else {
+                } else {
                     Toast.makeText(mContext, "没有下一首了", Toast.LENGTH_SHORT).show();
                 }
                 break;

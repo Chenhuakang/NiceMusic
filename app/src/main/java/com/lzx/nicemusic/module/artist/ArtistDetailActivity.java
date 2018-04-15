@@ -203,7 +203,7 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
     }
 
     @Override
-    public void onBuffering(boolean isFinishBuffer) {
+    public void onAsyncLoading(boolean isFinishLoading) {
 
     }
 }

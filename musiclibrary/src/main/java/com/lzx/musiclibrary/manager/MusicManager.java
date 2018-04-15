@@ -195,8 +195,8 @@ public class MusicManager implements IPlayControl {
         }
 
         @Override
-        public void onBuffering(boolean isFinishBuffer) {
-            mClientHandler.obtainMessage(MSG_BUFFERING, isFinishBuffer).sendToTarget();
+        public void onAsyncLoading(boolean isFinishLoading) throws RemoteException {
+            mClientHandler.obtainMessage(MSG_BUFFERING, isFinishLoading).sendToTarget();
         }
     };
 
@@ -243,8 +243,8 @@ public class MusicManager implements IPlayControl {
                     manager.mStateObservable.stateChangeNotifyObservers(MSG_PLAYER_ERROR);
                     break;
                 case MSG_BUFFERING:
-                    boolean isFinishBuffer = (boolean) msg.obj;
-                    manager.notifyPlayerEventChange(MSG_BUFFERING, null, "", isFinishBuffer);
+                    boolean isFinishLoading = (boolean) msg.obj;
+                    manager.notifyPlayerEventChange(MSG_BUFFERING, null, "", isFinishLoading);
                     manager.mStateObservable.stateChangeNotifyObservers(MSG_BUFFERING);
                     break;
                 case MSG_TIMER_FINISH:
@@ -316,7 +316,7 @@ public class MusicManager implements IPlayControl {
                     listener.onError(errorMsg);
                     break;
                 case MSG_BUFFERING:
-                    listener.onBuffering(isFinishBuffer);
+                    listener.onAsyncLoading(isFinishBuffer);
                     break;
             }
         }
@@ -694,6 +694,18 @@ public class MusicManager implements IPlayControl {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public long getBufferedPosition()  {
+        if (control != null) {
+            try {
+                return control.getBufferedPosition();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
     }
 
     @Override

@@ -55,4 +55,5 @@ dependencies {
     compile project(':musiclibrary')
     //compile 'com.github.lizixian18:MusicLibrary:v1.2.6'
     implementation files('libs/TingPhoneOpenSDK_5.6.4.jar')
+
 }

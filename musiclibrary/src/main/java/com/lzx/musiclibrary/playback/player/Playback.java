@@ -50,6 +50,12 @@ public interface Playback {
     long getCurrentStreamPosition();
 
     /**
+     * 获取缓冲进度
+     * @return
+     */
+    long getBufferedPosition();
+
+    /**
      * Queries the underlying stream and update the internal last known stream position.
      */
     void updateLastKnownStreamPosition();
