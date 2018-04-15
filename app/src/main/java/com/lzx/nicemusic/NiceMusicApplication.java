@@ -65,7 +65,6 @@ public class NiceMusicApplication extends Application {
                     .setContext(this)
                     .setNotificationCreater(creater)
                     .setCacheConfig(cacheConfig)
-                    .setUseMediaPlayer(true)
                     .init();
         }
     }

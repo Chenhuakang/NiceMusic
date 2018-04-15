@@ -61,7 +61,7 @@ public class MediaPlayback implements Playback,
         mFocusAndLockManager = new FocusAndLockManager(applicationContext, this);
 
         builder = CacheUtils.createHttpProxyCacheServerBuilder(mContext, cacheConfig);
-        if (cacheConfig.isOpenCacheWhenPlaying()) {
+        if (cacheConfig != null && cacheConfig.isOpenCacheWhenPlaying()) {
             isOpenCacheWhenPlaying = true;
         }
         mProxyCacheServer = builder.build();
@@ -352,7 +352,7 @@ public class MediaPlayback implements Playback,
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
         if (isOpenCacheWhenPlaying && mCurrentMediaSongInfo != null) {
             boolean fullyCached = mProxyCacheServer.isCached(mCurrentMediaSongInfo.getSongUrl());
-            currbufferedPosition =  fullyCached ? getDuration() : percent * getDuration();
+            currbufferedPosition = fullyCached ? getDuration() : percent * getDuration();
         } else {
             currbufferedPosition = percent * getDuration();
         }

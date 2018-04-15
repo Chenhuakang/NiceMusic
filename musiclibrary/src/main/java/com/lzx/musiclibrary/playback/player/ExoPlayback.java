@@ -91,7 +91,7 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
         mediaDataSourceFactory = buildDataSourceFactory(true);
 
         builder = CacheUtils.createHttpProxyCacheServerBuilder(mContext, cacheConfig);
-        if (cacheConfig.isOpenCacheWhenPlaying()) {
+        if (cacheConfig != null && cacheConfig.isOpenCacheWhenPlaying()) {
             isOpenCacheWhenPlaying = true;
         }
         mProxyCacheServer = builder.build();
