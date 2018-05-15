@@ -9,8 +9,8 @@ import android.net.wifi.WifiManager;
  */
 
 public class FocusAndLockManager {
-    private final AudioManager mAudioManager;
-    private final WifiManager.WifiLock mWifiLock;
+    private AudioManager mAudioManager;
+    private WifiManager.WifiLock mWifiLock;
 
     public static final float VOLUME_DUCK = 0.2f;
     public static final float VOLUME_NORMAL = 1.0f;
@@ -30,6 +30,10 @@ public class FocusAndLockManager {
         this.mWifiLock = ((WifiManager) applicationContext.getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, "uAmp_lock");
         this.mListener = listener;
+    }
+
+    public FocusAndLockManager(Context context) {
+        new FocusAndLockManager(context, null);
     }
 
     public void giveUpAudioFocus() {
@@ -74,12 +78,9 @@ public class FocusAndLockManager {
                     mCurrentAudioFocusState = AUDIO_FOCUSED;
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                    // Audio focus was lost, but it's possible to duck (i.e.: play quietly)
                     mCurrentAudioFocusState = AUDIO_NO_FOCUS_CAN_DUCK;
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                    // Lost audio focus, but will gain it back (shortly), so note whether
-                    // playback should resume
                     mCurrentAudioFocusState = AUDIO_NO_FOCUS_NO_DUCK;
 
                     if (mListener != null) {
@@ -87,7 +88,6 @@ public class FocusAndLockManager {
                     }
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS:
-                    // Lost audio focus, probably "permanently"
                     mCurrentAudioFocusState = AUDIO_NO_FOCUS_NO_DUCK;
                     break;
             }

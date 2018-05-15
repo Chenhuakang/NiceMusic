@@ -198,6 +198,11 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
     }
 
     @Override
+    public void onPlayerStop() {
+
+    }
+
+    @Override
     public void onError(String errorMsg) {
         Toast.makeText(mContext, "播放失败!", Toast.LENGTH_SHORT).show();
     }

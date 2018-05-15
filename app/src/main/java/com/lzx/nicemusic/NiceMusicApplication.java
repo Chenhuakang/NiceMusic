@@ -9,6 +9,7 @@ import android.os.RemoteException;
 import com.danikula.videocache.ProxyCacheUtils;
 import com.lzx.musiclibrary.cache.CacheConfig;
 import com.lzx.musiclibrary.cache.CacheUtils;
+import com.lzx.musiclibrary.manager.MusicLibrary;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.notification.NotificationCreater;
 import com.lzx.musiclibrary.utils.BaseUtil;
@@ -49,10 +50,6 @@ public class NiceMusicApplication extends Application {
             //通知栏配置
             NotificationCreater creater = new NotificationCreater.Builder()
                     .setTargetClass("com.lzx.nicemusic.module.main.HomeActivity")
-                    .setFavoriteIntent(getPendingIntent(favoriteActionName))
-                    .setLyricsIntent(getPendingIntent(lyricsActionName))
-                    .setCloseIntent(getPendingIntent(closeActionName))
-                    .setCreateSystemNotification(true)
                     .build();
 
             //边播边存配置
@@ -61,11 +58,16 @@ public class NiceMusicApplication extends Application {
                     .setCachePath(CacheUtils.getStorageDirectoryPath() + "/NiceMusic/Cache/")
                     .build();
 
-            MusicManager.get()
-                    .setContext(this)
+//            MusicManager.get()
+//                    .setContext(this)
+//                    .setNotificationCreater(creater)
+//                    .setCacheConfig(cacheConfig)
+//                    .init();
+            MusicLibrary musicLibrary = new MusicLibrary.Builder(this)
                     .setNotificationCreater(creater)
                     .setCacheConfig(cacheConfig)
-                    .init();
+                    .build();
+            musicLibrary.init();
         }
     }
 

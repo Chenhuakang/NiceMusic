@@ -46,14 +46,14 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
 
     private PlayController(Builder builder) {
         this.mMusicService = builder.mMusicService;
-        this.mPlayMode = builder.mPlayMode;
         this.mPlayback = builder.mPlayback;
         this.mNotifyStatusChanged = builder.mNotifyStatusChanged;
         this.mNotifyMusicSwitch = builder.mNotifyMusicSwitch;
         this.mNotifyTimerTask = builder.notifyTimerTask;
 
+        mPlayMode = new PlayMode();
         mTimerTaskManager = new TimerTaskManager();
-        mQueueManager = new QueueManager(this, mPlayMode);
+        mQueueManager = new QueueManager(mMusicService.getApplicationContext(), this, mPlayMode);
         mPlaybackManager = new PlaybackManager(mPlayback, mQueueManager, mPlayMode, builder.isAutoPlayNext);
         mPlaybackManager.setServiceCallback(this);
         mMediaSessionManager = new MediaSessionManager(this.mMusicService.getApplicationContext(), mPlaybackManager);
@@ -74,7 +74,6 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
 
     public static class Builder {
         private MusicService mMusicService;
-        private PlayMode mPlayMode;
         private Playback mPlayback;
         private NotifyContract.NotifyStatusChanged mNotifyStatusChanged;
         private NotifyContract.NotifyMusicSwitch mNotifyMusicSwitch;
@@ -86,10 +85,6 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
             mMusicService = mService;
         }
 
-        Builder setPlayMode(PlayMode playMode) {
-            mPlayMode = playMode;
-            return this;
-        }
 
         Builder setPlayback(Playback playback) {
             mPlayback = playback;
@@ -123,6 +118,23 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
 
         public PlayController build() {
             return new PlayController(this);
+        }
+    }
+
+    public void setPlayMode(int mode, boolean isSaveLocal) {
+        if (isSaveLocal) {
+            mPlayMode.setCurrPlayMode(mMusicService, mode);
+        } else {
+            mPlayMode.setCurrPlayMode(mode);
+        }
+        mQueueManager.updatePlayModel(mPlayMode);
+    }
+
+    public int getPlayMode(boolean isGetLocal) {
+        if (isGetLocal) {
+            return mPlayMode.getCurrPlayMode(mMusicService.getApplicationContext());
+        } else {
+            return mPlayMode.getCurrPlayMode();
         }
     }
 
@@ -219,7 +231,6 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         mQueueManager.setCurrentMusic(index);
     }
 
-
     long getProgress() {
         return mPlaybackManager.getCurrentPosition();
     }
@@ -230,6 +241,10 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
 
     void seekTo(int position) {
         mPlaybackManager.getPlayback().seekTo(position);
+    }
+
+    public int getAudioSessionId() {
+        return mPlaybackManager.getAudioSessionId();
     }
 
     void pausePlayInMillis(long time) {
@@ -263,6 +278,10 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
 
     void setPlaybackParameters(float speed, float pitch) {
         mPlayback.setPlaybackParameters(speed, pitch);
+    }
+
+    public void setVolume(float audioVolume) {
+        mPlayback.setVolume(audioVolume);
     }
 
     @Override

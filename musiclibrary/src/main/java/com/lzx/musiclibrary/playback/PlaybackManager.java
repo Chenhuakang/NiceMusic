@@ -52,6 +52,8 @@ public class PlaybackManager implements Playback.Callback {
         return mMediaSessionCallback;
     }
 
+
+
     /**
      * 播放
      */
@@ -70,7 +72,7 @@ public class PlaybackManager implements Playback.Callback {
             mPlayback.play(currentMusic);
             //更新媒体信息
             mQueueManager.updateMetadata();
-            updatePlaybackState(null);
+            //updatePlaybackState(null);
         }
     }
 
@@ -80,7 +82,7 @@ public class PlaybackManager implements Playback.Callback {
     public void handlePauseRequest() {
         if (mPlayback.isPlaying()) {
             mPlayback.pause();
-            updatePlaybackState(null);
+            //updatePlaybackState(null);
         }
     }
 
@@ -161,14 +163,6 @@ public class PlaybackManager implements Playback.Callback {
                 break;
             //随机播放
             case PlayMode.PLAY_IN_RANDOM:
-                //0到size-1的随机数
-                int random = (int) (Math.random() * mQueueManager.getCurrentQueueSize() - 1);
-                if (mQueueManager.skipQueuePosition(random)) {
-                    handlePlayRequest();
-                } else {
-                    handleStopRequest(null);
-                }
-                break;
             //列表循环
             case PlayMode.PLAY_IN_LIST_LOOP:
                 if (mQueueManager.skipQueuePosition(amount)) {
@@ -265,7 +259,6 @@ public class PlaybackManager implements Playback.Callback {
                 .setActions(getAvailableActions());
 
         //获取播放状态
-        //int state = mPlayback.getState();
         int state = mPlayback.getState();
         //如果是播放失败
         if (error != null) {
@@ -307,10 +300,12 @@ public class PlaybackManager implements Playback.Callback {
         } else {
             actions |= PlaybackStateCompat.ACTION_PLAY;
         }
-
         return actions;
     }
 
+    public int getAudioSessionId(){
+        return mPlayback.getAudioSessionId();
+    }
 
     public void switchToPlayback(Playback playback, boolean resumePlaying) {
         if (playback == null) {

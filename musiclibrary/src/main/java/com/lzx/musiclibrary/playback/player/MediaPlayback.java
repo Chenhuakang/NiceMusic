@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.PlaybackParams;
+import android.media.audiofx.Visualizer;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -18,7 +19,6 @@ import com.lzx.musiclibrary.cache.CacheUtils;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.manager.FocusAndLockManager;
 import com.lzx.musiclibrary.utils.BaseUtil;
-import com.lzx.musiclibrary.utils.LogUtil;
 
 import java.io.IOException;
 
@@ -44,7 +44,7 @@ public class MediaPlayback implements Playback,
     private String mCurrentMediaId; //当前播放的媒体id
     private long currbufferedPosition = 0;
     private SongInfo mCurrentMediaSongInfo;
-
+    private boolean isGiveUpAudioFocusManager = false;
     private MediaPlayer mMediaPlayer;
     private Callback mCallback;
     private Context mContext;
@@ -55,11 +55,13 @@ public class MediaPlayback implements Playback,
     private HttpProxyCacheServer mProxyCacheServer;
     private HttpProxyCacheServer.Builder builder;
 
-    public MediaPlayback(Context context, CacheConfig cacheConfig) {
+
+
+    public MediaPlayback(Context context, CacheConfig cacheConfig, boolean isGiveUpAudioFocusManager) {
         Context applicationContext = context.getApplicationContext();
         this.mContext = applicationContext;
         mFocusAndLockManager = new FocusAndLockManager(applicationContext, this);
-
+        this.isGiveUpAudioFocusManager = isGiveUpAudioFocusManager;
         builder = CacheUtils.createHttpProxyCacheServerBuilder(mContext, cacheConfig);
         if (cacheConfig != null && cacheConfig.isOpenCacheWhenPlaying()) {
             isOpenCacheWhenPlaying = true;
@@ -110,7 +112,9 @@ public class MediaPlayback implements Playback,
 
     private void configurePlayerState() {
         if (mFocusAndLockManager.getCurrentAudioFocusState() == AUDIO_NO_FOCUS_NO_DUCK) {
-            pause();
+            if (!isGiveUpAudioFocusManager) {
+                pause();
+            }
         } else {
             registerAudioNoisyReceiver();
             if (mFocusAndLockManager.getCurrentAudioFocusState() == AUDIO_NO_FOCUS_CAN_DUCK) {
@@ -139,7 +143,7 @@ public class MediaPlayback implements Playback,
         mFocusAndLockManager.giveUpAudioFocus();
         unregisterAudioNoisyReceiver();
         releaseResources(true);
-        mPlayState = State.STATE_ENDED;
+        mPlayState = State.STATE_STOP;
     }
 
     @Override
@@ -175,7 +179,6 @@ public class MediaPlayback implements Playback,
 
     @Override
     public long getBufferedPosition() {
-        LogUtil.i("currbufferedPosition = " + currbufferedPosition);
         return currbufferedPosition;
     }
 
@@ -200,7 +203,7 @@ public class MediaPlayback implements Playback,
             releaseResources(false); // release everything except the player
 
             String source = info.getSongUrl();
-            if (source != null) {
+            if (source != null && BaseUtil.isOnLineSource(source)) {
                 source = source.replaceAll(" ", "%20"); // Escape spaces for URLs
             }
 
@@ -221,7 +224,7 @@ public class MediaPlayback implements Playback,
                 return;
             }
 
-            LogUtil.i("isOpenCacheWhenPlaying = " + isOpenCacheWhenPlaying + " playUri = " + playUrl);
+            //LogUtil.i("isOpenCacheWhenPlaying = " + isOpenCacheWhenPlaying + " playUri = " + playUrl);
 
             if (mMediaPlayer == null) {
                 mMediaPlayer = new MediaPlayer();
@@ -313,6 +316,21 @@ public class MediaPlayback implements Playback,
         }
     }
 
+    @Override
+    public void setVolume(float audioVolume) {
+        if (mMediaPlayer != null) {
+            mMediaPlayer.setVolume(audioVolume, audioVolume);
+        }
+    }
+
+    @Override
+    public int getAudioSessionId() {
+        if (mMediaPlayer != null) {
+            return mMediaPlayer.getAudioSessionId();
+        }
+        return 0;
+    }
+
 
     @Override
     public void setCallback(Callback callback) {
@@ -336,7 +354,7 @@ public class MediaPlayback implements Playback,
     public void onCompletion(MediaPlayer mp) {
         if (mCallback != null) {
             mCallback.onPlayCompletion();
-            mCallback.onPlaybackStatusChanged(State.STATE_ENDED);
+            //mCallback.onPlaybackStatusChanged(State.STATE_ENDED);
         }
     }
 

@@ -1,185 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#82000000"
-                android:orientation="vertical">
-
-    <com.lzx.nicemusic.widget.OuterLayerImageView
-        android:id="@+id/music_bg"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:adjustViewBounds="true"
-        android:scaleType="fitXY"/>
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:padding="12dp"
-        android:src="@drawable/ic_back"/>
-
-    <TextView
-        android:id="@+id/music_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp"
-        android:paddingBottom="12dp"
-        android:paddingTop="12dp"
-        android:text="家里的卡时间到啦"
-        android:textColor="@color/white"
-        android:textSize="15sp"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:layout_below="@id/music_name"
-        android:background="@color/white"/>
-
-    <TextView
-        android:id="@+id/songer_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/music_name"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="12dp"
-        android:text="梁君诺"
-        android:textColor="@color/white"
-        android:textSize="16sp"/>
-
-    <com.lzx.nicemusic.widget.CircleImageView
-        android:id="@+id/music_cover"
-        android:layout_width="280dp"
-        android:layout_height="300dp"
-        android:layout_below="@+id/songer_name"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="12dp"
-        app:border_color="#3c000000"
-        app:border_width="5dp"/>
-
-    <TextView
-        android:id="@+id/lyrics_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/music_cover"
-        android:layout_marginTop="12dp"
-        android:gravity="center"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp"
-        android:textColor="@color/white"
-        android:textSize="14sp"
-        android:visibility="invisible"/>
-
-    <SeekBar
-        android:id="@+id/seekBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/lyrics_text"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
-        android:layout_marginTop="33dp"
-        android:layout_toLeftOf="@+id/total_time"
-        android:layout_toRightOf="@+id/start_time"
-        android:maxHeight="1.5dp"
-        android:paddingEnd="7dp"
-        android:paddingLeft="7dp"
-        android:paddingRight="7dp"
-        android:paddingStart="7dp"
-        android:progressDrawable="@drawable/seekbar_progress"
-        android:thumb="@drawable/shape_round_primary"/>
-
-    <TextView
-        android:id="@+id/start_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/lyrics_text"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="30dp"
-        android:text="00:00"
-        android:textColor="@color/white"
-        android:textSize="12sp"/>
-
-    <TextView
-        android:id="@+id/total_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/lyrics_text"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="30dp"
-        android:text="00:00"
-        android:textColor="@color/white"
-        android:textSize="12sp"/>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="@color/white"/>
-
-        <ImageView
-            android:id="@+id/btn_music_list"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="16dp"
-            android:src="@drawable/ic_music_list"
-            android:tint="@color/white"/>
-
-        <ImageView
-            android:id="@+id/btn_play_time"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="16dp"
-            android:padding="5dp"
-            android:src="@drawable/host_playmode_loop"
-            android:tint="@color/white"/>
-
-        <ImageView
-            android:id="@+id/btn_play_pause"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="12dp"
-            android:layout_marginTop="12dp"
-            android:adjustViewBounds="true"
-            android:scaleType="fitXY"
-            android:src="@drawable/notify_btn_dark_play_normal"
-            android:tint="@color/white"/>
-
-        <ImageView
-            android:id="@+id/btn_pre"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/btn_play_pause"
-            android:src="@drawanotify_btn_light_prev_pressedrmal"
-            android:tint="@color/white"/>
-
-        <ImageView
-            android:id="@+id/btn_next"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/btn_play_pause"
-            android:src="@drawanotify_btn_light_next_pressedrmal"
-            android:tint="@color/white"/>
-
-    </RelativeLayout>
-
-
-    <include layout="@layout/layout_dialog_song_list"/>
-
-
-</RelativeLayout>-->
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -325,9 +144,9 @@
             android:paddingEnd="7.5dp"
             android:paddingLeft="7.5dp"
             android:paddingRight="7.5dp"
-            android:secondaryProgressTint="@color/red"
             android:paddingStart="7.5dp"
             android:progressDrawable="@drawable/seekbar_progress"
+            android:secondaryProgressTint="@color/red"
             android:thumb="@drawable/seekbar_thumb" />
 
         <TextView
@@ -384,4 +203,51 @@
         android:layout_toRightOf="@id/btn_play_pause"
         android:adjustViewBounds="true"
         android:src="@drawable/ic_next" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/shuiji"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="随机播放" />
+
+        <TextView
+            android:id="@+id/shunxu"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="顺序播放" />
+
+        <TextView
+            android:id="@+id/shangyishou"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="上一首信息" />
+
+        <TextView
+            android:id="@+id/xiayishou"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="下一首信息" />
+
+        <TextView
+            android:id="@+id/tingzhi"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="停止播放" />
+    </LinearLayout>
 </RelativeLayout>

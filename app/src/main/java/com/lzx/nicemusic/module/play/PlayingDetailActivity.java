@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.cache.MusicMd5Generator;
+import com.lzx.musiclibrary.constans.PlayMode;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.manager.TimerTaskManager;
 import com.lzx.musiclibrary.utils.LogUtil;
@@ -112,6 +113,29 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         if (MusicManager.isPaused()) {
             MusicManager.get().resumeMusic();
         }
+
+
+        findViewById(R.id.shuiji).setOnClickListener(v -> {
+            Toast.makeText(mContext, "随机播放", Toast.LENGTH_SHORT).show();
+            MusicManager.get().setPlayMode(PlayMode.PLAY_IN_RANDOM);
+        });
+        findViewById(R.id.shunxu).setOnClickListener(v -> {
+            Toast.makeText(mContext, "顺序播放", Toast.LENGTH_SHORT).show();
+            MusicManager.get().setPlayMode(PlayMode.PLAY_IN_ORDER);
+        });
+        findViewById(R.id.shangyishou).setOnClickListener(v -> {
+            SongInfo songInfo = MusicManager.get().getPreMusic();
+            Toast.makeText(mContext, "上一首信息 = " + songInfo.getSongName(), Toast.LENGTH_SHORT).show();
+        });
+        findViewById(R.id.xiayishou).setOnClickListener(v -> {
+            SongInfo songInfo = MusicManager.get().getNextMusic();
+            Toast.makeText(mContext, "下一首信息 = " + songInfo.getSongName(), Toast.LENGTH_SHORT).show();
+        });
+        findViewById(R.id.tingzhi).setOnClickListener(v -> {
+            Toast.makeText(mContext, "停止", Toast.LENGTH_SHORT).show();
+            MusicManager.get().stopMusic();
+            MusicManager.get().stopNotification();
+        });
     }
 
     private void updateUI(SongInfo music) {
@@ -134,7 +158,7 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         mSeekBar.setProgress((int) progress);
         mSeekBar.setSecondaryProgress((int) bufferProgress);
 
-  //     LogUtil.i("bufferProgress = " + bufferProgress);
+        //     LogUtil.i("bufferProgress = " + bufferProgress);
 
         mStartTime.setText(FormatUtil.formatMusicTime(progress));
         if (lrcList != null && lrcList.size() > 0) {
@@ -186,6 +210,11 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         mSeekBar.setProgress(0);
         mStartTime.setText("00:00");
         resetCoverAnim();
+    }
+
+    @Override
+    public void onPlayerStop() {
+        Toast.makeText(mContext, "onPlayerStop", Toast.LENGTH_SHORT).show();
     }
 
     @Override

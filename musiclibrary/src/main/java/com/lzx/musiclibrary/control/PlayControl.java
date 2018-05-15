@@ -29,10 +29,9 @@ import java.util.List;
 public class PlayControl extends IPlayControl.Stub {
 
     private MusicService mService;
-    private PlayMode mPlayMode;
+
     private PlayController mController;
     private Playback playback;
-
 
     private RemoteCallbackList<IOnPlayerEventListener> mRemoteCallbackList;
     private RemoteCallbackList<IOnTimerTaskListener> mOnTimerTaskListenerList;
@@ -51,17 +50,17 @@ public class PlayControl extends IPlayControl.Stub {
         mRemoteCallbackList = new RemoteCallbackList<>();
         mOnTimerTaskListenerList = new RemoteCallbackList<>();
 
-        mPlayMode = new PlayMode();
+
         playback = builder.isUseMediaPlayer
-                ? new MediaPlayback(mService.getApplicationContext(), builder.cacheConfig)
-                : new ExoPlayback(mService.getApplicationContext(), builder.cacheConfig);
+                ? new MediaPlayback(mService.getApplicationContext(), builder.cacheConfig, builder.isGiveUpAudioFocusManager)
+                : new ExoPlayback(mService.getApplicationContext(), builder.cacheConfig, builder.isGiveUpAudioFocusManager);
 
         mController = new PlayController.Builder(mService)
                 .setAutoPlayNext(builder.isAutoPlayNext)
                 .setNotifyMusicSwitch(mNotifyMusicSwitch)
                 .setNotifyStatusChanged(mNotifyStatusChanged)
+                .setNotifyTimerTask(mNotifyTimerTask)
                 .setPlayback(playback)
-                .setPlayMode(mPlayMode)
                 .setNotificationCreater(builder.notificationCreater)
                 .build();
     }
@@ -74,6 +73,7 @@ public class PlayControl extends IPlayControl.Stub {
         private MusicService mMusicService;
         private boolean isUseMediaPlayer = false;
         private boolean isAutoPlayNext = true;
+        private boolean isGiveUpAudioFocusManager = false;
         private NotificationCreater notificationCreater;
         private CacheConfig cacheConfig;
 
@@ -98,6 +98,11 @@ public class PlayControl extends IPlayControl.Stub {
 
         public Builder setCacheConfig(CacheConfig cacheConfig) {
             this.cacheConfig = cacheConfig;
+            return this;
+        }
+
+        public Builder setGiveUpAudioFocusManager(boolean giveUpAudioFocusManager) {
+            isGiveUpAudioFocusManager = giveUpAudioFocusManager;
             return this;
         }
 
@@ -133,6 +138,9 @@ public class PlayControl extends IPlayControl.Stub {
                                 case State.STATE_ENDED:
                                 case State.STATE_NONE:
                                     listener.onPlayCompletion();
+                                    break;
+                                case State.STATE_STOP:
+                                    listener.onPlayerStop();
                                     break;
                                 case State.STATE_ERROR:
                                     listener.onError("");
@@ -316,16 +324,12 @@ public class PlayControl extends IPlayControl.Stub {
 
     @Override
     public void setPlayMode(int mode, boolean isSaveLocal) throws RemoteException {
-        if (isSaveLocal) {
-            mPlayMode.setCurrPlayMode(mService, mode);
-        } else {
-            mPlayMode.setCurrPlayMode(mode);
-        }
+        mController.setPlayMode(mode, isSaveLocal);
     }
 
     @Override
     public int getPlayMode(boolean isGetLocal) throws RemoteException {
-        return mPlayMode.getCurrPlayMode();
+        return mController.getPlayMode(isGetLocal);
     }
 
     @Override
@@ -362,6 +366,11 @@ public class PlayControl extends IPlayControl.Stub {
     @Override
     public long getBufferedPosition() throws RemoteException {
         return mController.getBufferedPosition();
+    }
+
+    @Override
+    public void setVolume(float audioVolume) throws RemoteException {
+        mController.setVolume(audioVolume);
     }
 
     @Override
@@ -402,6 +411,11 @@ public class PlayControl extends IPlayControl.Stub {
     @Override
     public void unregisterTimerTaskListener(IOnTimerTaskListener listener) throws RemoteException {
         mOnTimerTaskListenerList.unregister(listener);
+    }
+
+    @Override
+    public int getAudioSessionId() throws RemoteException {
+        return mController.getAudioSessionId();
     }
 
 

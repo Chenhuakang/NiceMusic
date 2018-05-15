@@ -1,5 +1,6 @@
 package com.lzx.musiclibrary.manager;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
@@ -10,6 +11,7 @@ import com.lzx.musiclibrary.helper.QueueHelper;
 import com.lzx.musiclibrary.utils.AlbumArtCache;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,12 +25,39 @@ public class QueueManager {
     private int mCurrentIndex;
     private MetadataUpdateListener mListener;
     private PlayMode mPlayMode;
+    private List<SongInfo> mNormalOrderQueue;
+    private boolean isPlayRandomModel = false;
+    private Context mContext;
 
-    public QueueManager(MetadataUpdateListener listener, PlayMode playMode) {
+    public QueueManager(Context context, MetadataUpdateListener listener, PlayMode playMode) {
         mPlayingQueue = Collections.synchronizedList(new ArrayList<SongInfo>());
+        mNormalOrderQueue = Collections.synchronizedList(new ArrayList<SongInfo>());
         mCurrentIndex = 0;
         mListener = listener;
-        mPlayMode = playMode;
+        this.mPlayMode = playMode;
+        mContext = context;
+    }
+
+    public void updatePlayModel(PlayMode playModel) {
+        this.mPlayMode = playModel;
+        setUpRandomQueue();
+    }
+
+    private void setUpRandomQueue() {
+        isPlayRandomModel = mPlayMode.getCurrPlayMode() == PlayMode.PLAY_IN_RANDOM || mPlayMode.getCurrPlayMode(mContext) == PlayMode.PLAY_IN_RANDOM;
+        if (isPlayRandomModel) {
+            mNormalOrderQueue.clear();
+            mNormalOrderQueue.addAll(mPlayingQueue);
+            Collections.shuffle(mPlayingQueue); //洗牌算法打乱顺序
+        } else {
+            if (mNormalOrderQueue.size() != 0) {
+                SongInfo songInfo = getCurrentMusic();
+                mPlayingQueue.clear();
+                mPlayingQueue.addAll(mNormalOrderQueue);
+                mCurrentIndex = QueueHelper.getMusicIndexOnQueue(mPlayingQueue, songInfo.getSongId());
+                mNormalOrderQueue.clear();
+            }
+        }
     }
 
     public void setListener(MetadataUpdateListener listener) {
@@ -41,7 +70,7 @@ public class QueueManager {
      * @return
      */
     public List<SongInfo> getPlayingQueue() {
-        return mPlayingQueue;
+        return isPlayRandomModel ? mNormalOrderQueue : mPlayingQueue;
     }
 
     /**
@@ -66,8 +95,9 @@ public class QueueManager {
         }
         mCurrentIndex = Math.max(index, 0);
         mPlayingQueue.clear();
-
         mPlayingQueue.addAll(newQueue);
+
+        setUpRandomQueue();
 
         //通知播放列表更新了
         List<MediaSessionCompat.QueueItem> queueItems = QueueHelper.getQueueItems(mPlayingQueue);
@@ -95,6 +125,9 @@ public class QueueManager {
             return;
         }
         mPlayingQueue.add(info);
+
+        setUpRandomQueue();
+
         //通知播放列表更新了
         List<MediaSessionCompat.QueueItem> queueItems = QueueHelper.getQueueItems(mPlayingQueue);
         if (mListener != null) {
@@ -110,6 +143,8 @@ public class QueueManager {
             return;
         }
         mPlayingQueue.remove(info);
+
+        setUpRandomQueue();
 
         List<MediaSessionCompat.QueueItem> queueItems = QueueHelper.getQueueItems(mPlayingQueue);
         if (mListener != null) {
@@ -183,9 +218,8 @@ public class QueueManager {
      *
      * @param musicId
      * @param bitmap
-     * @param icon
      */
-    public void updateSongCoverBitmap(String musicId, Bitmap bitmap, Bitmap icon) {
+    public void updateSongCoverBitmap(String musicId, Bitmap bitmap) {
         SongInfo musicInfo = QueueHelper.getMusicInfoById(mPlayingQueue, musicId);
         if (musicInfo == null) {
             return;
@@ -236,6 +270,7 @@ public class QueueManager {
 
     private SongInfo getNextOrPreMusicInfo(int amount) {
         SongInfo info = null;
+        SongInfo songInfo = mPlayingQueue.get(mCurrentIndex + amount);
         switch (mPlayMode.getCurrPlayMode()) {
             //单曲循环
             case PlayMode.PLAY_IN_SINGLE_LOOP:
@@ -243,35 +278,23 @@ public class QueueManager {
                 break;
             //随机播放
             case PlayMode.PLAY_IN_RANDOM:
-                //0到size-1的随机数
-                int random = (int) (Math.random() * getCurrentQueueSize() - 1);
-                if (skipQueuePosition(random)) {
-                    info = getCurrentMusic();
-                }
-                break;
-            //列表循环
+                //列表循环
             case PlayMode.PLAY_IN_LIST_LOOP:
-                if (skipQueuePosition(amount)) {
-                    info = getCurrentMusic();
-                }
+                info = songInfo == null ? getCurrentMusic() : songInfo;
                 break;
             //顺序播放
             case PlayMode.PLAY_IN_ORDER:
                 if (amount == 1) {
                     if (mCurrentIndex != mPlayingQueue.size() - 1) {
-                        if (skipQueuePosition(amount)) {
-                            info = getCurrentMusic();
-                        }
+                        info = songInfo == null ? getCurrentMusic() : songInfo;
                     } else {
-                        info = null;
+                        info = getCurrentMusic();
                     }
                 } else if (amount == -1) {
                     if (mCurrentIndex != 0) {
-                        if (skipQueuePosition(amount)) {
-                            info = getCurrentMusic();
-                        }
+                        info = songInfo == null ? getCurrentMusic() : songInfo;
                     } else {
-                        info = null;
+                        info = getCurrentMusic();
                     }
                 }
                 break;
@@ -304,7 +327,7 @@ public class QueueManager {
             AlbumArtCache.getInstance().fetch(coverUri, new AlbumArtCache.FetchListener() {
                 @Override
                 public void onFetched(String artUrl, Bitmap bitmap, Bitmap icon) {
-                    updateSongCoverBitmap(musicId, bitmap, icon);
+                    updateSongCoverBitmap(musicId, bitmap);
                     SongInfo currentMusic = getCurrentMusic();
                     if (currentMusic == null) {
                         return;
