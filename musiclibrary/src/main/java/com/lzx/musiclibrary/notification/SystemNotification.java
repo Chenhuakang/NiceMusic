@@ -177,8 +177,7 @@ public class SystemNotification implements IMediaNotification {
         mNotificationColor = themeColor;
         if (mNotificationColor != -1) {
             notificationBuilder
-                    .setColor(mNotificationColor)
-                    .setColorized(true);
+                    .setColor(mNotificationColor);
             mNotificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
             LogUtil.i("updateNotificationThemeColor  =  " + themeColor);
         }
@@ -230,6 +229,7 @@ public class SystemNotification implements IMediaNotification {
                     .setSmallIcon(R.drawable.icon_notification)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                     .setOnlyAlertOnce(true)
+                    .setColorized(true)
                     .setContentIntent(contentIntent)
                     .setContentTitle(contentTitle)
                     .setContentText(contentText)
