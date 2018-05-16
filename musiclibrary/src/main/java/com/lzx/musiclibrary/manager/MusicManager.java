@@ -95,9 +95,9 @@ public class MusicManager implements IPlayControl {
         this.mServiceConnection = serviceConnection;
     }
 
-    void attachMusicLibraryBuilder(MusicLibrary.Builder builder){
+    void attachMusicLibraryBuilder(MusicLibrary.Builder builder) {
         this.mCacheConfig = builder.getCacheConfig();
-        isOpenCacheWhenPlaying =mCacheConfig.isOpenCacheWhenPlaying();
+        isOpenCacheWhenPlaying = mCacheConfig.isOpenCacheWhenPlaying();
     }
 
     public void unbindService() {
@@ -839,6 +839,17 @@ public class MusicManager implements IPlayControl {
             }
         }
         return 0;
+    }
+
+    @Override
+    public void updateNotificationThemeColor(int themeColor) {
+        if (control != null) {
+            try {
+                control.updateNotificationThemeColor(themeColor);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

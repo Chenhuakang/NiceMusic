@@ -10,8 +10,8 @@ import android.os.Parcelable;
 
 public class NotificationCreater implements Parcelable {
 
-    private boolean isCreateSystemNotification = false;
-    private boolean isNotificationCanClearBySystemBtn = false;
+    private boolean isCreateSystemNotification;
+    private boolean isNotificationCanClearBySystemBtn;
     private String targetClass;
     private String contentTitle;
     private String contentText;

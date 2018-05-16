@@ -202,6 +202,10 @@ public class CustomNotification implements IMediaNotification {
     @Override
     public void updateViewStateAtPause() {
         if (mNotification != null) {
+            if (mNotificationCreater != null && mNotificationCreater.isNotificationCanClearBySystemBtn()) {
+                mService.stopForeground(false);
+                mStarted = false;
+            }
             boolean isDark = NotificationColorUtils.isDarkNotificationBar(mService, mNotification);
             updateRemoteViews();
             if (mRemoteView != null) {
@@ -245,6 +249,11 @@ public class CustomNotification implements IMediaNotification {
             mNotification.contentIntent = contentIntent;
             mNotificationManager.notify(NOTIFICATION_ID, mNotification);
         }
+    }
+
+    @Override
+    public void updateNotificationThemeColor(int themeColor) {
+
     }
 
     /**
@@ -401,7 +410,6 @@ public class CustomNotification implements IMediaNotification {
             }
         }
 
-        // changeTextColor(mRemoteView,mBigRemoteView,notification); 暂时不需要
         updateRemoteViewUI(notification, smallIconRes);
 
         return notification;

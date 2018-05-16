@@ -342,6 +342,12 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         }
     }
 
+    void updateNotificationThemeColor(int themeColor) {
+        if (mNotification != null) {
+            mNotification.updateNotificationThemeColor(themeColor);
+        }
+    }
+
     void updateFavorite(boolean isFavorite) {
         if (mNotification != null) {
             mNotification.updateFavorite(isFavorite);

@@ -50,6 +50,7 @@ public class NiceMusicApplication extends Application {
             //通知栏配置
             NotificationCreater creater = new NotificationCreater.Builder()
                     .setTargetClass("com.lzx.nicemusic.module.main.HomeActivity")
+                    .setCreateSystemNotification(true)
                     .build();
 
             //边播边存配置
@@ -58,11 +59,6 @@ public class NiceMusicApplication extends Application {
                     .setCachePath(CacheUtils.getStorageDirectoryPath() + "/NiceMusic/Cache/")
                     .build();
 
-//            MusicManager.get()
-//                    .setContext(this)
-//                    .setNotificationCreater(creater)
-//                    .setCacheConfig(cacheConfig)
-//                    .init();
             MusicLibrary musicLibrary = new MusicLibrary.Builder(this)
                     .setNotificationCreater(creater)
                     .setCacheConfig(cacheConfig)

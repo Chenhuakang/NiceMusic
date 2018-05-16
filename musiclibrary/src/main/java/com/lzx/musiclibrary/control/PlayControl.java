@@ -207,7 +207,7 @@ public class PlayControl extends IPlayControl.Stub {
     }
 
     @Override
-    public void playMusic(List<SongInfo> list, int index, boolean isJustPlay) throws RemoteException {
+    public void playMusic(List<SongInfo> list, int index, boolean isJustPlay) {
         if (!QueueHelper.isIndexPlayable(index, list)) {
             return;
         }
@@ -215,7 +215,7 @@ public class PlayControl extends IPlayControl.Stub {
     }
 
     @Override
-    public void playMusicByInfo(SongInfo info, boolean isJustPlay) throws RemoteException {
+    public void playMusicByInfo(SongInfo info, boolean isJustPlay) {
         if (info == null) {
             return;
         }
@@ -223,133 +223,133 @@ public class PlayControl extends IPlayControl.Stub {
     }
 
     @Override
-    public void playMusicByIndex(int index, boolean isJustPlay) throws RemoteException {
+    public void playMusicByIndex(int index, boolean isJustPlay) {
         mController.playMusicByIndex(index, isJustPlay);
     }
 
     @Override
-    public void pausePlayInMillis(long time) throws RemoteException {
+    public void pausePlayInMillis(long time) {
         mController.pausePlayInMillis(time);
     }
 
     @Override
-    public int getCurrPlayingIndex() throws RemoteException {
+    public int getCurrPlayingIndex() {
         return mController.getCurrPlayingIndex();
     }
 
     @Override
-    public void pauseMusic() throws RemoteException {
+    public void pauseMusic() {
         mController.pauseMusic();
     }
 
     @Override
-    public void resumeMusic() throws RemoteException {
+    public void resumeMusic() {
         mController.resumeMusic();
     }
 
     @Override
-    public void stopMusic() throws RemoteException {
+    public void stopMusic() {
         mController.stopMusic();
     }
 
     @Override
-    public void setPlayList(List<SongInfo> list) throws RemoteException {
+    public void setPlayList(List<SongInfo> list) {
         mController.setPlayList(list);
     }
 
     @Override
-    public void setPlayListWithIndex(List<SongInfo> list, int index) throws RemoteException {
+    public void setPlayListWithIndex(List<SongInfo> list, int index) {
         mController.setPlayListWithIndex(list, index);
     }
 
     @Override
-    public List<SongInfo> getPlayList() throws RemoteException {
+    public List<SongInfo> getPlayList() {
         return mController.getPlayList();
     }
 
     @Override
-    public void deleteSongInfoOnPlayList(SongInfo info, boolean isNeedToPlayNext) throws RemoteException {
+    public void deleteSongInfoOnPlayList(SongInfo info, boolean isNeedToPlayNext) {
         mController.deleteMusicInfoOnPlayList(info, isNeedToPlayNext);
     }
 
     @Override
-    public int getStatus() throws RemoteException {
+    public int getStatus() {
         return mController.getState();
     }
 
     @Override
-    public int getDuration() throws RemoteException {
+    public int getDuration() {
         return mController.getDuration();
     }
 
     @Override
-    public void playNext() throws RemoteException {
+    public void playNext() {
         mController.playNext();
     }
 
     @Override
-    public void playPre() throws RemoteException {
+    public void playPre() {
         mController.playPre();
     }
 
     @Override
-    public boolean hasPre() throws RemoteException {
+    public boolean hasPre() {
         return mController.hasPre();
     }
 
     @Override
-    public boolean hasNext() throws RemoteException {
+    public boolean hasNext() {
         return mController.hasNext();
     }
 
     @Override
-    public SongInfo getPreMusic() throws RemoteException {
+    public SongInfo getPreMusic() {
         return mController.getPreMusic();
     }
 
     @Override
-    public SongInfo getNextMusic() throws RemoteException {
+    public SongInfo getNextMusic() {
         return mController.getNextMusic();
     }
 
     @Override
-    public SongInfo getCurrPlayingMusic() throws RemoteException {
+    public SongInfo getCurrPlayingMusic() {
         return mController.getCurrPlayingMusic();
     }
 
     @Override
-    public void setCurrMusic(int index) throws RemoteException {
+    public void setCurrMusic(int index) {
         mController.setCurrMusic(index);
     }
 
     @Override
-    public void setPlayMode(int mode, boolean isSaveLocal) throws RemoteException {
+    public void setPlayMode(int mode, boolean isSaveLocal) {
         mController.setPlayMode(mode, isSaveLocal);
     }
 
     @Override
-    public int getPlayMode(boolean isGetLocal) throws RemoteException {
+    public int getPlayMode(boolean isGetLocal) {
         return mController.getPlayMode(isGetLocal);
     }
 
     @Override
-    public long getProgress() throws RemoteException {
+    public long getProgress() {
         return mController.getProgress();
     }
 
     @Override
-    public void seekTo(int position) throws RemoteException {
+    public void seekTo(int position) {
         mController.seekTo(position);
     }
 
     @Override
-    public void reset() throws RemoteException {
+    public void reset() {
         mController.stopMusic();
         mController.stopNotification();
     }
 
     @Override
-    public void openCacheWhenPlaying(boolean isOpen) throws RemoteException {
+    public void openCacheWhenPlaying(boolean isOpen) {
         mController.openCacheWhenPlaying(isOpen);
     }
 
@@ -359,63 +359,68 @@ public class PlayControl extends IPlayControl.Stub {
     }
 
     @Override
-    public void setPlaybackParameters(float speed, float pitch) throws RemoteException {
+    public void setPlaybackParameters(float speed, float pitch) {
         mController.setPlaybackParameters(speed, pitch);
     }
 
     @Override
-    public long getBufferedPosition() throws RemoteException {
+    public long getBufferedPosition() {
         return mController.getBufferedPosition();
     }
 
     @Override
-    public void setVolume(float audioVolume) throws RemoteException {
+    public void setVolume(float audioVolume) {
         mController.setVolume(audioVolume);
     }
 
     @Override
-    public void updateNotificationCreater(NotificationCreater creater) throws RemoteException {
+    public void updateNotificationCreater(NotificationCreater creater) {
         mController.updateNotificationCreater(creater);
     }
 
     @Override
-    public void updateNotificationFavorite(boolean isFavorite) throws RemoteException {
+    public void updateNotificationFavorite(boolean isFavorite) {
         mController.updateFavorite(isFavorite);
     }
 
     @Override
-    public void updateNotificationLyrics(boolean isChecked) throws RemoteException {
+    public void updateNotificationLyrics(boolean isChecked) {
         mController.updateLyrics(isChecked);
     }
 
     @Override
-    public void updateNotificationContentIntent(Bundle bundle, String targetClass) throws RemoteException {
+    public void updateNotificationContentIntent(Bundle bundle, String targetClass) {
         mController.updateContentIntent(bundle, targetClass);
     }
 
     @Override
-    public void registerPlayerEventListener(IOnPlayerEventListener listener) throws RemoteException {
+    public void registerPlayerEventListener(IOnPlayerEventListener listener) {
         mRemoteCallbackList.register(listener);
     }
 
     @Override
-    public void unregisterPlayerEventListener(IOnPlayerEventListener listener) throws RemoteException {
+    public void unregisterPlayerEventListener(IOnPlayerEventListener listener) {
         mRemoteCallbackList.unregister(listener);
     }
 
     @Override
-    public void registerTimerTaskListener(IOnTimerTaskListener listener) throws RemoteException {
+    public void registerTimerTaskListener(IOnTimerTaskListener listener) {
         mOnTimerTaskListenerList.register(listener);
     }
 
     @Override
-    public void unregisterTimerTaskListener(IOnTimerTaskListener listener) throws RemoteException {
+    public void unregisterTimerTaskListener(IOnTimerTaskListener listener) {
         mOnTimerTaskListenerList.unregister(listener);
     }
 
     @Override
-    public int getAudioSessionId() throws RemoteException {
+    public int getAudioSessionId() {
         return mController.getAudioSessionId();
+    }
+
+    @Override
+    public void updateNotificationThemeColor(int themeColor) {
+        mController.updateNotificationThemeColor(themeColor);
     }
 
 

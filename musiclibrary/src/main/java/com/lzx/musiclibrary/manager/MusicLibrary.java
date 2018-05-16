@@ -21,9 +21,9 @@ import com.lzx.musiclibrary.playback.PlayStateObservable;
 public class MusicLibrary {
 
     private Context mContext;
-    private boolean isUseMediaPlayer = false;
-    private boolean isAutoPlayNext = true;
-    private boolean isGiveUpAudioFocusManager = false;
+    private boolean isUseMediaPlayer;
+    private boolean isAutoPlayNext;
+    private boolean isGiveUpAudioFocusManager;
 
     private NotificationCreater mNotificationCreater;
     private CacheConfig mCacheConfig;
@@ -93,7 +93,6 @@ public class MusicLibrary {
         NotificationCreater getNotificationCreater() {
             return mNotificationCreater;
         }
-
 
 
         CacheConfig getCacheConfig() {

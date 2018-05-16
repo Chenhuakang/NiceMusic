@@ -397,11 +397,19 @@ public interface IPlayControl extends android.os.IInterface {
                     reply.writeNoException();
                     return true;
                 }
-                case TRANSACTION_getAudioSessionId:{
+                case TRANSACTION_getAudioSessionId: {
                     data.enforceInterface(DESCRIPTOR);
                     int _result = this.getAudioSessionId();
                     reply.writeNoException();
                     reply.writeInt(_result);
+                    return true;
+                }
+                case TRANSACTION_updateNotificationThemeColor: {
+                    data.enforceInterface(DESCRIPTOR);
+                    int _arg0;
+                    _arg0 = data.readInt();
+                    this.updateNotificationThemeColor(_arg0);
+                    reply.writeNoException();
                     return true;
                 }
             }
@@ -1217,7 +1225,20 @@ public interface IPlayControl extends android.os.IInterface {
                 return _result;
             }
 
-
+            @Override
+            public void updateNotificationThemeColor(int themeColor) throws RemoteException {
+                android.os.Parcel _data = android.os.Parcel.obtain();
+                android.os.Parcel _reply = android.os.Parcel.obtain();
+                try {
+                    _data.writeInterfaceToken(DESCRIPTOR);
+                    _data.writeInt(themeColor);
+                    mRemote.transact(Stub.TRANSACTION_updateNotificationThemeColor, _data, _reply, 0);
+                    _reply.readException();
+                } finally {
+                    _reply.recycle();
+                    _data.recycle();
+                }
+            }
         }
 
         static final int TRANSACTION_playMusic = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);
@@ -1261,6 +1282,7 @@ public interface IPlayControl extends android.os.IInterface {
         static final int TRANSACTION_registerTimerTaskListener = (android.os.IBinder.FIRST_CALL_TRANSACTION + 38);
         static final int TRANSACTION_unregisterTimerTaskListener = (android.os.IBinder.FIRST_CALL_TRANSACTION + 39);
         static final int TRANSACTION_getAudioSessionId = (android.os.IBinder.FIRST_CALL_TRANSACTION + 40);
+        static final int TRANSACTION_updateNotificationThemeColor = (android.os.IBinder.FIRST_CALL_TRANSACTION + 41);
     }
 
     //播放，并设置播放列表
@@ -1383,4 +1405,7 @@ public interface IPlayControl extends android.os.IInterface {
 
     //获取音频SessionId
     int getAudioSessionId() throws android.os.RemoteException;
+
+    //更新系统通知栏主题颜色
+    void updateNotificationThemeColor(int themeColor) throws android.os.RemoteException;
 }

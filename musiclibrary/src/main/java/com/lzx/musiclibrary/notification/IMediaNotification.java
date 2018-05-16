@@ -44,4 +44,6 @@ public interface IMediaNotification {
     void updateModelDetail(SongInfo songInfo);
 
     void updateContentIntent(Bundle bundle, String targetClass);
+
+    void updateNotificationThemeColor(int themeColor);
 }

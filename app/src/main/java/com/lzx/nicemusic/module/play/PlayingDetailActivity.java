@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.TextUtils;
@@ -136,6 +137,8 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
             MusicManager.get().stopMusic();
             MusicManager.get().stopNotification();
         });
+
+
     }
 
     private void updateUI(SongInfo music) {
@@ -181,12 +184,30 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         return lrc;
     }
 
+    //    private void fetchPictureColor(final Bitmap bitmap, final NotificationCompat.Builder builder) {
+//        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+//            @Override
+//            public void onGenerated(Palette palette) {
+//                Palette.Swatch swatch = palette.getMutedSwatch();
+//                if (swatch != null) {
+//                    notificationColorCache.put(bitmap, swatch.getRgb());
+//                    builder.setColor(swatch.getRgb());
+//                    mNotificationManager.notify(NOTIFICATION_ID, builder.build());
+//                }
+//            }
+//        });
+//    }
+
+    String[] colors = new String[]{"#fb7299", "#50cdd4", "#000000"};
+    int index = 0;
+
     @Override
     public void onMusicSwitch(SongInfo music) {
         mSongInfo = music;
         getPresenter().getLrcInfo(music.getSongId());
         mBtnPlayPause.setImageResource(R.drawable.ic_play);
         updateUI(music);
+
     }
 
     @Override
@@ -252,6 +273,11 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
                 break;
             case R.id.btn_next:
                 if (MusicManager.get().hasNext()) {
+                    index++;
+                    if (index == colors.length - 1) {
+                        index = 0;
+                    }
+                    MusicManager.get().updateNotificationThemeColor(Color.parseColor(colors[index]));
                     MusicManager.get().playNext();
                 } else {
                     Toast.makeText(mContext, "没有下一首了", Toast.LENGTH_SHORT).show();

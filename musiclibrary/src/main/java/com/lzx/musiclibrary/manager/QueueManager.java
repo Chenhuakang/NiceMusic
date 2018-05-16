@@ -36,6 +36,7 @@ public class QueueManager {
         mListener = listener;
         this.mPlayMode = playMode;
         mContext = context;
+
     }
 
     public void updatePlayModel(PlayMode playModel) {
