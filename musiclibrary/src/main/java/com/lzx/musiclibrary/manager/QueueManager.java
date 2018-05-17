@@ -9,11 +9,14 @@ import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.constans.PlayMode;
 import com.lzx.musiclibrary.helper.QueueHelper;
 import com.lzx.musiclibrary.utils.AlbumArtCache;
+import com.lzx.musiclibrary.utils.SPUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static com.lzx.musiclibrary.control.PlayController.KEY_PLAY_MODE_IS_SAVE_LOCAL;
 
 /**
  * Created by xian on 2018/1/20.
@@ -36,7 +39,10 @@ public class QueueManager {
         mListener = listener;
         this.mPlayMode = playMode;
         mContext = context;
+    }
 
+    public Context getContext() {
+        return mContext;
     }
 
     public void updatePlayModel(PlayMode playModel) {
@@ -45,7 +51,12 @@ public class QueueManager {
     }
 
     private void setUpRandomQueue() {
-        isPlayRandomModel = mPlayMode.getCurrPlayMode() == PlayMode.PLAY_IN_RANDOM || mPlayMode.getCurrPlayMode(mContext) == PlayMode.PLAY_IN_RANDOM;
+        boolean isPlayModeSaveLocal = (boolean) SPUtils.get(mContext, KEY_PLAY_MODE_IS_SAVE_LOCAL, false);
+        if (isPlayModeSaveLocal) {
+            isPlayRandomModel = mPlayMode.getCurrPlayMode(mContext) == PlayMode.PLAY_IN_RANDOM;
+        } else {
+            isPlayRandomModel = mPlayMode.getCurrPlayMode() == PlayMode.PLAY_IN_RANDOM;
+        }
         if (isPlayRandomModel) {
             mNormalOrderQueue.clear();
             mNormalOrderQueue.addAll(mPlayingQueue);
@@ -272,7 +283,9 @@ public class QueueManager {
     private SongInfo getNextOrPreMusicInfo(int amount) {
         SongInfo info = null;
         SongInfo songInfo = mPlayingQueue.get(mCurrentIndex + amount);
-        switch (mPlayMode.getCurrPlayMode()) {
+        boolean isPlayModeSaveLocal = (boolean) SPUtils.get(mContext, KEY_PLAY_MODE_IS_SAVE_LOCAL, false);
+        int playMode = isPlayModeSaveLocal ? mPlayMode.getCurrPlayMode(mContext) : mPlayMode.getCurrPlayMode();
+        switch (playMode) {
             //单曲循环
             case PlayMode.PLAY_IN_SINGLE_LOOP:
                 info = getCurrentMusic();

@@ -19,6 +19,7 @@ import com.lzx.musiclibrary.notification.NotificationCreater;
 import com.lzx.musiclibrary.notification.SystemNotification;
 import com.lzx.musiclibrary.playback.PlaybackManager;
 import com.lzx.musiclibrary.playback.player.Playback;
+import com.lzx.musiclibrary.utils.SPUtils;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ import java.util.List;
 
 public class PlayController implements QueueManager.MetadataUpdateListener, PlaybackManager.PlaybackServiceCallback {
 
+    public static String KEY_PLAY_MODE_IS_SAVE_LOCAL = "KEY_PLAY_MODE_IS_SAVE_LOCAL";
     private MusicService mMusicService;
     private QueueManager mQueueManager;
     private PlaybackManager mPlaybackManager;
@@ -122,6 +124,7 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
     }
 
     public void setPlayMode(int mode, boolean isSaveLocal) {
+        SPUtils.put(mMusicService.getApplicationContext(), KEY_PLAY_MODE_IS_SAVE_LOCAL, isSaveLocal);
         if (isSaveLocal) {
             mPlayMode.setCurrPlayMode(mMusicService, mode);
         } else {

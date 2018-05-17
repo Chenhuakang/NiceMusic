@@ -15,7 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
-import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
 
 import com.lzx.musiclibrary.MusicService;
@@ -57,7 +56,6 @@ public class SystemNotification implements IMediaNotification {
     private Notification mNotification;
     private NotificationCompat.Builder notificationBuilder;
     private PlaybackManager mPlaybackManager;
-    private int mNotificationColor = -1;
 
     public SystemNotification(MusicService musicService, NotificationCreater creater, PlaybackManager playbackManager) {
         mService = musicService;
