@@ -842,17 +842,6 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public void updateNotificationThemeColor(int themeColor) {
-        if (control != null) {
-            try {
-                control.updateNotificationThemeColor(themeColor);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
     public void registerPlayerEventListener(IOnPlayerEventListener listener) {
         //Do nothing
     }

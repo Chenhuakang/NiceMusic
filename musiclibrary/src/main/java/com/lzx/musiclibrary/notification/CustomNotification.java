@@ -251,11 +251,6 @@ public class CustomNotification implements IMediaNotification {
         }
     }
 
-    @Override
-    public void updateNotificationThemeColor(int themeColor) {
-
-    }
-
     /**
      * 更新Notification的RemoteView
      */

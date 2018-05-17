@@ -417,11 +417,4 @@ public class PlayControl extends IPlayControl.Stub {
     public int getAudioSessionId() {
         return mController.getAudioSessionId();
     }
-
-    @Override
-    public void updateNotificationThemeColor(int themeColor) {
-        mController.updateNotificationThemeColor(themeColor);
-    }
-
-
 }

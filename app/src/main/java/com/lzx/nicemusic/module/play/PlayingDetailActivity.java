@@ -184,23 +184,6 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
         return lrc;
     }
 
-    //    private void fetchPictureColor(final Bitmap bitmap, final NotificationCompat.Builder builder) {
-//        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-//            @Override
-//            public void onGenerated(Palette palette) {
-//                Palette.Swatch swatch = palette.getMutedSwatch();
-//                if (swatch != null) {
-//                    notificationColorCache.put(bitmap, swatch.getRgb());
-//                    builder.setColor(swatch.getRgb());
-//                    mNotificationManager.notify(NOTIFICATION_ID, builder.build());
-//                }
-//            }
-//        });
-//    }
-
-    String[] colors = new String[]{"#fb7299", "#50cdd4", "#000000"};
-    int index = 0;
-
     @Override
     public void onMusicSwitch(SongInfo music) {
         mSongInfo = music;
@@ -267,21 +250,18 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
             case R.id.btn_pre:
                 if (MusicManager.get().hasPre()) {
                     MusicManager.get().playPre();
+
                 } else {
                     Toast.makeText(mContext, "没有上一首了", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.btn_next:
                 if (MusicManager.get().hasNext()) {
-                    index++;
-                    if (index == colors.length - 1) {
-                        index = 0;
-                    }
-                    MusicManager.get().updateNotificationThemeColor(Color.parseColor(colors[index]));
                     MusicManager.get().playNext();
                 } else {
                     Toast.makeText(mContext, "没有下一首了", Toast.LENGTH_SHORT).show();
                 }
+
                 break;
         }
     }

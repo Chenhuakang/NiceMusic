@@ -172,17 +172,6 @@ public class SystemNotification implements IMediaNotification {
         }
     }
 
-    @Override
-    public void updateNotificationThemeColor(int themeColor) {
-        mNotificationColor = themeColor;
-        if (mNotificationColor != -1) {
-            notificationBuilder
-                    .setColor(mNotificationColor);
-            mNotificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
-            LogUtil.i("updateNotificationThemeColor  =  " + themeColor);
-        }
-    }
-
     private Notification createNotification() {
         if (mNotificationCreater != null && !TextUtils.isEmpty(mNotificationCreater.getTargetClass())) {
             Class clazz = getTargetClass(mNotificationCreater.getTargetClass());
