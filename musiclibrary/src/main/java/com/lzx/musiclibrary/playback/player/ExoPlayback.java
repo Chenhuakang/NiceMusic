@@ -47,6 +47,7 @@ import com.lzx.musiclibrary.cache.CacheUtils;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.manager.FocusAndLockManager;
 import com.lzx.musiclibrary.utils.BaseUtil;
+import com.lzx.musiclibrary.utils.LogUtil;
 
 import static com.google.android.exoplayer2.C.CONTENT_TYPE_MUSIC;
 import static com.google.android.exoplayer2.C.USAGE_MEDIA;
@@ -90,7 +91,7 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
         mFocusAndLockManager = new FocusAndLockManager(applicationContext, this);
         userAgent = Util.getUserAgent(mContext, "ExoPlayer");
         mediaDataSourceFactory = buildDataSourceFactory(true);
-        mediaDataSourceFactory = buildDataSourceFactory(true);
+        rtmpDataSourceFactory = new RtmpDataSourceFactory();
         builder = CacheUtils.createHttpProxyCacheServerBuilder(mContext, cacheConfig);
         if (cacheConfig != null && cacheConfig.isOpenCacheWhenPlaying()) {
             isOpenCacheWhenPlaying = true;
@@ -302,7 +303,7 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
                         .createMediaSource(uri, handler, listener);
             case C.TYPE_OTHER:
                 boolean isRtmpSource = uri.toString().toLowerCase().startsWith("rtmp://");
-                return new ExtractorMediaSource.Factory(isRtmpSource ? rtmpDataSourceFactory :mediaDataSourceFactory)
+                return new ExtractorMediaSource.Factory(isRtmpSource ? rtmpDataSourceFactory : mediaDataSourceFactory)
                         .createMediaSource(uri, handler, listener);
             default: {
                 throw new IllegalStateException("Unsupported type: " + type);
@@ -527,6 +528,7 @@ public class ExoPlayback implements Playback, FocusAndLockManager.AudioFocusChan
                 default:
                     what = "Unknown: " + error;
             }
+            LogUtil.i("what = " + what);
             if (mCallback != null) {
                 mCallback.onError("ExoPlayer error " + what);
             }
