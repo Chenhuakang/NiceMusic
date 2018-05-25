@@ -226,7 +226,7 @@
             android:gravity="center"
             android:text="顺序播放" />
 
-        <TextView
+    <!--    <TextView
             android:id="@+id/shangyishou"
             android:layout_width="0dp"
             android:layout_height="30dp"
@@ -240,7 +240,7 @@
             android:layout_height="30dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="下一首信息" />
+            android:text="下一首信息" />-->
 
         <TextView
             android:id="@+id/tingzhi"

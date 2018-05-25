@@ -35,8 +35,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
- * @author lzx
- * @date 2018/1/22
+ * lzx
+ * 2018/1/22
  */
 
 public class MusicManager implements IPlayControl {
@@ -97,7 +97,9 @@ public class MusicManager implements IPlayControl {
 
     void attachMusicLibraryBuilder(MusicLibrary.Builder builder) {
         this.mCacheConfig = builder.getCacheConfig();
-        isOpenCacheWhenPlaying = mCacheConfig.isOpenCacheWhenPlaying();
+        if (mCacheConfig != null) {
+            isOpenCacheWhenPlaying = mCacheConfig.isOpenCacheWhenPlaying();
+        }
     }
 
     public void unbindService() {
@@ -567,34 +569,26 @@ public class MusicManager implements IPlayControl {
     }
 
     @Override
-    public void setPlayMode(int mode, boolean isSaveLocal) {
+    public void setPlayMode(int mode) {
         if (control != null) {
             try {
-                control.setPlayMode(mode, isSaveLocal);
+                control.setPlayMode(mode);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public void setPlayMode(int mode) {
-        setPlayMode(mode, false);
-    }
-
     @Override
-    public int getPlayMode(boolean isGetLocal) {
+    public int getPlayMode() {
         if (control != null) {
             try {
-                return control.getPlayMode(isGetLocal);
+                return control.getPlayMode();
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
         }
         return 0;
-    }
-
-    public int getPlayMode() {
-        return getPlayMode(false);
     }
 
     @Override
@@ -767,8 +761,7 @@ public class MusicManager implements IPlayControl {
     }
 
     public static boolean isIdea() {
-        return MusicManager.get().getStatus() == State.STATE_NONE ||
-                MusicManager.get().getStatus() == State.STATE_IDLE;
+        return MusicManager.get().getStatus() == State.STATE_IDLE;
     }
 
     /**

@@ -102,12 +102,12 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
                 songInfos.add(mSongInfo);
             }
             MusicManager.get().playMusic(songInfos, position);
-            PlayingDetailActivity.launch(mContext, songInfos, position);
+            PlayingDetailActivity.launch(mContext, songInfos, 0);
 
-//            //播放asset文件下文件示例
+
 //            SongInfo songInfo = new SongInfo();
 //            songInfo.setSongId("111");
-//            songInfo.setSongUrl("file:///android_asset/abf7b21322edb157b193c82f61bc0b2d");
+//            songInfo.setSongUrl("rtmp://live.hkstv.hk.lxdns.com/live/hks");
 //            MusicManager.get().playMusicByInfo(songInfo);
         });
         mAdapter.setOnItemClickListener((info, position) -> {

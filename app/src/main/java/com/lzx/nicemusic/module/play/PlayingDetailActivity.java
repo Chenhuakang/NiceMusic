@@ -124,14 +124,16 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
             Toast.makeText(mContext, "顺序播放", Toast.LENGTH_SHORT).show();
             MusicManager.get().setPlayMode(PlayMode.PLAY_IN_ORDER);
         });
-        findViewById(R.id.shangyishou).setOnClickListener(v -> {
-            SongInfo songInfo = MusicManager.get().getPreMusic();
-            Toast.makeText(mContext, "上一首信息 = " + songInfo.getSongName(), Toast.LENGTH_SHORT).show();
-        });
-        findViewById(R.id.xiayishou).setOnClickListener(v -> {
-            SongInfo songInfo = MusicManager.get().getNextMusic();
-            Toast.makeText(mContext, "下一首信息 = " + songInfo.getSongName(), Toast.LENGTH_SHORT).show();
-        });
+//        findViewById(R.id.shangyishou).setOnClickListener(v -> {
+//
+//        });
+//        findViewById(R.id.xiayishou).setOnClickListener(v -> {
+//            //播放asset文件下文件示例
+//            SongInfo songInfo = new SongInfo();
+//            songInfo.setSongId(System.currentTimeMillis()+"");
+//            songInfo.setSongUrl("file:///android_asset/abf7b21322edb157b193c82f61bc0b2d");
+//            MusicManager.get().playMusicByInfo(songInfo);
+//        });
         findViewById(R.id.tingzhi).setOnClickListener(v -> {
             Toast.makeText(mContext, "停止", Toast.LENGTH_SHORT).show();
             MusicManager.get().stopMusic();
