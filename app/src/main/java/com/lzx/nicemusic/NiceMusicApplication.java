@@ -13,6 +13,7 @@ import com.lzx.musiclibrary.manager.MusicLibrary;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.notification.NotificationCreater;
 import com.lzx.musiclibrary.utils.BaseUtil;
+import com.lzx.nicemusic.floatwindow.FloatWindowUtils;
 import com.lzx.nicemusic.receiver.MyPlayerReceiver;
 import com.lzx.nicemusic.utils.CrashHandler;
 import com.lzx.nicemusic.utils.SpUtil;
@@ -64,6 +65,8 @@ public class NiceMusicApplication extends Application {
                     .setCacheConfig(cacheConfig)
                     .build();
             musicLibrary.init();
+
+
         }
     }
 

@@ -12,6 +12,7 @@ import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
 import com.lzx.nicemusic.base.BaseMvpActivity;
 import com.lzx.nicemusic.base.mvp.factory.CreatePresenter;
+import com.lzx.nicemusic.floatwindow.FloatWindowUtils;
 import com.lzx.nicemusic.module.main.sectioned.BannerSectioned;
 import com.lzx.nicemusic.module.main.sectioned.ChartTopSectioned;
 import com.lzx.nicemusic.module.main.sectioned.HomeSongSection;
@@ -49,7 +50,8 @@ public class HomeActivity extends BaseMvpActivity<SongListContract.View, SongLis
 
         getNotificationIntentData(getIntent());
 
-       // MusicManager.get().openCacheWhenPlaying(true);
+        FloatWindowUtils.init(this);
+        // MusicManager.get().openCacheWhenPlaying(true);
     }
 
     @Override
