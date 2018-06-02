@@ -1,5 +1,6 @@
 package com.lzx.nicemusic.module.artist.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.support.v4.content.ContextCompat;
@@ -10,9 +11,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
+import com.lzx.musiclibrary.manager.TimerTaskManager;
+import com.lzx.musiclibrary.utils.LogUtil;
 import com.lzx.nicemusic.R;
+import com.lzx.nicemusic.utils.FormatUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,22 +57,37 @@ public class ArtistSongAdapter extends RecyclerView.Adapter<ArtistSongAdapter.Ar
         return new ArtistHolder(view);
     }
 
+    TimerTaskManager manager;
+
+    public void onRemoveUpdateProgressTask(){
+        if (manager!=null){
+            manager.onRemoveUpdateProgressTask();
+            manager = null;
+        }
+    }
+
     @Override
     public void onBindViewHolder(ArtistHolder holder, int position) {
         SongInfo info = mSongInfoList.get(position);
         holder.mMusicNum.setText(String.valueOf(position + 1));
         holder.mMusicName.setText(info.getSongName());
         AnimationDrawable animationDrawable = (AnimationDrawable) holder.mImageAnim.getDrawable();
+
+        manager = new TimerTaskManager();
         if (MusicManager.isCurrMusicIsPlayingMusic(info)) {
             holder.mMusicNum.setVisibility(View.GONE);
             holder.mImageAnim.setVisibility(View.VISIBLE);
             if (MusicManager.isPlaying()) {
                 animationDrawable.start();
+                manager.scheduleSeekBarUpdate();
             } else {
                 animationDrawable.stop();
+                manager.stopSeekBarUpdate();
             }
         } else {
             animationDrawable.stop();
+            manager.onRemoveUpdateProgressTask();
+            manager = null;
             holder.mMusicNum.setVisibility(View.VISIBLE);
             holder.mImageAnim.setVisibility(View.GONE);
         }
@@ -76,6 +96,24 @@ public class ArtistSongAdapter extends RecyclerView.Adapter<ArtistSongAdapter.Ar
                 mOnItemClickListener.onItemClick(info, position);
             }
         });
+
+        if (manager!=null) {
+            manager.setUpdateProgressTask(() -> updateProgress(info, holder));
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void updateProgress(SongInfo songInfo, ArtistHolder holder) {
+        long progress = MusicManager.get().getProgress();
+        if (MusicManager.isCurrMusicIsPlayingMusic(songInfo)) {
+            if (MusicManager.isPlaying()) {
+                holder.mTime.setText(FormatUtil.formatMusicTime(progress));
+            } else {
+                holder.mTime.setText("00:00");
+            }
+        } else {
+            holder.mTime.setText("00:00");
+        }
     }
 
     @Override
@@ -86,7 +124,7 @@ public class ArtistSongAdapter extends RecyclerView.Adapter<ArtistSongAdapter.Ar
 
     class ArtistHolder extends RecyclerView.ViewHolder {
 
-        TextView mMusicNum, mMusicName;
+        TextView mMusicNum, mMusicName, mTime;
         ImageView mImageAnim;
 
         ArtistHolder(View itemView) {
@@ -94,6 +132,7 @@ public class ArtistSongAdapter extends RecyclerView.Adapter<ArtistSongAdapter.Ar
             mMusicNum = itemView.findViewById(R.id.song_num);
             mMusicName = itemView.findViewById(R.id.song_name);
             mImageAnim = itemView.findViewById(R.id.image_anim);
+            mTime = itemView.findViewById(R.id.time);
         }
     }
 

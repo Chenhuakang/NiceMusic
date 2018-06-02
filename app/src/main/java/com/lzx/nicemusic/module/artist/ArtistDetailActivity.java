@@ -173,6 +173,7 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mAdapter.onRemoveUpdateProgressTask();
         MusicManager.get().removePlayerEventListener(this);
     }
 
