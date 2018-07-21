@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -21,14 +20,10 @@ import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.R;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.constans.State;
-import com.lzx.musiclibrary.helper.ResourceHelper;
 import com.lzx.musiclibrary.playback.PlaybackManager;
 import com.lzx.musiclibrary.receiver.PlayerReceiver;
 import com.lzx.musiclibrary.utils.AlbumArtCache;
 import com.lzx.musiclibrary.utils.LogUtil;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 系统通知栏
@@ -127,6 +122,10 @@ public class SystemNotification implements IMediaNotification {
 
     @Override
     public void updateViewStateAtPause() {
+        if (mNotificationCreater != null && mNotificationCreater.isNotificationCanClearBySystemBtn()) {
+            mService.stopForeground(false);
+            mStarted = false;
+        }
         mNotification = createNotification();
         if (mNotification != null) {
             mNotificationManager.notify(NOTIFICATION_ID, mNotification);
@@ -244,7 +243,21 @@ public class SystemNotification implements IMediaNotification {
             openUI.putExtra("bundleInfo", bundle);
         }
         @SuppressLint("WrongConstant")
-        PendingIntent pendingIntent = PendingIntent.getActivity(mService, REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pendingIntent;
+        switch (mNotificationCreater.getPendingIntentMode()) {
+            case PendingIntentMode.MODE_ACTIVITY:
+                pendingIntent = PendingIntent.getActivity(mService, REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT);
+                break;
+            case PendingIntentMode.MODE_BROADCAST:
+                pendingIntent = PendingIntent.getBroadcast(mService, REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT);
+                break;
+            case PendingIntentMode.MODE_SERVICE:
+                pendingIntent = PendingIntent.getService(mService, REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT);
+                break;
+            default:
+                pendingIntent = PendingIntent.getActivity(mService, REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT);
+                break;
+        }
         return pendingIntent;
     }
 
@@ -282,14 +295,16 @@ public class SystemNotification implements IMediaNotification {
             mService.stopForeground(true);
             return;
         }
-        if (mPlaybackManager.getPlayback().getState() == State.STATE_PLAYING && mPlaybackManager.getCurrentPosition() >= 0) {
-            builder.setWhen(System.currentTimeMillis() - mPlaybackManager.getCurrentPosition())
-                    .setShowWhen(true)
-                    .setUsesChronometer(true);
-        } else {
-            builder.setWhen(0).setShowWhen(false).setUsesChronometer(false);
+        //通知栏时间
+        if (mNotificationCreater != null && mNotificationCreater.isSystemNotificationShowTime()) {
+            if (mPlaybackManager.getPlayback().getState() == State.STATE_PLAYING && mPlaybackManager.getCurrentPosition() >= 0) {
+                builder.setWhen(System.currentTimeMillis() - mPlaybackManager.getCurrentPosition())
+                        .setShowWhen(true)
+                        .setUsesChronometer(true);
+            } else {
+                builder.setWhen(0).setShowWhen(false).setUsesChronometer(false);
+            }
         }
-
         builder.setOngoing(mPlaybackManager.getPlayback().getState() == State.STATE_PLAYING);
     }
 

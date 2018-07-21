@@ -25,11 +25,15 @@ public interface Playback {
 
     /**
      * Set the latest playback state as determined by the caller.
+     *
+     * @param state
      */
     void setState(int state);
 
     /**
      * Get the current {@link android.media.session.PlaybackState#getState()}
+     *
+     * @return int
      */
     int getState();
 
@@ -51,6 +55,8 @@ public interface Playback {
 
     /**
      * 获取缓冲进度
+     *
+     * @return position
      */
     long getBufferedPosition();
 
@@ -75,20 +81,32 @@ public interface Playback {
 
     /**
      * 是否打开边播边存
+     *
+     * @param isOpen
      */
     void openCacheWhenPlaying(boolean isOpen);
 
     /**
      * 变速
+     *
+     * @param pitch
+     * @param speed
      */
     void setPlaybackParameters(float speed, float pitch);
 
     /**
      * 设置音量
+     *
+     * @param audioVolume
      */
     void setVolume(float audioVolume);
 
     int getAudioSessionId();
+
+    float getPlaybackSpeed();
+
+
+    float getPlaybackPitch();
 
     interface Callback {
         /**

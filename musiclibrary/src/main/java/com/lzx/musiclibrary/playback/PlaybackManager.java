@@ -58,15 +58,13 @@ public class PlaybackManager implements Playback.Callback {
      */
     public void handlePlayRequest() {
         SongInfo currentMusic = mQueueManager.getCurrentMusic();
-        if (currentMusic != null) {
-
+        if (currentMusic != null && mPlayback.getState() != State.STATE_ASYNC_LOADING) {
             String mediaId = currentMusic.getSongId();
             boolean mediaHasChanged = !TextUtils.equals(mediaId, mCurrentMediaId);
             if (mediaHasChanged) {
                 mCurrentMediaId = mediaId;
                 notifyPlaybackSwitch(currentMusic);
             }
-
             //播放
             mPlayback.play(currentMusic);
             //更新媒体信息
@@ -97,6 +95,9 @@ public class PlaybackManager implements Playback.Callback {
 
     /**
      * 播放/暂停/切歌
+     *
+     * @param isJustPlay
+     * @param isSwitchMusic
      */
     public void handlePlayPauseRequest(boolean isJustPlay, boolean isSwitchMusic) {
         if (isJustPlay) {
@@ -113,7 +114,9 @@ public class PlaybackManager implements Playback.Callback {
                 }
             } else if (state == State.STATE_PAUSED) {
                 handlePlayRequest();
-            }else if (state == State.STATE_STOP){
+            } else if (state == State.STATE_STOP) {
+                handlePlayRequest();
+            } else if (state == State.STATE_ENDED) {
                 handlePlayRequest();
             }
         }
@@ -122,7 +125,7 @@ public class PlaybackManager implements Playback.Callback {
     /**
      * 获取当前进度
      *
-     * @return
+     * @return long
      */
     public long getCurrentPosition() {
         long position = 0;
@@ -141,7 +144,8 @@ public class PlaybackManager implements Playback.Callback {
             mServiceCallback.onPlaybackCompletion();
         }
         if (isAutoPlayNext) {
-            playNextOrPre(1);
+            int playModel = mPlayMode.getCurrPlayMode(mQueueManager.getContext());
+            playNextOrPre(playModel == PlayMode.PLAY_IN_FLASHBACK ? -1 : 1, playModel);
         }
     }
 
@@ -151,7 +155,12 @@ public class PlaybackManager implements Playback.Callback {
      * @param amount 负数为上一首，正数为下一首
      */
     public void playNextOrPre(int amount) {
-        switch (mPlayMode.getCurrPlayMode(mQueueManager.getContext())) {
+        int playModel = mPlayMode.getCurrPlayMode(mQueueManager.getContext());
+        playNextOrPre(amount, playModel);
+    }
+
+    public void playNextOrPre(int amount, int playModel) {
+        switch (playModel) {
             //单曲循环
             case PlayMode.PLAY_IN_SINGLE_LOOP:
                 if (mQueueManager.skipQueuePosition(0)) {
@@ -162,10 +171,12 @@ public class PlaybackManager implements Playback.Callback {
                     handleStopRequest(null);
                 }
                 break;
-            //随机播放
-            case PlayMode.PLAY_IN_RANDOM:
-                //列表循环
-            case PlayMode.PLAY_IN_LIST_LOOP:
+            case PlayMode.PLAY_IN_RANDOM:     //随机播放
+            case PlayMode.PLAY_IN_FLASHBACK:  //倒叙播放
+            case PlayMode.PLAY_IN_LIST_LOOP:  //列表循环
+                if (mQueueManager.getCurrentQueueSize() == 1) {
+                    handleStopRequest(null);
+                }
                 if (mQueueManager.skipQueuePosition(amount)) {
                     handlePlayRequest();
                 }
@@ -180,6 +191,7 @@ public class PlaybackManager implements Playback.Callback {
                     handleStopRequest(null);
                 }
                 break;
+
             default:
                 handleStopRequest(null);
                 break;
@@ -245,6 +257,8 @@ public class PlaybackManager implements Playback.Callback {
 
     /**
      * 获取当前媒体id
+     *
+     * @return id
      */
     public String getCurrentMediaId() {
         return mPlayback.getCurrentMediaId();
@@ -429,6 +443,9 @@ public class PlaybackManager implements Playback.Callback {
          * Since this method runs on the main thread, most apps with non-trivial metadata
          * should defer the actual search to another thread (for example, by using
          * an {@link AsyncTask} as we do here).
+         *
+         * @param extras
+         * @param query
          **/
         @Override
         public void onPlayFromSearch(final String query, final Bundle extras) {

@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.lzx.musiclibrary.utils.SPUtils;
 
+import static com.lzx.musiclibrary.constans.Constans.music_key_play_model;
+
 /**
  * Created by xian on 2018/1/28.
  */
@@ -22,16 +24,19 @@ public class PlayMode {
     //顺序播放
     public static final int PLAY_IN_ORDER = 4;
 
+    //倒叙播放
+    public static final int PLAY_IN_FLASHBACK = 5;
+
     private int currPlayMode = PLAY_IN_LIST_LOOP;
 
     public int getCurrPlayMode(Context context) {
-        currPlayMode = (int) SPUtils.get(context, "music_key_play_model", PLAY_IN_LIST_LOOP);
+        currPlayMode = (int) SPUtils.get(context, music_key_play_model, PLAY_IN_LIST_LOOP);
         return currPlayMode;
     }
 
     public void setCurrPlayMode(Context context, int currPlayMode) {
         this.currPlayMode = currPlayMode;
-        SPUtils.put(context, "music_key_play_model", currPlayMode);
+        SPUtils.put(context, music_key_play_model, currPlayMode);
     }
 
 }

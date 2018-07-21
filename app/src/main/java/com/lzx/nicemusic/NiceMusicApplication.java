@@ -12,6 +12,7 @@ import com.lzx.musiclibrary.cache.CacheUtils;
 import com.lzx.musiclibrary.manager.MusicLibrary;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.notification.NotificationCreater;
+import com.lzx.musiclibrary.notification.PendingIntentMode;
 import com.lzx.musiclibrary.utils.BaseUtil;
 import com.lzx.nicemusic.floatwindow.FloatWindowUtils;
 import com.lzx.nicemusic.receiver.MyPlayerReceiver;
@@ -52,6 +53,9 @@ public class NiceMusicApplication extends Application {
             NotificationCreater creater = new NotificationCreater.Builder()
                     .setTargetClass("com.lzx.nicemusic.module.main.HomeActivity")
                     .setCreateSystemNotification(true)
+                    .setNotificationCanClearBySystemBtn(true)
+                    .setSystemNotificationShowTime(true)
+                    .setPendingIntentMode(PendingIntentMode.MODE_ACTIVITY)
                     .build();
 
             //边播边存配置
@@ -63,6 +67,7 @@ public class NiceMusicApplication extends Application {
             MusicLibrary musicLibrary = new MusicLibrary.Builder(this)
                     .setNotificationCreater(creater)
                     .setCacheConfig(cacheConfig)
+                    .setUseMediaPlayer(false)
                     .build();
             musicLibrary.init();
 

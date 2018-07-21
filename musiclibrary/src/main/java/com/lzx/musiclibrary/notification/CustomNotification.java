@@ -434,8 +434,23 @@ public class CustomNotification implements IMediaNotification {
         if (bundle != null) {
             openUI.putExtra("bundleInfo", bundle);
         }
+
         @SuppressLint("WrongConstant")
-        PendingIntent pendingIntent = PendingIntent.getActivity(mService, REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pendingIntent;
+        switch (mNotificationCreater.getPendingIntentMode()) {
+            case PendingIntentMode.MODE_ACTIVITY:
+                pendingIntent = PendingIntent.getActivity(mService, REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT);
+                break;
+            case PendingIntentMode.MODE_BROADCAST:
+                pendingIntent = PendingIntent.getBroadcast(mService, REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT);
+                break;
+            case PendingIntentMode.MODE_SERVICE:
+                pendingIntent = PendingIntent.getService(mService, REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT);
+                break;
+            default:
+                pendingIntent = PendingIntent.getActivity(mService, REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT);
+                break;
+        }
         return pendingIntent;
     }
 
@@ -473,7 +488,7 @@ public class CustomNotification implements IMediaNotification {
     private void updateRemoteViewUI(Notification notification, int smallIconRes) {
         boolean isDark = NotificationColorUtils.isDarkNotificationBar(mService, notification);
         String artistName;
-        if (!TextUtils.isEmpty(mSongInfo.getAlbumInfo().getAlbumName())) {
+        if (mSongInfo.getAlbumInfo() != null && !TextUtils.isEmpty(mSongInfo.getAlbumInfo().getAlbumName())) {
             artistName = mSongInfo.getArtist() + " - " + mSongInfo.getAlbumInfo().getAlbumName();
         } else {
             artistName = mSongInfo.getArtist();

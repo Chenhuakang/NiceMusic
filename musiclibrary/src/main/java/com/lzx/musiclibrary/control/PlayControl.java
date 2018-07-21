@@ -11,7 +11,6 @@ import com.lzx.musiclibrary.aidl.source.IOnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.source.IOnTimerTaskListener;
 import com.lzx.musiclibrary.aidl.source.IPlayControl;
 import com.lzx.musiclibrary.cache.CacheConfig;
-import com.lzx.musiclibrary.constans.PlayMode;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.helper.QueueHelper;
 import com.lzx.musiclibrary.notification.NotificationCreater;
@@ -30,7 +29,7 @@ public class PlayControl extends IPlayControl.Stub {
 
     private MusicService mService;
 
-    private PlayController mController;
+    private PlayControlImpl mController;
     private Playback playback;
 
     private RemoteCallbackList<IOnPlayerEventListener> mRemoteCallbackList;
@@ -39,7 +38,7 @@ public class PlayControl extends IPlayControl.Stub {
     private NotifyContract.NotifyStatusChanged mNotifyStatusChanged;
     private NotifyContract.NotifyMusicSwitch mNotifyMusicSwitch;
     private NotifyContract.NotifyTimerTask mNotifyTimerTask;
-
+    private boolean isAsyncLoading = false;
 
     private PlayControl(Builder builder) {
         mService = builder.mMusicService;
@@ -55,7 +54,7 @@ public class PlayControl extends IPlayControl.Stub {
                 ? new MediaPlayback(mService.getApplicationContext(), builder.cacheConfig, builder.isGiveUpAudioFocusManager)
                 : new ExoPlayback(mService.getApplicationContext(), builder.cacheConfig, builder.isGiveUpAudioFocusManager);
 
-        mController = new PlayController.Builder(mService)
+        mController = new PlayControlImpl.Builder(mService)
                 .setAutoPlayNext(builder.isAutoPlayNext)
                 .setNotifyMusicSwitch(mNotifyMusicSwitch)
                 .setNotifyStatusChanged(mNotifyStatusChanged)
@@ -65,7 +64,7 @@ public class PlayControl extends IPlayControl.Stub {
                 .build();
     }
 
-    public PlayController getController() {
+    public PlayControlImpl getController() {
         return mController;
     }
 
@@ -126,13 +125,19 @@ public class PlayControl extends IPlayControl.Stub {
                                     listener.onPlayCompletion();
                                     break;
                                 case State.STATE_ASYNC_LOADING:
-                                    listener.onAsyncLoading(true);
+                                    isAsyncLoading = true;
+                                    listener.onAsyncLoading(false);
                                     break;
                                 case State.STATE_PLAYING:
-                                    listener.onAsyncLoading(false);
+                                    isAsyncLoading = false;
+                                    listener.onAsyncLoading(true);
                                     listener.onPlayerStart();
                                     break;
                                 case State.STATE_PAUSED:
+                                    if (isAsyncLoading) {
+                                        listener.onAsyncLoading(true);
+                                        isAsyncLoading = false;
+                                    }
                                     listener.onPlayerPause();
                                     break;
                                 case State.STATE_ENDED:
@@ -142,7 +147,7 @@ public class PlayControl extends IPlayControl.Stub {
                                     listener.onPlayerStop();
                                     break;
                                 case State.STATE_ERROR:
-                                    listener.onError("");
+                                    listener.onError(errorMsg);
                                     break;
                             }
                         } catch (RemoteException e) {
@@ -187,6 +192,24 @@ public class PlayControl extends IPlayControl.Stub {
                     if (listener != null) {
                         try {
                             listener.onTimerFinish();
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                mOnTimerTaskListenerList.finishBroadcast();
+            }
+        }
+
+        @Override
+        public void onTimerTick(long millisUntilFinished, long totalTime) {
+            synchronized (PlayControl.class) {
+                final int N = mOnTimerTaskListenerList.beginBroadcast();
+                for (int i = 0; i < N; i++) {
+                    IOnTimerTaskListener listener = mOnTimerTaskListenerList.getBroadcastItem(i);
+                    if (listener != null) {
+                        try {
+                            listener.onTimerTick(millisUntilFinished, totalTime);
                         } catch (RemoteException e) {
                             e.printStackTrace();
                         }
@@ -415,5 +438,15 @@ public class PlayControl extends IPlayControl.Stub {
     @Override
     public int getAudioSessionId() {
         return mController.getAudioSessionId();
+    }
+
+    @Override
+    public float getPlaybackSpeed() {
+        return mController.getPlaybackSpeed();
+    }
+
+    @Override
+    public float getPlaybackPitch() {
+        return mController.getPlaybackPitch();
     }
 }

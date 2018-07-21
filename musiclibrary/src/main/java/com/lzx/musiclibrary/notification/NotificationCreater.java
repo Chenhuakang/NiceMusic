@@ -10,21 +10,24 @@ import android.os.Parcelable;
 
 public class NotificationCreater implements Parcelable {
 
-    private boolean isCreateSystemNotification;
-    private boolean isNotificationCanClearBySystemBtn;
-    private String targetClass;
-    private String contentTitle;
-    private String contentText;
-    private PendingIntent startOrPauseIntent;
-    private PendingIntent nextIntent;
-    private PendingIntent preIntent;
-    private PendingIntent closeIntent;
-    private PendingIntent favoriteIntent;
-    private PendingIntent lyricsIntent;
-    private PendingIntent playIntent;
-    private PendingIntent pauseIntent;
-    private PendingIntent stopIntent;
-    private PendingIntent downloadIntent;
+
+    private boolean isCreateSystemNotification;   //是否使用系统通知栏
+    private boolean isNotificationCanClearBySystemBtn; //是否让通知栏当暂停的时候可以滑动清除
+    private String targetClass; //通知栏点击转跳界面
+    private String contentTitle; //通知栏标题
+    private String contentText;  //通知栏内容
+    private PendingIntent startOrPauseIntent; //播放或暂停按钮 PendingIntent
+    private PendingIntent nextIntent; //下一首按钮 PendingIntent
+    private PendingIntent preIntent; //上一首按钮 PendingIntent
+    private PendingIntent closeIntent; //关闭按钮 PendingIntent
+    private PendingIntent favoriteIntent; //喜欢或收藏按钮 PendingIntent
+    private PendingIntent lyricsIntent; //桌面歌词按钮 PendingIntent
+    private PendingIntent playIntent; //播放按钮 PendingIntent
+    private PendingIntent pauseIntent; // 暂停按钮 PendingIntent
+    private PendingIntent stopIntent; //停止按钮 PendingIntent
+    private PendingIntent downloadIntent; //下载按钮 PendingIntent
+    private int pendingIntentMode; //通知栏点击模式
+    private boolean isSystemNotificationShowTime; //系统通知栏是否显示时间
 
     private NotificationCreater(Builder builder) {
         this.isCreateSystemNotification = builder.isCreateSystemNotification;
@@ -42,6 +45,8 @@ public class NotificationCreater implements Parcelable {
         this.pauseIntent = builder.pauseIntent;
         this.stopIntent = builder.stopIntent;
         this.downloadIntent = builder.downloadIntent;
+        this.pendingIntentMode = builder.pendingIntentMode;
+        this.isSystemNotificationShowTime = builder.isSystemNotificationShowTime;
     }
 
     public static class Builder {
@@ -60,6 +65,8 @@ public class NotificationCreater implements Parcelable {
         private PendingIntent pauseIntent;
         private PendingIntent stopIntent;
         private PendingIntent downloadIntent;
+        private int pendingIntentMode;
+        private boolean isSystemNotificationShowTime;
 
         public Builder setCreateSystemNotification(boolean createSystemNotification) {
             isCreateSystemNotification = createSystemNotification;
@@ -136,6 +143,16 @@ public class NotificationCreater implements Parcelable {
             return this;
         }
 
+        public Builder setPendingIntentMode(int pendingIntentMode) {
+            this.pendingIntentMode = pendingIntentMode;
+            return this;
+        }
+
+        public Builder setSystemNotificationShowTime(boolean systemNotificationShowTime) {
+            isSystemNotificationShowTime = systemNotificationShowTime;
+            return this;
+        }
+
         public NotificationCreater build() {
             return new NotificationCreater(this);
         }
@@ -201,6 +218,14 @@ public class NotificationCreater implements Parcelable {
         return downloadIntent;
     }
 
+    public int getPendingIntentMode() {
+        return pendingIntentMode;
+    }
+
+    public boolean isSystemNotificationShowTime() {
+        return isSystemNotificationShowTime;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -210,6 +235,7 @@ public class NotificationCreater implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeByte(this.isCreateSystemNotification ? (byte) 1 : (byte) 0);
         dest.writeByte(this.isNotificationCanClearBySystemBtn ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.isSystemNotificationShowTime ? (byte) 1 : (byte) 0);
         dest.writeString(this.targetClass);
         dest.writeString(this.contentTitle);
         dest.writeString(this.contentText);
@@ -223,11 +249,13 @@ public class NotificationCreater implements Parcelable {
         dest.writeParcelable(this.pauseIntent, flags);
         dest.writeParcelable(this.stopIntent, flags);
         dest.writeParcelable(this.downloadIntent, flags);
+        dest.writeInt(this.pendingIntentMode);
     }
 
     protected NotificationCreater(Parcel in) {
         this.isCreateSystemNotification = in.readByte() != 0;
         this.isNotificationCanClearBySystemBtn = in.readByte() != 0;
+        this.isSystemNotificationShowTime = in.readByte() != 0;
         this.targetClass = in.readString();
         this.contentTitle = in.readString();
         this.contentText = in.readString();
@@ -241,6 +269,7 @@ public class NotificationCreater implements Parcelable {
         this.pauseIntent = in.readParcelable(PendingIntent.class.getClassLoader());
         this.stopIntent = in.readParcelable(PendingIntent.class.getClassLoader());
         this.downloadIntent = in.readParcelable(PendingIntent.class.getClassLoader());
+        this.pendingIntentMode = in.readInt();
     }
 
     public static final Parcelable.Creator<NotificationCreater> CREATOR = new Parcelable.Creator<NotificationCreater>() {

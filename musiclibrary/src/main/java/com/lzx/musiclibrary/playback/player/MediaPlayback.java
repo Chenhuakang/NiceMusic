@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.PlaybackParams;
-import android.media.audiofx.Visualizer;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -19,9 +18,13 @@ import com.lzx.musiclibrary.cache.CacheUtils;
 import com.lzx.musiclibrary.constans.State;
 import com.lzx.musiclibrary.manager.FocusAndLockManager;
 import com.lzx.musiclibrary.utils.BaseUtil;
+import com.lzx.musiclibrary.utils.LogUtil;
+import com.lzx.musiclibrary.utils.SPUtils;
 
 import java.io.IOException;
 
+import static com.lzx.musiclibrary.constans.Constans.play_back_pitch;
+import static com.lzx.musiclibrary.constans.Constans.play_back_speed;
 import static com.lzx.musiclibrary.manager.FocusAndLockManager.AUDIO_NO_FOCUS_CAN_DUCK;
 import static com.lzx.musiclibrary.manager.FocusAndLockManager.AUDIO_NO_FOCUS_NO_DUCK;
 import static com.lzx.musiclibrary.manager.FocusAndLockManager.VOLUME_DUCK;
@@ -35,7 +38,7 @@ public class MediaPlayback implements Playback,
         FocusAndLockManager.AudioFocusChangeListener,
         MediaPlayer.OnPreparedListener,
         MediaPlayer.OnCompletionListener,
-        MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener {
+        MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnSeekCompleteListener {
 
     private boolean isOpenCacheWhenPlaying = false;
     private boolean mPlayOnFocusGain;
@@ -234,6 +237,9 @@ public class MediaPlayback implements Playback,
                 //当播放中发生错误的时候回调
                 mMediaPlayer.setOnErrorListener(this);
                 mMediaPlayer.setOnBufferingUpdateListener(this);
+                mMediaPlayer.setOnSeekCompleteListener(this);
+
+                changePlaybackParameters();
             }
 
             try {
@@ -250,6 +256,18 @@ public class MediaPlayback implements Playback,
             mFocusAndLockManager.acquireWifiLock();
         } else {
             configurePlayerState();
+        }
+    }
+
+    private void changePlaybackParameters() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            float spSpeed = (float) SPUtils.get(mContext, play_back_speed, 1f);
+            float spPitch = (float) SPUtils.get(mContext, play_back_pitch, 1f);
+            float currSpeed = mMediaPlayer.getPlaybackParams().getSpeed();
+            float currPitch = mMediaPlayer.getPlaybackParams().getPitch();
+            if (spSpeed != currSpeed || spPitch != currPitch) {
+                setPlaybackParameters(spSpeed, spPitch);
+            }
         }
     }
 
@@ -330,6 +348,24 @@ public class MediaPlayback implements Playback,
         return 0;
     }
 
+    @Override
+    public float getPlaybackSpeed() {
+        if (mMediaPlayer != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return mMediaPlayer.getPlaybackParams().getSpeed();
+        } else {
+            return (float) SPUtils.get(mContext, play_back_speed, 1f);
+        }
+    }
+
+    @Override
+    public float getPlaybackPitch() {
+        if (mMediaPlayer != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return mMediaPlayer.getPlaybackParams().getPitch();
+        } else {
+            return (float) SPUtils.get(mContext, play_back_pitch, 1f);
+        }
+    }
+
 
     @Override
     public void setCallback(Callback callback) {
@@ -373,5 +409,11 @@ public class MediaPlayback implements Playback,
         } else {
             currbufferedPosition = percent * getDuration();
         }
+    }
+
+    @Override
+    public void onSeekComplete(MediaPlayer mediaPlayer) {
+       //TODO
+        LogUtil.i("-------------------onSeekComplete------------------");
     }
 }

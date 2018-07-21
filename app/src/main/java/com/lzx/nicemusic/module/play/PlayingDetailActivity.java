@@ -117,30 +117,26 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
 
 
         findViewById(R.id.shuiji).setOnClickListener(v -> {
-            Toast.makeText(mContext, "随机播放", Toast.LENGTH_SHORT).show();
-            MusicManager.get().setPlayMode(PlayMode.PLAY_IN_RANDOM);
+            Toast.makeText(mContext, "1", Toast.LENGTH_SHORT).show();
+            MusicManager.get().setPlaybackParameters(1f, 1f);
         });
         findViewById(R.id.shunxu).setOnClickListener(v -> {
-            Toast.makeText(mContext, "顺序播放", Toast.LENGTH_SHORT).show();
-            MusicManager.get().setPlayMode(PlayMode.PLAY_IN_ORDER);
+            Toast.makeText(mContext, "2", Toast.LENGTH_SHORT).show();
+            MusicManager.get().setPlaybackParameters(2f, 1f);
         });
-//        findViewById(R.id.shangyishou).setOnClickListener(v -> {
-//
-//        });
-//        findViewById(R.id.xiayishou).setOnClickListener(v -> {
-//            //播放asset文件下文件示例
-//            SongInfo songInfo = new SongInfo();
-//            songInfo.setSongId(System.currentTimeMillis()+"");
-//            songInfo.setSongUrl("file:///android_asset/abf7b21322edb157b193c82f61bc0b2d");
-//            MusicManager.get().playMusicByInfo(songInfo);
-//        });
+        findViewById(R.id.shangyishou).setOnClickListener(v -> {
+            Toast.makeText(mContext, "3", Toast.LENGTH_SHORT).show();
+            MusicManager.get().setPlaybackParameters(3f, 1f);
+        });
+        findViewById(R.id.xiayishou).setOnClickListener(v -> {
+            Toast.makeText(mContext, "4", Toast.LENGTH_SHORT).show();
+            MusicManager.get().setPlaybackParameters(4f, 1f);
+        });
         findViewById(R.id.tingzhi).setOnClickListener(v -> {
             Toast.makeText(mContext, "停止", Toast.LENGTH_SHORT).show();
             MusicManager.get().stopMusic();
             MusicManager.get().stopNotification();
         });
-
-
     }
 
     private void updateUI(SongInfo music) {
@@ -231,7 +227,7 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
 
     @Override
     public void onAsyncLoading(boolean isFinishLoading) {
-
+        LogUtil.i("onAsyncLoading = " + isFinishLoading);
     }
 
     @Override

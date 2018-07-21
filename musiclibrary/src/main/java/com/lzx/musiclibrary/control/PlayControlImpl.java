@@ -23,6 +23,9 @@ import com.lzx.musiclibrary.utils.SPUtils;
 
 import java.util.List;
 
+import static com.lzx.musiclibrary.constans.Constans.play_back_pitch;
+import static com.lzx.musiclibrary.constans.Constans.play_back_speed;
+
 /**
  * 运行在Remote端
  * <p>
@@ -30,7 +33,7 @@ import java.util.List;
  * 2018/2/8
  */
 
-public class PlayController implements QueueManager.MetadataUpdateListener, PlaybackManager.PlaybackServiceCallback {
+public class PlayControlImpl implements QueueManager.MetadataUpdateListener, PlaybackManager.PlaybackServiceCallback {
 
     private MusicService mMusicService;
     private QueueManager mQueueManager;
@@ -45,7 +48,7 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
 
     private IMediaNotification mNotification;
 
-    private PlayController(Builder builder) {
+    private PlayControlImpl(Builder builder) {
         this.mMusicService = builder.mMusicService;
         this.mPlayback = builder.mPlayback;
         this.mNotifyStatusChanged = builder.mNotifyStatusChanged;
@@ -117,8 +120,8 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
             return this;
         }
 
-        public PlayController build() {
-            return new PlayController(this);
+        public PlayControlImpl build() {
+            return new PlayControlImpl(this);
         }
     }
 
@@ -240,7 +243,17 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
         return mPlaybackManager.getAudioSessionId();
     }
 
-    void pausePlayInMillis(long time) {
+
+    public float getPlaybackSpeed() {
+        return mPlayback.getPlaybackSpeed();
+    }
+
+
+    public float getPlaybackPitch() {
+        return mPlayback.getPlaybackPitch();
+    }
+
+    void pausePlayInMillis(final long time) {
         mTimerTaskManager.cancelCountDownTask();
         if (time != -1) {
             mTimerTaskManager.starCountDownTask(time, new TimerTaskManager.OnCountDownFinishListener() {
@@ -254,7 +267,7 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
 
                 @Override
                 public void onTick(long millisUntilFinished) {
-
+                    mNotifyTimerTask.onTimerTick(millisUntilFinished, time);
                 }
             });
         }
@@ -270,6 +283,8 @@ public class PlayController implements QueueManager.MetadataUpdateListener, Play
     }
 
     void setPlaybackParameters(float speed, float pitch) {
+        SPUtils.put(mMusicService.getApplicationContext(), play_back_speed, speed);
+        SPUtils.put(mMusicService.getApplicationContext(), play_back_pitch, pitch);
         mPlayback.setPlaybackParameters(speed, pitch);
     }
 

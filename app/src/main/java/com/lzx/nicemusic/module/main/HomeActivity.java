@@ -1,11 +1,14 @@
 package com.lzx.nicemusic.module.main;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.TextView;
 
+import com.jakewharton.rxbinding2.view.RxView;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.utils.LogUtil;
@@ -23,6 +26,7 @@ import com.lzx.nicemusic.module.main.presenter.SongListPresenter;
 import java.util.List;
 
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
+import io.reactivex.functions.Consumer;
 
 /**
  * @author lzx
@@ -39,6 +43,7 @@ public class HomeActivity extends BaseMvpActivity<SongListContract.View, SongLis
         return R.layout.activity_home;
     }
 
+    @SuppressLint("CheckResult")
     @Override
     protected void init(Bundle savedInstanceState) {
         mRecyclerView = findViewById(R.id.recycle_view);
@@ -51,7 +56,20 @@ public class HomeActivity extends BaseMvpActivity<SongListContract.View, SongLis
         getNotificationIntentData(getIntent());
 
         FloatWindowUtils.init(this);
-        // MusicManager.get().openCacheWhenPlaying(true);
+
+        TextView title = findViewById(R.id.title);
+        RxView.clicks(title)
+                .subscribe(new Consumer<Object>() {
+                    @Override
+                    public void accept(Object o) throws Exception {
+                        LogUtil.i("o = " + o);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        LogUtil.i("throwable = " + throwable.getMessage());
+                    }
+                });
     }
 
     @Override

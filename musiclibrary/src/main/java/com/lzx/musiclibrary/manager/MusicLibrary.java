@@ -5,14 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import android.os.RemoteException;
+import android.support.v4.content.ContextCompat;
 
 import com.lzx.musiclibrary.MusicService;
 import com.lzx.musiclibrary.aidl.source.IPlayControl;
 import com.lzx.musiclibrary.cache.CacheConfig;
-import com.lzx.musiclibrary.control.PlayController;
 import com.lzx.musiclibrary.notification.NotificationCreater;
-import com.lzx.musiclibrary.playback.PlayStateObservable;
 
 /**
  * Created by xian on 2018/5/15.
@@ -20,6 +18,7 @@ import com.lzx.musiclibrary.playback.PlayStateObservable;
 
 public class MusicLibrary {
 
+    public static boolean isInitLibrary = false;
     private Context mContext;
     private boolean isUseMediaPlayer;
     private boolean isAutoPlayNext;
@@ -113,6 +112,9 @@ public class MusicLibrary {
     }
 
     private void init(boolean isStartService) {
+        if (isInitLibrary) {
+            return;
+        }
         Intent intent = new Intent(mContext, MusicService.class);
         intent.putExtra("isUseMediaPlayer", isUseMediaPlayer);
         intent.putExtra("isAutoPlayNext", isAutoPlayNext);
@@ -120,7 +122,7 @@ public class MusicLibrary {
         intent.putExtra("notificationCreater", mNotificationCreater);
         intent.putExtra("cacheConfig", mCacheConfig);
         if (isStartService) {
-            mContext.startService(intent);
+            ContextCompat.startForegroundService(mContext, intent);
         }
         mContext.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
@@ -132,10 +134,12 @@ public class MusicLibrary {
             MusicManager.get().attachPlayControl(mContext, control);
             MusicManager.get().attachServiceConnection(this);
             MusicManager.get().attachMusicLibraryBuilder(mBuilder);
+            isInitLibrary = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
+            isInitLibrary = false;
         }
     };
 }

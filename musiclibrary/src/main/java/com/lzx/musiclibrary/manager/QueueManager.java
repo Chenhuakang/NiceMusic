@@ -72,6 +72,8 @@ public class QueueManager {
 
     /**
      * 获取播放列表
+     *
+     * @return list
      */
     public List<SongInfo> getPlayingQueue() {
         return isPlayRandomModel ? mNormalOrderQueue : mPlayingQueue;
@@ -79,6 +81,8 @@ public class QueueManager {
 
     /**
      * 获取当前索引
+     *
+     * @return index
      */
     public int getCurrentIndex() {
         return mCurrentIndex;
@@ -197,6 +201,7 @@ public class QueueManager {
      * 转跳到指定位置
      *
      * @param amount 维度
+     * @return boolean
      */
     public boolean skipQueuePosition(int amount) {
         if (mPlayingQueue.size() == 0) {
@@ -204,8 +209,13 @@ public class QueueManager {
         } else {
             int index = mCurrentIndex + amount;
             if (index < 0) {
-                // 在第一首歌曲之前向后跳，让你在第一首歌曲上
-                index = 0;
+                // 在第一首歌曲是上一首，让你在第一首歌曲上
+                int playModel = mPlayMode.getCurrPlayMode(mContext);
+                if (playModel == PlayMode.PLAY_IN_FLASHBACK || playModel == PlayMode.PLAY_IN_LIST_LOOP) { //如果是倒序或者列表循环，则回去最后一首
+                    index = mPlayingQueue.size() - 1;
+                } else {
+                    index = 0;
+                }
             } else {
                 //当在最后一首歌时点下一首将返回第一首个
                 index %= mPlayingQueue.size();
@@ -237,7 +247,9 @@ public class QueueManager {
     /**
      * 设置当前的音乐item，用于播放
      *
-     * @param musicId 音乐id
+     * @param musicId       音乐id
+     * @param isJustPlay
+     * @param isSwitchMusic
      */
     public void setCurrentQueueItem(String musicId, boolean isJustPlay, boolean isSwitchMusic) {
         int index = QueueHelper.getMusicIndexOnQueue(mPlayingQueue, musicId);
@@ -247,7 +259,9 @@ public class QueueManager {
     /**
      * 设置当前的音乐item，用于播放
      *
-     * @param index 队列下标
+     * @param index         队列下标
+     * @param isJustPlay
+     * @param isSwitchMusic
      */
     private void setCurrentQueueIndex(int index, boolean isJustPlay, boolean isSwitchMusic) {
         if (index >= 0 && index < mPlayingQueue.size()) {
@@ -260,6 +274,8 @@ public class QueueManager {
 
     /**
      * 得到上一首音乐信息
+     *
+     * @return SongInfo
      */
     public SongInfo getPreMusicInfo() {
         return getNextOrPreMusicInfo(-1);
@@ -267,6 +283,8 @@ public class QueueManager {
 
     /**
      * 得到下一首音乐信息
+     *
+     * @return SongInfo
      */
     public SongInfo getNextMusicInfo() {
         return getNextOrPreMusicInfo(1);
@@ -280,10 +298,9 @@ public class QueueManager {
             case PlayMode.PLAY_IN_SINGLE_LOOP:
                 info = getCurrentMusic();
                 break;
-            //随机播放
-            case PlayMode.PLAY_IN_RANDOM:
-                //列表循环
-            case PlayMode.PLAY_IN_LIST_LOOP:
+            case PlayMode.PLAY_IN_RANDOM:     //随机播放
+            case PlayMode.PLAY_IN_FLASHBACK:  //倒叙播放
+            case PlayMode.PLAY_IN_LIST_LOOP:  //列表循环
                 info = songInfo == null ? getCurrentMusic() : songInfo;
                 break;
             //顺序播放

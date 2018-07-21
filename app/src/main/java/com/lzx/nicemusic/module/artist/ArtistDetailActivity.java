@@ -101,8 +101,13 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
             } else {
                 songInfos.add(mSongInfo);
             }
-            MusicManager.get().playMusic(songInfos, position);
-            PlayingDetailActivity.launch(mContext, songInfos, 0);
+          //  SongInfo songInfo = new SongInfo();
+         //   songInfo.setSongId("111");
+        //    songInfo.setSongUrl("http://img-tailor.11222.cn/miaodu/app/201804116b030adab3bf7832d3f65f21022b86a6.m4a");
+           // songInfo.setSongUrl("http://igetoss.cdn.igetget.com/aac/201806/27/48000_201806270929260963665613.m4a");
+             MusicManager.get().playMusic(songInfos, position);
+//            MusicManager.get().playMusicByInfo(songInfo);
+//            PlayingDetailActivity.launch(mContext, songInfos, 0);
 
 
 //            SongInfo songInfo = new SongInfo();
