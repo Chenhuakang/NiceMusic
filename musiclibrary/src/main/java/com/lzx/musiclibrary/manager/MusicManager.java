@@ -898,6 +898,11 @@ public class MusicManager implements IPlayControl {
         return 0;
     }
 
+
+    public void setAuditionList(List<SongInfo> auditionList) {
+        setPlayList(auditionList);
+    }
+
     @Override
     public void registerPlayerEventListener(IOnPlayerEventListener listener) {
         //Do nothing

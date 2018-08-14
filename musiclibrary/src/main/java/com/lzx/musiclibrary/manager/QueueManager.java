@@ -9,10 +9,8 @@ import com.lzx.musiclibrary.aidl.model.SongInfo;
 import com.lzx.musiclibrary.constans.PlayMode;
 import com.lzx.musiclibrary.helper.QueueHelper;
 import com.lzx.musiclibrary.utils.AlbumArtCache;
-import com.lzx.musiclibrary.utils.SPUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 

@@ -76,6 +76,7 @@ public class PlayControlImpl implements QueueManager.MetadataUpdateListener, Pla
         }
     }
 
+
     public static class Builder {
         private MusicService mMusicService;
         private Playback mPlayback;

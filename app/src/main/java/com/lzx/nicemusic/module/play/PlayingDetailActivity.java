@@ -184,6 +184,8 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
 
     @Override
     public void onMusicSwitch(SongInfo music) {
+        LogUtil.i("--->" + MusicManager.get().getCurrPlayingIndex() + " --->" + music.getSongName());
+
         mSongInfo = music;
         getPresenter().getLrcInfo(music.getSongId());
         mBtnPlayPause.setImageResource(R.drawable.ic_play);
@@ -208,6 +210,9 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
 
     @Override
     public void onPlayCompletion() {
+
+        MusicManager.get().pauseMusic();
+
         mBtnPlayPause.setImageResource(R.drawable.ic_play);
         mSeekBar.setProgress(0);
         mStartTime.setText("00:00");
@@ -227,7 +232,7 @@ public class PlayingDetailActivity extends BaseMvpActivity<PlayContract.View, Pl
 
     @Override
     public void onAsyncLoading(boolean isFinishLoading) {
-        LogUtil.i("onAsyncLoading = " + isFinishLoading);
+        //LogUtil.i("onAsyncLoading = " + isFinishLoading);
     }
 
     @Override

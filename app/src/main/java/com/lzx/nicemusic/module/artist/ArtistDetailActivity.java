@@ -10,6 +10,7 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import com.lzx.musiclibrary.aidl.listener.OnPlayerEventListener;
 import com.lzx.musiclibrary.aidl.model.SongInfo;
+import com.lzx.musiclibrary.constans.PlayMode;
 import com.lzx.musiclibrary.helper.QueueHelper;
 import com.lzx.musiclibrary.manager.MusicManager;
 import com.lzx.musiclibrary.utils.LogUtil;
@@ -101,19 +103,8 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
             } else {
                 songInfos.add(mSongInfo);
             }
-          //  SongInfo songInfo = new SongInfo();
-         //   songInfo.setSongId("111");
-        //    songInfo.setSongUrl("http://img-tailor.11222.cn/miaodu/app/201804116b030adab3bf7832d3f65f21022b86a6.m4a");
-           // songInfo.setSongUrl("http://igetoss.cdn.igetget.com/aac/201806/27/48000_201806270929260963665613.m4a");
-             MusicManager.get().playMusic(songInfos, position);
-//            MusicManager.get().playMusicByInfo(songInfo);
-//            PlayingDetailActivity.launch(mContext, songInfos, 0);
-
-
-//            SongInfo songInfo = new SongInfo();
-//            songInfo.setSongId("111");
-//            songInfo.setSongUrl("rtmp://live.hkstv.hk.lxdns.com/live/hks");
-//            MusicManager.get().playMusicByInfo(songInfo);
+            MusicManager.get().playMusic(songInfos, position);
+            PlayingDetailActivity.launch(mContext, songInfos, position);
         });
         mAdapter.setOnItemClickListener((info, position) -> {
             List<SongInfo> songInfos = mAdapter.getSongInfoList();
@@ -127,6 +118,34 @@ public class ArtistDetailActivity extends BaseMvpActivity<ArtistContract.View, A
         Bundle bundle = new Bundle();
         bundle.putString("name", "大妈的");
         MusicManager.get().updateNotificationContentIntent(bundle, null);
+
+
+        findViewById(R.id.btn_pre).setOnClickListener(v -> {
+            if (MusicManager.get().hasPre()) {
+                MusicManager.get().playPre();
+            }
+        });
+        findViewById(R.id.btn_next).setOnClickListener(v -> {
+            if (MusicManager.get().hasNext()) {
+                MusicManager.get().playNext();
+            }
+        });
+        findViewById(R.id.btn_play_mode).setOnClickListener(v -> {
+            int mode = MusicManager.get().getPlayMode();
+            if (mode == PlayMode.PLAY_IN_LIST_LOOP) {
+                MusicManager.get().setPlayMode(PlayMode.PLAY_IN_ORDER);
+                Toast.makeText(mContext, "顺序播放", Toast.LENGTH_SHORT).show();
+            } else if (mode == PlayMode.PLAY_IN_ORDER) {
+                MusicManager.get().setPlayMode(PlayMode.PLAY_IN_SINGLE_LOOP);
+                Toast.makeText(mContext, "单曲循环", Toast.LENGTH_SHORT).show();
+            } else if (mode == PlayMode.PLAY_IN_SINGLE_LOOP) {
+                MusicManager.get().setPlayMode(PlayMode.PLAY_IN_RANDOM);
+                Toast.makeText(mContext, "随机播放", Toast.LENGTH_SHORT).show();
+            } else if (mode == PlayMode.PLAY_IN_RANDOM) {
+                MusicManager.get().setPlayMode(PlayMode.PLAY_IN_LIST_LOOP);
+                Toast.makeText(mContext, "列表循环", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void initUI(SongInfo info) {

@@ -410,7 +410,7 @@ public interface IPlayControl extends android.os.IInterface {
                     reply.writeFloat(_result);
                     return true;
                 }
-                case TRANSACTION_getPlaybackPitch:{
+                case TRANSACTION_getPlaybackPitch: {
                     data.enforceInterface(DESCRIPTOR);
                     float _result = this.getPlaybackPitch();
                     reply.writeNoException();
@@ -1333,6 +1333,8 @@ public interface IPlayControl extends android.os.IInterface {
                 }
                 return _result;
             }
+
+
         }
 
         static final int TRANSACTION_playMusic = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);
@@ -1378,6 +1380,7 @@ public interface IPlayControl extends android.os.IInterface {
         static final int TRANSACTION_getAudioSessionId = (android.os.IBinder.FIRST_CALL_TRANSACTION + 40);
         static final int TRANSACTION_getPlaybackSpeed = (android.os.IBinder.FIRST_CALL_TRANSACTION + 41);
         static final int TRANSACTION_getPlaybackPitch = (android.os.IBinder.FIRST_CALL_TRANSACTION + 42);
+
     }
 
     //播放，并设置播放列表
@@ -1506,4 +1509,6 @@ public interface IPlayControl extends android.os.IInterface {
 
     //获取播放音调
     float getPlaybackPitch() throws android.os.RemoteException;
+
+
 }
