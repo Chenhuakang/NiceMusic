@@ -11,7 +11,8 @@
 
 ## Statement
 这是一个音频集成库  [StarrySky](https://github.com/lizixian18/StarrySky) 的一个小 demo。  
-UI 来自项目  [Music-Player](https://github.com/andremion/Music-Player),接口来自网易云音乐。
+UI 来自项目  [Music-Player](https://github.com/andremion/Music-Player)，接口来自网易云音乐。  
+demo 写得并不是那么的不完善，主要作用是简单演示一下 StarrySky 的使用方法。
 
 
 如果你有想法或者意见和建议，欢迎提issue，喜欢点个star。
