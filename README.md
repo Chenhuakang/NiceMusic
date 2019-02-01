@@ -1,28 +1,21 @@
 # NiceMusic
 
-### A Nice MusicPlayer Powered by [MusicLibrary](https://github.com/lizixian18/MusicLibrary)
+### A Nice MusicPlayer Powered by [StarrySky](https://github.com/lizixian18/StarrySky)
 
-![](art/ic_launcher.png)
 
 ## Screenshots ：
-<a href="art/image_1.png"><img src="art/image_1.png" width="30%"/></a>
-<a href="art/image_2.png"><img src="art/image_2.png" width="30%"/></a> 
-<a href="art/image_3.png"><img src="art/image_3.png" width="30%"/></a>
+<a href="art/art1.png"><img src="art/art1.png" width="30%"/></a>
+<a href="art/art2.png"><img src="art/art2.png" width="30%"/></a> 
+<a href="art/art3.png"><img src="art/art3.png" width="30%"/></a>
 
-<a href="art/live.png"><img src="art/live.png" width="30%"/></a>
-<a href="art/notif_sys.png"><img src="art/notif_sys.png" width="30%"/></a>
-<a href="art/notif_user.png"><img src="art/notif_user.png" width="30%"/></a>
-
-<a href="art/image_4.png"><img src="art/image_4.png" width="30%"/></a>
-<a href="art/image_5.png"><img src="art/image_5.png" width="30%"/></a> 
-<a href="art/ic_gif.gif"><img src="art/ic_gif.gif" width="30%"/></a>
 
 ## Statement
-本项目现阶段旨在尽量模拟各种场景来测试[MusicLibrary](https://github.com/lizixian18/MusicLibrary)，并作为一个例子去使用[MusicLibrary](https://github.com/lizixian18/MusicLibrary)，
-所以做得比较粗糙，界面也不多，以后会慢慢完善起来，暂不提供Apk下载，有兴趣可以下载代码运行一下，一起学习。
+这是一个音频集成库  [StarrySky](https://github.com/lizixian18/StarrySky) 的一个小 demo。  
+UI 来自项目  [Music-Player](https://github.com/andremion/Music-Player),接口来自网易云音乐。
 
 
 如果你有想法或者意见和建议，欢迎提issue，喜欢点个star。
+
 
 #### About me
 An android developer in GuangZhou  
