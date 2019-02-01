@@ -201,11 +201,13 @@ public class DetailActivity extends PlayerActivity implements MusicCoverView.Cal
     @Override
     public void onPlayerStart() {
         mTimerTaskManager.startToUpdateProgress();
+        mCoverView.start();
     }
 
     @Override
     public void onPlayerPause() {
         mTimerTaskManager.stopToUpdateProgress();
+        mCoverView.stop();
     }
 
     @Override
@@ -231,7 +233,6 @@ public class DetailActivity extends PlayerActivity implements MusicCoverView.Cal
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        MusicManager.getInstance().removePlayerEventListener(this);
         mTimerTaskManager.removeUpdateProgressTask();
     }
 

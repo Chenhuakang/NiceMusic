@@ -10,7 +10,9 @@ public class MusicApplication extends Application {
     public void onCreate() {
         super.onCreate();
         MusicManager.initMusicManager(this);
+        //配置通知栏
         NotificationConstructor constructor = new NotificationConstructor.Builder()
+                .setCreateSystemNotification(false)
                 .bulid();
         MusicManager.getInstance().setNotificationConstructor(constructor);
     }

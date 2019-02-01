@@ -170,6 +170,7 @@ public class MainActivity extends PlayerActivity implements OnPlayerEventListene
 
     @Override
     public void onPlayerStart() {
+        LogUtil.i("onPlayerStart = ");
         mTimerTaskManager.startToUpdateProgress();
     }
 
@@ -215,5 +216,6 @@ public class MainActivity extends PlayerActivity implements OnPlayerEventListene
     protected void onDestroy() {
         super.onDestroy();
         mTimerTaskManager.removeUpdateProgressTask();
+        MusicManager.getInstance().removePlayerEventListener(this);
     }
 }
