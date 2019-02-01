@@ -184,13 +184,13 @@ public class DetailActivity extends PlayerActivity implements MusicCoverView.Cal
     }
 
     public void onFabClick(View view) {
-       // MusicManager.getInstance().pauseMusic();
+        MusicManager.getInstance().pauseMusic();
         mCoverView.stop();
     }
 
     @Override
     public void onBackPressed() {
-        onFabClick(null);
+        mCoverView.stop();
     }
 
     @Override

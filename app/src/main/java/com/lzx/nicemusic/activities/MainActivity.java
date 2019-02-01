@@ -106,7 +106,7 @@ public class MainActivity extends PlayerActivity implements OnPlayerEventListene
 
         mTimerTaskManager.setUpdateProgressTask(() -> {
             long position = MusicManager.getInstance().getPlayingPosition();
-            long duration = MusicManager.getInstance().getDuration()/1000;
+            long duration = MusicManager.getInstance().getDuration() / 1000;
             if (mProgressView.getMax() != duration) {
                 mProgressView.setMax((int) duration);
                 mDurationView.setText(Utils.formatMusicTime(duration));
@@ -137,6 +137,17 @@ public class MainActivity extends PlayerActivity implements OnPlayerEventListene
     }
 
     public void onFabClick(View view) {
+        if (MusicManager.getInstance().getPlayList().size() == 0) {
+            SongInfo songInfo = new SongInfo();
+            songInfo.setSongId("30431376");
+            songInfo.setSongName("易燃易爆炸");
+            songInfo.setArtist("陈粒");
+            songInfo.setAlbumName("如也");
+            songInfo.setDuration(200000);
+            songInfo.setSongCover("http://img.jammyfm.com/wordpress/wp-content/uploads/2017/07/201707261110447854.jpg");
+            songInfo.setSongUrl("http://music.163.com/song/media/outer/url?id=" + songInfo.getSongId() + ".mp3");
+            MusicManager.getInstance().playMusicByInfo(songInfo);
+        }
         //noinspection unchecked
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
                 new Pair<>(mCoverView, ViewCompat.getTransitionName(mCoverView)),
