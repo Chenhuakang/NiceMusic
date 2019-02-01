@@ -164,7 +164,7 @@ public class DetailActivity extends PlayerActivity implements MusicCoverView.Cal
     }
 
     public void updateUI(SongInfo songInfo) {
-        if (songInfo != null) {
+        if (songInfo != null && !isDestroyed() && !isFinishing()) {
             Glide.with(this).load(songInfo.getSongCover()).into(mCoverView);
             mSongTitle.setText(songInfo.getSongName());
             mArtist.setText(songInfo.getArtist());

@@ -36,7 +36,7 @@ public abstract class PlayerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MediaSessionConnection.getInstance(this).connect();
+
     }
 
     @Override
@@ -62,7 +62,7 @@ public abstract class PlayerActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        MediaSessionConnection.getInstance(this).disconnect();
+
     }
 
 

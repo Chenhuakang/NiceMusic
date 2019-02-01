@@ -40,6 +40,7 @@ import com.lzx.nicemusic.utils.LogUtil;
 import com.lzx.nicemusic.utils.Utils;
 import com.lzx.nicemusic.view.ProgressView;
 import com.lzx.nicemusic.view.RecyclerViewAdapter;
+import com.lzx.starrysky.manager.MediaSessionConnection;
 import com.lzx.starrysky.manager.MusicManager;
 import com.lzx.starrysky.manager.OnPlayerEventListener;
 import com.lzx.starrysky.model.SongInfo;
@@ -81,6 +82,9 @@ public class MainActivity extends PlayerActivity implements OnPlayerEventListene
         mCounter = findViewById(R.id.counter);
 
         mRecyclerView = findViewById(R.id.tracks);
+
+        MediaSessionConnection.getInstance(this).connect();
+
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new RecyclerViewAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
@@ -161,6 +165,7 @@ public class MainActivity extends PlayerActivity implements OnPlayerEventListene
 
     @Override
     public void onMusicSwitch(SongInfo songInfo) {
+        LogUtil.i("= onMusicSwitch = "+songInfo.getSongName());
         Glide.with(this)
                 .load(songInfo.getSongCover())
                 .into(mCoverView);
@@ -170,7 +175,6 @@ public class MainActivity extends PlayerActivity implements OnPlayerEventListene
 
     @Override
     public void onPlayerStart() {
-        LogUtil.i("onPlayerStart = ");
         mTimerTaskManager.startToUpdateProgress();
     }
 
