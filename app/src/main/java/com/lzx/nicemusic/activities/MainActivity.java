@@ -96,7 +96,7 @@ public class MainActivity extends PlayerActivity implements OnPlayerEventListene
 
             @Override
             public void onItemClick(List<SongInfo> list, int position) {
-                MusicManager.getInstance().playMusic(list, position);
+                MusicManager.getInstance().playMusicByInfo(list.get(position));
             }
         });
 
@@ -165,7 +165,7 @@ public class MainActivity extends PlayerActivity implements OnPlayerEventListene
 
     @Override
     public void onMusicSwitch(SongInfo songInfo) {
-        LogUtil.i("= onMusicSwitch = "+songInfo.getSongName());
+        LogUtil.i("= onMusicSwitch = " + songInfo.getSongName());
         Glide.with(this)
                 .load(songInfo.getSongCover())
                 .into(mCoverView);
