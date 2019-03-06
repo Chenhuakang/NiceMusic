@@ -38,14 +38,12 @@ import com.lzx.nicemusic.bean.Personalized
 import com.lzx.nicemusic.utils.InjectorUtils
 import com.lzx.nicemusic.utils.LogUtil
 import com.lzx.nicemusic.utils.Utils
-import com.lzx.nicemusic.view.ProgressView
 import com.lzx.nicemusic.view.RecyclerViewAdapter
 import com.lzx.starrysky.manager.MediaSessionConnection
 import com.lzx.starrysky.manager.MusicManager
 import com.lzx.starrysky.manager.OnPlayerEventListener
 import com.lzx.starrysky.model.SongInfo
 import com.lzx.starrysky.utils.TimerTaskManager
-import io.reactivex.functions.Consumer
 
 
 class MainActivity : PlayerActivity(), OnPlayerEventListener {
@@ -83,7 +81,7 @@ class MainActivity : PlayerActivity(), OnPlayerEventListener {
         mRecyclerView!!.layoutManager = LinearLayoutManager(this)
         mAdapter = RecyclerViewAdapter(this)
         mRecyclerView!!.adapter = mAdapter
-        mAdapter!!.setOnItemClickListener(object : RecyclerViewAdapter.onItemClickListener {
+        mAdapter!!.setOnItemClickListener(object : RecyclerViewAdapter.OnItemClickListener {
             override fun onItemClick(personalized: Personalized, position: Int) {
                 updatePlayList(personalized, position)
             }
@@ -94,7 +92,7 @@ class MainActivity : PlayerActivity(), OnPlayerEventListener {
         })
 
         mViewModel = ViewModelProviders
-                .of(this, InjectorUtils.provideMainActivityViewModel(this))
+                .of(this, InjectorUtils.provideMainActivityViewModel())
                 .get(MainViewModel::class.java)
 
         mTimerTaskManager = TimerTaskManager()
@@ -113,13 +111,13 @@ class MainActivity : PlayerActivity(), OnPlayerEventListener {
         }
 
         mViewModel!!.requestPersonalized().subscribe({
-            mAdapter!!.setPersonalizeds(it)
+            mAdapter!!.setPersonalised(it)
         }, { it.printStackTrace() })
     }
 
     @SuppressLint("CheckResult", "SetTextI18n")
     fun updatePlayList(personalized: Personalized, position: Int) {
-        mViewModel!!.requestPlayListDetail(personalized.id)
+        mViewModel!!.requestPlayListDetail(personalized.id!!)
                 .subscribe({
                     if (it.size > 0) {
                         MusicManager.getInstance().updatePlayList(it)
