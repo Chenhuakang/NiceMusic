@@ -99,9 +99,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             });
         } else {
             Personalized personalized = mPersonalizeds.get(position);
-            coverImgUrl = personalized.picUrl;
-            title = personalized.name;
-            artist = personalized.copywriter;
+            coverImgUrl = personalized.getPicUrl();
+            title = personalized.getName();
+            artist = personalized.getCopywriter();
             holder.mDurationView.setVisibility(View.GONE);
             holder.mView.setOnClickListener(v -> {
                 if (mOnItemClickListener != null) {

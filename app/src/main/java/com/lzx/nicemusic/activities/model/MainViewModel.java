@@ -35,7 +35,7 @@ public class MainViewModel extends ViewModel {
     private String before;
 
     public MainViewModel(Context context) {
-        mMediaApi = RetrofitHelper.get().createApi(MediaApi.class);
+        mMediaApi = RetrofitHelper.Companion.get().createApi(MediaApi.class);
         mContext = context;
     }
 
@@ -94,10 +94,10 @@ public class MainViewModel extends ViewModel {
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject object = jsonArray.getJSONObject(i);
                         Personalized personalized = new Personalized();
-                        personalized.id = object.optString("id");
-                        personalized.name = object.optString("name");
-                        personalized.copywriter = object.optString("copywriter");
-                        personalized.picUrl = object.optString("picUrl");
+                        personalized.setId(object.optString("id"));
+                        personalized.setName(object.optString("name"));
+                        personalized.setCopywriter(object.optString("copywriter"));
+                        personalized.setPicUrl(object.optString("picUrl"));
                         list.add(personalized);
                     }
                     return list;
