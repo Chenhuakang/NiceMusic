@@ -92,8 +92,8 @@ class MainActivity : PlayerActivity(), OnPlayerEventListener {
         })
 
         mViewModel = ViewModelProviders
-                .of(this, InjectorUtils.provideMainActivityViewModel())
-                .get(MainViewModel::class.java)
+            .of(this, InjectorUtils.provideMainActivityViewModel())
+            .get(MainViewModel::class.java)
 
         mTimerTaskManager = TimerTaskManager()
 
@@ -118,16 +118,16 @@ class MainActivity : PlayerActivity(), OnPlayerEventListener {
     @SuppressLint("CheckResult", "SetTextI18n")
     fun updatePlayList(personalized: Personalized, position: Int) {
         mViewModel!!.requestPlayListDetail(personalized.id!!)
-                .subscribe({
-                    if (it.size > 0) {
-                        MusicManager.getInstance().updatePlayList(it)
-                        mAdapter!!.isShowPlayList = true
-                        mAdapter!!.setSongInfos(it, false)
-                        val songInfo = it[0]
-                        mName!!.text = songInfo.albumName
-                        mCounter!!.text = "By:" + songInfo.albumArtist
-                    }
-                }, { it.printStackTrace() })
+            .subscribe({
+                if (it.size > 0) {
+                    MusicManager.getInstance().updatePlayList(it)
+                    mAdapter!!.isShowPlayList = true
+                    mAdapter!!.setSongInfos(it, false)
+                    val songInfo = it[0]
+                    mName!!.text = songInfo.albumName
+                    mCounter!!.text = "By:" + songInfo.albumArtist
+                }
+            }, { it.printStackTrace() })
     }
 
     fun onFabClick(view: View) {
@@ -139,25 +139,26 @@ class MainActivity : PlayerActivity(), OnPlayerEventListener {
             songInfo.albumName = "如也"
             songInfo.duration = 200000
             songInfo.songCover = "http://img.jammyfm.com/wordpress/wp-content/uploads/2017/07/201707261110447854.jpg"
-            songInfo.songUrl = "http://music.163.com/song/media/outer/url?id=" + songInfo.songId + ".mp3"
+            //songInfo.songUrl = "http://music.163.com/song/media/outer/url?id=" + songInfo.songId + ".mp3"
+            songInfo.songUrl = "http://image.gqfxcn.com/attachment/mp3/21/1560745095.mp3"
             MusicManager.getInstance().playMusicByInfo(songInfo)
         }
 
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
-                Pair(mCoverView, ViewCompat.getTransitionName(mCoverView!!)),
-                Pair(mTitleView, ViewCompat.getTransitionName(mTitleView!!)),
-                Pair(mTimeView, ViewCompat.getTransitionName(mTimeView!!)),
-                Pair(mDurationView, ViewCompat.getTransitionName(mDurationView!!)),
-                Pair(mProgressView, ViewCompat.getTransitionName(mProgressView!!)),
-                Pair(mFabView, ViewCompat.getTransitionName(mFabView!!)))
+            Pair(mCoverView, ViewCompat.getTransitionName(mCoverView!!)),
+            Pair(mTitleView, ViewCompat.getTransitionName(mTitleView!!)),
+            Pair(mTimeView, ViewCompat.getTransitionName(mTimeView!!)),
+            Pair(mDurationView, ViewCompat.getTransitionName(mDurationView!!)),
+            Pair(mProgressView, ViewCompat.getTransitionName(mProgressView!!)),
+            Pair(mFabView, ViewCompat.getTransitionName(mFabView!!)))
         ActivityCompat.startActivity(this, Intent(this, DetailActivity::class.java), options.toBundle())
     }
 
     override fun onMusicSwitch(songInfo: SongInfo) {
         LogUtil.i("= onMusicSwitch = " + songInfo.songName)
         Glide.with(this)
-                .load(songInfo.songCover)
-                .into(mCoverView!!)
+            .load(songInfo.songCover)
+            .into(mCoverView!!)
         mSongTitle!!.text = songInfo.songName
         mArtist!!.text = songInfo.artist
     }
@@ -179,7 +180,6 @@ class MainActivity : PlayerActivity(), OnPlayerEventListener {
     }
 
     override fun onBuffering() {
-
     }
 
     override fun onError(errorCode: Int, errorMsg: String) {

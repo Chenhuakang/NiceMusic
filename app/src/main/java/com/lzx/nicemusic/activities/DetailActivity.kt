@@ -23,8 +23,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-
 import com.bumptech.glide.Glide
+
 import com.lzx.nicemusic.R
 import com.lzx.nicemusic.utils.Utils
 import com.lzx.nicemusic.view.ProgressView
@@ -111,13 +111,11 @@ class DetailActivity : PlayerActivity(), MusicCoverView.Callbacks, OnPlayerEvent
                         MusicManager.getInstance().repeatMode = PlaybackStateCompat.REPEAT_MODE_ONE
                         Toast.makeText(this, "设置为单曲循环", Toast.LENGTH_SHORT).show()
                         mRepeatView!!.setImageResource(R.drawable.ic_repeat_one_white_24dp)
-
                     }
                     PlaybackStateCompat.REPEAT_MODE_ONE -> {
                         MusicManager.getInstance().repeatMode = PlaybackStateCompat.REPEAT_MODE_ALL
                         Toast.makeText(this, "设置为列表循环", Toast.LENGTH_SHORT).show()
                         mRepeatView!!.setImageResource(R.drawable.ic_repeat_white_24dp)
-
                     }
                     PlaybackStateCompat.REPEAT_MODE_ALL -> {
                         MusicManager.getInstance().repeatMode = PlaybackStateCompat.REPEAT_MODE_NONE
@@ -133,7 +131,6 @@ class DetailActivity : PlayerActivity(), MusicCoverView.Callbacks, OnPlayerEvent
                     MusicManager.getInstance().shuffleMode = PlaybackStateCompat.SHUFFLE_MODE_ALL
                     mShuffleView!!.setImageResource(R.drawable.ic_shuffle_white_24dp)
                     Toast.makeText(this, "设置为随机播放", Toast.LENGTH_SHORT).show()
-
                 } else {
                     MusicManager.getInstance().shuffleMode = PlaybackStateCompat.SHUFFLE_MODE_NONE
                     mShuffleView!!.setImageResource(R.drawable.ic_repeat_all_white_24dp)
@@ -205,7 +202,6 @@ class DetailActivity : PlayerActivity(), MusicCoverView.Callbacks, OnPlayerEvent
     }
 
     override fun onBuffering() {
-
     }
 
     override fun onError(errorCode: Int, errorMsg: String) {
@@ -216,6 +212,4 @@ class DetailActivity : PlayerActivity(), MusicCoverView.Callbacks, OnPlayerEvent
         super.onDestroy()
         mTimerTaskManager!!.removeUpdateProgressTask()
     }
-
-
 }
